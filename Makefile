@@ -13,11 +13,11 @@ setup:	CMakeLists.txt
 
 # Build the project (lib and src)
 build:	setup
-	cmake --build $(BUILD_DIR) --target XXTEMPLATEXX > /dev/zero
+	cmake --build $(BUILD_DIR) --target Bachelor > /dev/zero
 
 # Build the benchmarking tool
 run:	build
-	./$(BUILD_DIR)/XXTEMPLATEXX
+	./$(BUILD_DIR)/Bachelor
 
 # Build and run the tests
 test:	build

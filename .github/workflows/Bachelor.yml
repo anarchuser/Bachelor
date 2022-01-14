@@ -1,4 +1,4 @@
-name: XXTEMPLATEXX
+name: Bachelor
 on: [push]
 jobs:
   dependencies:
@@ -17,9 +17,9 @@ jobs:
       - name: configure cmake
         run:  cmake -H. -Bbuild
       - name: Build src and lib files
-        run:  cmake --build build --target XXTEMPLATEXX
+        run:  cmake --build build --target Bachelor
       - name: Run the benchmarks
-        run: ./build/XXTEMPLATEXX
+        run: ./build/Bachelor
 
   tests:
     needs:    dependencies
