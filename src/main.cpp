@@ -15,12 +15,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <glog/logging.h>
+
+#include "Server/Server.h"
+
+#define PORT 50000
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    LOG (INFO) << "Hello World";
-    std::cout << "Hello World" << std::endl;
+    bt::Server (PORT).run();
 }
