@@ -28,7 +28,7 @@ jobs:
       - name: install google logging library
         run:  sudo apt install -y libgoogle-glog-dev
       - name: download catch2 v2
-        run:  git clone -b v2.x https://github.com/catchorg/Catch2.git
+        run:  git clone https://github.com/catchorg/Catch2.git
       - name: setup catch2
         run:  cmake -BCatch2/build -HCatch2 -DBUILD_TESTING=OFF
       - name: build and install catch2
