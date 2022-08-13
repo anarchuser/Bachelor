@@ -20,8 +20,10 @@ namespace bt {
 
         [[noreturn]] virtual void service () final;
 
+        virtual void send (int receiver, std::string const & msg);
+
     protected:
-        virtual void process (std::string const & packet);
+        virtual void process (int sender, std::string const & msg);
 
     private:
         struct sockaddr_in address = {0};

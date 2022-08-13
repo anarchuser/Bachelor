@@ -17,12 +17,25 @@
 
 #include <glog/logging.h>
 
+#include <thread>
+
 #include "Socket/Socket.h"
 
-#define PORT 50000
+#define PORT1 50000
+#define PORT2 50001
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Socket (PORT).service ();
+    bt::Socket s1 (PORT1);
+    bt::Socket s2 (PORT2);
+
+    std::thread thread (& bt::Socket::service, s1);
+
+    s2.send (PORT1, "Hello, World!");
+    for (char c = 'a'; c <= 'z'; c++) {
+        s2.send (PORT1, std::string ("Counter = ") + c);
+    }
+
+    thread.join();
 }

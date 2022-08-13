@@ -25,17 +25,26 @@ namespace bt {
 
     void Socket::service () {
         char buffer [MAX_PAYLOAD_BYTES] = {0};
-        struct sockaddr_in client = {0};
+        struct sockaddr_in sender = {0};
 
         while (true) {
             socklen_t length;
-            std::size_t read = recvfrom (socket_fd, buffer, MAX_PAYLOAD_BYTES, MSG_WAITFORONE, (struct sockaddr *) & client, & length);
-            process ({buffer, read});
+            std::size_t read = recvfrom (socket_fd, buffer, MAX_PAYLOAD_BYTES, MSG_WAITFORONE, (struct sockaddr *) & sender, & length);
+            process (ntohs (sender.sin_port), {buffer, read});
         }
     }
 
-    void Socket::process (std::string const & packet) {
-        LOG (INFO) << packet.length() << "\t| " << packet;
+    void Socket::send (int receiver, std::string const & msg) {
+        LOG (INFO) << " SEND | " << receiver << " | " << msg.length() << "\t| " << msg;
+        struct sockaddr_in recv_addr = { .sin_family = AF_INET
+                                       , .sin_port = htons (receiver)
+                                       , .sin_addr = {.s_addr = INADDR_ANY}};
+
+        sendto (socket_fd, (char const *) msg.c_str(), msg.length(), 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+    }
+
+    void Socket::process (int sender, std::string const & msg) {
+        LOG (INFO) << " RECV | " << sender << " | " << msg.length() << "\t| " << msg;
     }
 }
 
