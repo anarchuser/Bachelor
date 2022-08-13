@@ -1,7 +1,7 @@
-#include "Server.h"
+#include "Socket.h"
 
 namespace bt {
-    Server::Server (int port)
+    Socket::Socket (int port)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -16,14 +16,14 @@ namespace bt {
                     throw (std::domain_error ("Could not bind to address"));
                 }
 
-                LOG (INFO) << "Server listening on port " << port;
+                LOG (INFO) << "Socket listening on port " << port;
             }
 
-    Server::~Server () {
+    Socket::~Socket () {
         close (socket_fd);
     }
 
-    void Server::run () {
+    void Socket::service () {
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in client = {0};
 
@@ -34,7 +34,7 @@ namespace bt {
         }
     }
 
-    void Server::process (std::string const & packet) {
+    void Socket::process (std::string const & packet) {
         LOG (INFO) << packet.length() << "\t| " << packet;
     }
 }

@@ -1,5 +1,5 @@
-#ifndef BACHELOR_SERVER_H
-#define BACHELOR_SERVER_H
+#ifndef BACHELOR_SOCKET_H
+#define BACHELOR_SOCKET_H
 
 #include <glog/logging.h>
 #include <iostream>
@@ -11,14 +11,14 @@
 #define MAX_PAYLOAD_BYTES 508
 
 namespace bt {
-    struct Server {
+    struct Socket {
     public:
         int const port;
 
-        explicit Server (int port);
-        ~Server();
+        explicit Socket (int port);
+        ~Socket();
 
-        [[noreturn]] virtual void run () final;
+        [[noreturn]] virtual void service () final;
 
     protected:
         virtual void process (std::string const & packet);
@@ -29,6 +29,6 @@ namespace bt {
     };
 }
 
-#endif //BACHELOR_SERVER_H
+#endif //BACHELOR_SOCKET_H
 
 /* Copyright © 2022 Aaron Alef */
