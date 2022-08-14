@@ -19,8 +19,11 @@
 
 #include <thread>
 
+#include "config.h"
 #include "Socket/Socket.h"
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
+
+
 }
