@@ -11,8 +11,10 @@ set(CMAKE_CXX_FLAGS "-fconcepts")
 
 # List source files and define target
 file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*)
-list(REMOVE_ITEM SRCS ${PROJECT_SOURCE_DIR}/src/main.cpp)
-add_executable(Bachelor ${PROJECT_SOURCE_DIR}/src/main.cpp ${SRCS})
+list(REMOVE_ITEM SRCS ${PROJECT_SOURCE_DIR}/src/peer.cpp)
+list(REMOVE_ITEM SRCS ${PROJECT_SOURCE_DIR}/src/router.cpp)
+add_executable(Peer ${PROJECT_SOURCE_DIR}/src/peer.cpp ${SRCS})
+add_executable(Router ${PROJECT_SOURCE_DIR}/src/router.cpp ${SRCS})
 
 # Threads
 set(CMAKE_THREAD_LIBS_INIT "-pthread")
@@ -20,11 +22,13 @@ set(CMAKE_HAVE_THREADS_LIBRARY 1)
 set(CMAKE_USE_PTHREADS_INIT 1)
 find_package(Threads REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-target_link_libraries(Bachelor Threads::Threads)
+target_link_libraries(Peer Threads::Threads)
+target_link_libraries(Router Threads::Threads)
 
 # Define dependencies
 ## Google Logging Library
-target_link_libraries(Bachelor glog)
+target_link_libraries(Peer glog)
+target_link_libraries(Router glog)
 
 # If Catch2 is installed prepare the `Test` target
 find_package(Catch2 3 CONFIG)
