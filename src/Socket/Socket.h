@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <exception>
+#include <atomic>
+#include <thread>
 
 #include "Packet/Packet.h"
 
@@ -18,7 +20,7 @@ namespace bt {
         explicit Socket (port_t port);
         ~Socket();
 
-        [[noreturn]] virtual void service () final;
+        virtual void service () final;
 
         virtual void send (Packet const & packet, port_t receiver);
         virtual void send (Packet const & packet);
@@ -29,6 +31,9 @@ namespace bt {
     private:
         struct sockaddr_in address = {0};
         int const socket_fd;
+
+        std::thread thread;
+        std::atomic <bool> should_stop = false;
     };
 }
 

@@ -29,16 +29,10 @@ int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
     bt::Router r  (PORT_ROUTER);
-    std::thread t_r  (& bt::Router::service, r);
-
     bt::Socket s1 (PORT(0));
-    std::thread t_s1 (& bt::Socket::service, s1);
 
     s1.send ({PORT(0), PORT(0), "Hello, World!"}, PORT_ROUTER);
     for (char c = 'a'; c <= 'z'; c++) {
         s1.send ({PORT(0), PORT(0), std::string ("Counter = ") += c}, PORT_ROUTER);
     }
-
-    t_r.join();
-    t_s1.join();
 }

@@ -7,38 +7,46 @@ namespace bt {
                       , .sin_port = htons (port)
                       , .sin_addr = {.s_addr = INADDR_ANY}
                       }
-            , socket_fd {socket (AF_INET, SOCK_DGRAM, 0)}
-            {
-                if (socket_fd < 0) {
+            , socket_fd {[&] () {
+                auto fd = socket (AF_INET, SOCK_DGRAM, 0);
+                if (fd < 0) {
                     throw std::domain_error ("Could not create socket");
                 }
-                if (bind (socket_fd, (struct sockaddr const *) (& address), sizeof (address))) {
+                if (bind (fd, (struct sockaddr const *) (& address), sizeof (address))) {
                     throw (std::domain_error ("Could not bind to address"));
                 }
-
-                LOG (INFO) << "Socket listening on port " << port;
-            }
+                return fd;
+            }()}
+            , thread {& Socket::service, this} {}
 
     Socket::~Socket () {
+        should_stop = true;
+        thread.join();
         close (socket_fd);
     }
 
     void Socket::service () {
+        LOG (INFO) << "Socket listening on port " << port;
+
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
         socklen_t length;
 
-        while (true) {
+        do {
             std::size_t read = recvfrom ( socket_fd
                                         , buffer
                                         , MAX_PAYLOAD_BYTES - 1
-                                        , MSG_WAITFORONE
+                                        , MSG_DONTWAIT
                                         , (struct sockaddr *) & sender
                                         , & length
                                         );
+            if (!length) {
+                std::this_thread::yield();
+                continue;
+            }
             buffer [read] = 0;
             process (Packet::from_buffer (buffer), ntohs (sender.sin_port));
-        }
+        } while (!should_stop);
     }
 
     void Socket::send (Packet const & packet) {
