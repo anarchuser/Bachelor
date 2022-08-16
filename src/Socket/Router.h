@@ -12,6 +12,7 @@ namespace bt {
     class Router : public Socket {
     public:
         explicit Router (port_t port, int timeout_ms = -1);
+        ~Router() override;
 
     private:
         void process (Packet const & packet, int sender) override;

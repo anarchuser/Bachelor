@@ -17,26 +17,21 @@
 
 #include <glog/logging.h>
 
-#include <thread>
-
 #include "config.h"
 #include "Socket/Socket.h"
 #include "Socket/Router.h"
 
 #define PORT(n) (PORT_PEER_START + n)
-#define TIMEOUT_MS -1//5000
+#define TIMEOUT_MS 5000
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
     bt::Router r  (PORT_ROUTER, TIMEOUT_MS);
-//    bt::Socket s1 (PORT(0), TIMEOUT_MS);
+    bt::Socket s1 (PORT(0), TIMEOUT_MS);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (1000));
-    r.send ({PORT_ROUTER, PORT_ROUTER, "test"});
-
-//    s1.send ({PORT_ROUTER, PORT_ROUTER, "Hello, World!"}, PORT_ROUTER);
-//    for (char c = 'a'; c <= 'z'; c++) {
-//        s1.send ({PORT(0), PORT(0), std::string ("Counter = ") += c}, PORT_ROUTER);
-//    }
+    s1.send ({PORT(0), PORT(0), "Hello, World!"}, PORT_ROUTER);
+    for (char c = 'a'; c <= 'z'; c++) {
+        s1.send ({PORT(0), PORT(0), std::string ("Counter = ") += c}, PORT_ROUTER);
+    }
 }

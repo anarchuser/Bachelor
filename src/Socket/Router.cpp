@@ -1,7 +1,9 @@
 #include "Router.h"
 
 namespace bt {
-    Router::Router (port_t port, int timeout): Socket (port, timeout) {}
+    Router::Router (port_t port, int timeout)
+            : Socket (port, timeout)
+            {}
 
     void Router::process (Packet const & packet, int sender) {
         Socket::process (packet, sender);
@@ -11,6 +13,10 @@ namespace bt {
 //        std::this_thread::sleep_for (std::chrono::microseconds (LATENCY_US));
 
         send (packet, packet.header.receiver);
+    }
+
+    Router::~Router () {
+        while (!is_destroyed) std::this_thread::yield();
     }
 }
 

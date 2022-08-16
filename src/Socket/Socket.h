@@ -25,7 +25,7 @@ namespace bt {
          * Positive: Stop if no message within this time arrived
          */
         explicit Socket (port_t port, int timeout_ms = 0);
-        ~Socket();
+        virtual ~Socket();
 
         virtual void service () final;
 
@@ -34,6 +34,7 @@ namespace bt {
 
     protected:
         virtual void process (Packet const & packet, port_t sender);
+        std::atomic <bool> is_destroyed = false;
 
     private:
         struct sockaddr_in address = {0};
@@ -41,7 +42,6 @@ namespace bt {
 
         std::thread thread;
         std::atomic <bool> should_stop = false;
-
         Timeout timeout;
     };
 }

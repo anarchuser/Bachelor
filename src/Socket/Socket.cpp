@@ -25,7 +25,9 @@ namespace bt {
         should_stop = true;
         thread.join();
         close (socket_fd);
+
         LOG (INFO) << "\t" << port << ": [DTOR]";
+        is_destroyed = true;
     }
 
     void Socket::service () {

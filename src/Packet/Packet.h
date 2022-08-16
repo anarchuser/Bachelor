@@ -23,7 +23,7 @@ namespace bt {
     /* [--,--|--,--,--,--|--,--,--,--|--,--,...]
      * [ size| receiver  | sender    | content ]
      */
-    struct Packet {
+    struct __attribute__((__packed__)) Packet {
         struct __attribute__((__packed__)) Header {
             size_t const size;
             port_t const receiver;
