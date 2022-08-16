@@ -1,7 +1,7 @@
 #include "Socket.h"
 
 namespace bt {
-    Socket::Socket (int port)
+    Socket::Socket (port_t port)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -37,15 +37,15 @@ namespace bt {
                                         , & length
                                         );
             buffer [read] = 0;
-            process (ntohs (sender.sin_port), Packet::from_buffer (buffer));
+            process (Packet::from_buffer (buffer), ntohs (sender.sin_port));
         }
     }
 
-    void Socket::send (Packet packet) {
+    void Socket::send (Packet const & packet) {
         send (packet, packet.header.receiver);
     }
-    void Socket::send (Packet packet, int receiver) {
-        LOG (INFO) << "[SEND|" << packet;
+    void Socket::send (Packet const & packet, port_t receiver) {
+        LOG (INFO) << '\t' << port << ": [SEND|" << packet;
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (receiver)
                                        , .sin_addr = {.s_addr = INADDR_ANY}};
@@ -53,8 +53,8 @@ namespace bt {
         sendto (socket_fd, packet.c_str(), packet.header.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
 
-    void Socket::process (int sender, Packet packet) {
-        LOG (INFO) << "[RECV|" << packet;
+    void Socket::process (Packet const & packet, port_t sender) {
+        LOG (INFO) << '\t' << port << ": [RECV|" << packet;
     }
 }
 

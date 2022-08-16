@@ -19,24 +19,26 @@
 
 #include <thread>
 
+#include "config.h"
 #include "Socket/Socket.h"
+#include "Socket/Router.h"
 
-#define PORT1 50000
-#define PORT2 50001
+#define PORT(n) (PORT_PEER_START + n)
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Socket s1 (PORT1);
-    bt::Socket s2 (PORT2);
+    bt::Router r  (PORT_ROUTER);
+    std::thread t_r  (& bt::Router::service, r);
 
-    std::thread thread (& bt::Socket::service, s1);
+    bt::Socket s1 (PORT(0));
+    std::thread t_s1 (& bt::Socket::service, s1);
 
-    s2.send ({PORT1, PORT2, "Hello, World!"});
-    s2.send ({PORT1, PORT2, "0-,-1-,-2-,-3-,-4-,-5,-,6-,-7-,-0-,-1-,-2-,-3-,-4-,-5-,-6-,-7-,-"});
-    for (char c = 'a'; c <= 'a'; c++) {
-        s2.send ({PORT1, PORT2, std::string ("Counter = ") += c});
+    s1.send ({PORT(0), PORT(0), "Hello, World!"}, PORT_ROUTER);
+    for (char c = 'a'; c <= 'z'; c++) {
+        s1.send ({PORT(0), PORT(0), std::string ("Counter = ") += c}, PORT_ROUTER);
     }
 
-    thread.join();
+    t_r.join();
+    t_s1.join();
 }

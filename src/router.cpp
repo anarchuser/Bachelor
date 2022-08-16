@@ -17,13 +17,11 @@
 
 #include <glog/logging.h>
 
-#include <thread>
-
 #include "config.h"
-#include "Socket/Socket.h"
+#include "Socket/Router.h"
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-
+    bt::Router (PORT_ROUTER).service();
 }

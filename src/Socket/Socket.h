@@ -13,18 +13,18 @@
 namespace bt {
     struct Socket {
     public:
-        int const port;
+        port_t const port;
 
-        explicit Socket (int port);
+        explicit Socket (port_t port);
         ~Socket();
 
         [[noreturn]] virtual void service () final;
 
-        virtual void send (Packet packet, int receiver);
-        virtual void send (Packet packet);
+        virtual void send (Packet const & packet, port_t receiver);
+        virtual void send (Packet const & packet);
 
     protected:
-        virtual void process (int sender, Packet packet);
+        virtual void process (Packet const & packet, port_t sender);
 
     private:
         struct sockaddr_in address = {0};
