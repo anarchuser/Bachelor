@@ -32,9 +32,10 @@ int main (int argc, char * argv[]) {
 
     std::thread thread (& bt::Socket::service, s1);
 
-    s2.send (PORT1, "Hello, World!");
-    for (char c = 'a'; c <= 'z'; c++) {
-        s2.send (PORT1, std::string ("Counter = ") + c);
+    s2.send ({PORT1, PORT2, "Hello, World!"});
+    s2.send ({PORT1, PORT2, "0-,-1-,-2-,-3-,-4-,-5,-,6-,-7-,-0-,-1-,-2-,-3-,-4-,-5-,-6-,-7-,-"});
+    for (char c = 'a'; c <= 'a'; c++) {
+        s2.send ({PORT1, PORT2, std::string ("Counter = ") += c});
     }
 
     thread.join();

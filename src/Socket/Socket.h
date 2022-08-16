@@ -8,7 +8,7 @@
 #include <netinet/in.h>
 #include <exception>
 
-#define MAX_PAYLOAD_BYTES 508
+#include "Packet/Packet.h"
 
 namespace bt {
     struct Socket {
@@ -20,10 +20,11 @@ namespace bt {
 
         [[noreturn]] virtual void service () final;
 
-        virtual void send (int receiver, std::string const & msg);
+        virtual void send (Packet packet, int receiver);
+        virtual void send (Packet packet);
 
     protected:
-        virtual void process (int sender, std::string const & msg);
+        virtual void process (int sender, Packet packet);
 
     private:
         struct sockaddr_in address = {0};

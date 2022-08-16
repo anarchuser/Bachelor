@@ -1,16 +1,53 @@
 #ifndef BACHELOR_PACKET_H
 #define BACHELOR_PACKET_H
 
-namespace bt {
-    struct Packet {
-        int const receiver;
-        int const sender;
-        char const * const msg;
+#include <string>
+#include <sstream>
 
-        explicit Packet (char const * msg);
+#include <cstring>
+#include <cstdint>
+#include <cmath>
+
+#include <glog/logging.h>
+
+namespace bt {
+    typedef int32_t port_t;
+    typedef uint16_t size_t;
+
+    /*   576 = Minimum required size to guarantee reassembly in case of fragmentation
+     * -  60 = Maximum IP header size
+     * -   8 = UDP header
+     * = 508 = Maximum safe UDP payload size */
+    static constexpr size_t MAX_PAYLOAD_BYTES = 576 - 60 - 8;
+
+    /* [--,--|--,--,--,--|--,--,--,--|--,--,...]
+     * [ size| receiver  | sender    | content ]
+     */
+    struct Packet {
+        struct __attribute__((__packed__)) Header {
+            size_t const size;
+            port_t const receiver;
+            port_t const sender;
+        } header;
+        char content [MAX_PAYLOAD_BYTES - sizeof (Header)];
+
+        Packet (port_t receiver, port_t sender, std::string const & msg);
+
+        /// Interpret 0-terminated string as Packet
+        static Packet const & from_buffer (char const * buffer);
+        /// Retrieve this Packet as 0-terminated string
         [[nodiscard]] char const * c_str() const;
+
+//        std::ostream & operator << (std::ostream & os) const;
     };
+
+    static constexpr size_t MAX_CONTENT_BYTES = MAX_PAYLOAD_BYTES - sizeof (Packet::Header);
+
+    std::ostream & operator << (std::ostream & os, bt::Packet const & packet);
+
+    static_assert (sizeof (Packet) == MAX_PAYLOAD_BYTES);
 };
+
 
 #endif //BACHELOR_PACKET_H
 

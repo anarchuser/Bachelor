@@ -26,25 +26,35 @@ namespace bt {
     void Socket::service () {
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
+        socklen_t length;
 
         while (true) {
-            socklen_t length;
-            std::size_t read = recvfrom (socket_fd, buffer, MAX_PAYLOAD_BYTES, MSG_WAITFORONE, (struct sockaddr *) & sender, & length);
-            process (ntohs (sender.sin_port), {buffer, read});
+            std::size_t read = recvfrom ( socket_fd
+                                        , buffer
+                                        , MAX_PAYLOAD_BYTES - 1
+                                        , MSG_WAITFORONE
+                                        , (struct sockaddr *) & sender
+                                        , & length
+                                        );
+            buffer [read] = 0;
+            process (ntohs (sender.sin_port), Packet::from_buffer (buffer));
         }
     }
 
-    void Socket::send (int receiver, std::string const & msg) {
-        LOG (INFO) << " SEND | " << receiver << " | " << msg.length() << "\t| " << msg;
+    void Socket::send (Packet packet) {
+        send (packet, packet.header.receiver);
+    }
+    void Socket::send (Packet packet, int receiver) {
+        LOG (INFO) << "[SEND|" << packet;
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (receiver)
                                        , .sin_addr = {.s_addr = INADDR_ANY}};
 
-        sendto (socket_fd, (char const *) msg.c_str(), msg.length(), 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+        sendto (socket_fd, packet.c_str(), packet.header.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
 
-    void Socket::process (int sender, std::string const & msg) {
-        LOG (INFO) << " RECV | " << sender << " | " << msg.length() << "\t| " << msg;
+    void Socket::process (int sender, Packet packet) {
+        LOG (INFO) << "[RECV|" << packet;
     }
 }
 

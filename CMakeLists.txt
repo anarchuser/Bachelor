@@ -15,6 +15,7 @@ list(REMOVE_ITEM SRCS ${PROJECT_SOURCE_DIR}/src/peer.cpp)
 list(REMOVE_ITEM SRCS ${PROJECT_SOURCE_DIR}/src/router.cpp)
 add_executable(Peer ${PROJECT_SOURCE_DIR}/src/peer.cpp ${SRCS})
 add_executable(Router ${PROJECT_SOURCE_DIR}/src/router.cpp ${SRCS})
+include_directories(src)
 
 # Threads
 set(CMAKE_THREAD_LIBS_INIT "-pthread")
