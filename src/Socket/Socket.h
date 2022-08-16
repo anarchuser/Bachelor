@@ -11,13 +11,20 @@
 #include <thread>
 
 #include "Packet/Packet.h"
+#include "Chrono/Timeout.h"
 
 namespace bt {
     struct Socket {
     public:
         port_t const port;
 
-        explicit Socket (port_t port);
+        /* Bind a duplex socket to the port.
+         * Timeout specifies how to behave on destruction:
+         * Negative: Never time out, run forever
+         * Zero:     Instantly time out
+         * Positive: Stop if no message within this time arrived
+         */
+        explicit Socket (port_t port, int timeout_ms = 0);
         ~Socket();
 
         virtual void service () final;
@@ -34,6 +41,8 @@ namespace bt {
 
         std::thread thread;
         std::atomic <bool> should_stop = false;
+
+        Timeout timeout;
     };
 }
 

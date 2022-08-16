@@ -1,7 +1,7 @@
 #include "Socket.h"
 
 namespace bt {
-    Socket::Socket (port_t port)
+    Socket::Socket (port_t port, int timeout)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -17,36 +17,49 @@ namespace bt {
                 }
                 return fd;
             }()}
-            , thread {& Socket::service, this} {}
+            , thread {& Socket::service, this}
+            , timeout (std::chrono::milliseconds (timeout))
+            {}
 
     Socket::~Socket () {
         should_stop = true;
         thread.join();
         close (socket_fd);
+        LOG (INFO) << "\t" << port << ": [DTOR]";
     }
 
     void Socket::service () {
-        LOG (INFO) << "Socket listening on port " << port;
+        LOG (INFO) << "\t" << port << ": [CTOR]";
 
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
-        socklen_t length;
+        socklen_t length = sizeof (struct sockaddr_in);
 
         do {
-            std::size_t read = recvfrom ( socket_fd
+            ssize_t read = recvfrom ( socket_fd
                                         , buffer
                                         , MAX_PAYLOAD_BYTES - 1
                                         , MSG_DONTWAIT
                                         , (struct sockaddr *) & sender
                                         , & length
                                         );
-            if (!length) {
-                std::this_thread::yield();
-                continue;
+            if (read < 0) {
+                switch (errno) {
+#if EAGAIN != EWOULDBLOCK  // POSIX.1-2001 does not require these to have the same value
+                    case EAGAIN:
+#endif
+                    case EWOULDBLOCK:
+                        std::this_thread::yield();
+                        continue;
+                    default:
+                        LOG (WARNING) << "Unknown error: " << errno;
+                }
             }
+
             buffer [read] = 0;
             process (Packet::from_buffer (buffer), ntohs (sender.sin_port));
-        } while (!should_stop);
+            timeout.refresh();
+        } while (! (should_stop && timeout.is_expired()));
     }
 
     void Socket::send (Packet const & packet) {

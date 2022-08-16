@@ -23,5 +23,5 @@
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Router (PORT_ROUTER).service();
+    bt::Router (PORT_ROUTER);
 }

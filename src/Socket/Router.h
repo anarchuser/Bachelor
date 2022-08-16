@@ -6,12 +6,12 @@
 
 #include "Socket.h"
 
-#define LATENCY_US 500000
+#define LATENCY_US 200000
 
 namespace bt {
     class Router : public Socket {
     public:
-        explicit Router (port_t port);
+        explicit Router (port_t port, int timeout_ms = -1);
 
     private:
         void process (Packet const & packet, int sender) override;
