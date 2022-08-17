@@ -22,12 +22,13 @@ namespace bt {
             {}
 
     Socket::~Socket () {
-        should_stop = true;
-        thread.join();
-        close (socket_fd);
-
-        LOG (INFO) << "\t" << port << ": [DTOR]";
-        is_destroyed = true;
+        if (!should_stop) {
+            should_stop = true;
+            thread.join ();
+            close (socket_fd);
+            is_destroyed = true;
+            LOG (INFO) << "\t" << port << ": [DTOR]";
+        }
     }
 
     void Socket::service () {

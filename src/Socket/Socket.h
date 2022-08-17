@@ -13,6 +13,8 @@
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 
+#define SOCKET_TIMEOUT_MS 0
+
 namespace bt {
     struct Socket {
     public:
@@ -24,7 +26,8 @@ namespace bt {
          * Zero:     Instantly time out
          * Positive: Stop if no message within this time arrived
          */
-        explicit Socket (port_t port, int timeout_ms = 0);
+        explicit Socket (port_t port, int timeout_ms = SOCKET_TIMEOUT_MS);
+        Socket (Socket const &) = delete;
         virtual ~Socket();
 
         virtual void service () final;
