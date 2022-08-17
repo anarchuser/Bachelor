@@ -36,10 +36,13 @@ int main (int argc, char * argv[]) {
     for (int i = 0; i < PEERS; i++) {
         peers.push_back (std::make_unique <bt::Peer> (PORT(i)));
     }
-    bt::port_t joiner;
     for (int i = 1; i < PEERS; i++) {
-        joiner = PORT(i);
-        peers[i]->send ({PORT(i - 1), PORT(i), (char const *) & joiner});
+        peers[i]->join (PORT(i - 1));
     }
-    // TODO: have all peers print all peers known to them
+
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
+
+    for (int i = 0; i < PEERS; i++) {
+        peers[i]->operator << (LOG (INFO));
+    }
 }

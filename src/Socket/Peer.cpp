@@ -27,19 +27,32 @@ namespace bt {
 
             if (packet.header.sender == joiner) {
                 LOG (INFO) << PRINT_PORT << joiner << " joined the network";
-                peers.insert (joiner);
                 for (auto peer : peers) {
                     send ({peer, port, (char const *) & joiner});
                 }
+                peers.insert (joiner);
             }
             else if (peers.contains (packet.header.sender)) {
                 LOG (INFO) << PRINT_PORT << packet.header.sender << " let me know of " << joiner;
-                peers.insert (joiner);
+                join (joiner);
             }
             else {
                 LOG (WARNING) << PRINT_PORT << "Unknown peer " << packet.header.sender << " told me of " << joiner;
             }
         }
+    }
+
+    void Peer::join (bt::port_t peer) {
+        send ({peer, port, (char const *) & port});
+        peers.insert (peer);
+    }
+
+    std::ostream & Peer::operator << (std::ostream & os) const {
+        os << PRINT_PORT << "|";
+        for (auto peer : peers) {
+            os << peer << "|";
+        }
+        return os;
     }
 }
 
