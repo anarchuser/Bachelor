@@ -27,12 +27,12 @@ namespace bt {
             thread.join ();
             close (socket_fd);
             is_destroyed = true;
-            LOG (INFO) << "\t" << port << ": [DTOR]";
+            LOG (INFO) << PRINT_PORT << "[DTOR]";
         }
     }
 
     void Socket::service () {
-        LOG (INFO) << "\t" << port << ": [CTOR]";
+        LOG (INFO) << PRINT_PORT << "[CTOR]";
 
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};

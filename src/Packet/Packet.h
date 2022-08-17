@@ -14,6 +14,11 @@ namespace bt {
     typedef int32_t port_t;
     typedef uint16_t size_t;
 
+    enum Action {
+        PING,       // Check for life signs
+        CONNECT     // Tell of the existence of a peer
+    };
+
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation
      * -  60 = Maximum IP header size
      * -   8 = UDP header
@@ -28,6 +33,7 @@ namespace bt {
             size_t const size;
             port_t const receiver;
             port_t const sender;
+            Action const action = CONNECT;
         } header;
         char content [MAX_PAYLOAD_BYTES - sizeof (Header)];
 

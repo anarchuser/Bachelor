@@ -12,7 +12,7 @@ namespace bt {
 
     void Router::process (Packet const & packet, port_t sender) {
         Socket::process (packet, sender);
-        LOG (INFO) << '\t' << port << ": [ROUT|" << sender << " -> " << packet.header.receiver << "]";
+        LOG (INFO) << PRINT_PORT << "[ROUT|" << sender << " -> " << packet.header.receiver << "]";
 
 //        std::this_thread::sleep_for (std::chrono::microseconds (LATENCY_US));
 

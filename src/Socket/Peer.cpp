@@ -14,15 +14,32 @@ namespace bt {
         Socket::process (packet, sender);
 
         if (packet.header.sender < PORT_PEER_START || packet.header.sender > PORT_PEER_END) {
-            LOG (WARNING) << "\t" << port << ": Received packet from suspicious port - " << packet;
+            LOG (WARNING) << PRINT_PORT << "Received packet from suspicious port - " << packet;
             return;
         }
         if (packet.header.receiver != port) {
-            LOG (WARNING) << "\t" << port << ": Received packet with foreign recipient - " << packet;
+            LOG (WARNING) << PRINT_PORT << "Received packet with foreign recipient - " << packet;
             return;
         }
+        if (packet.header.action == CONNECT) {
+            auto joiner = * (port_t *) packet.content;
+            if (peers.contains (joiner)) return;
 
-        peers.insert (packet.header.sender);
+            if (packet.header.sender == joiner) {
+                LOG (INFO) << PRINT_PORT << joiner << " joined the network";
+                peers.insert (joiner);
+                for (auto peer : peers) {
+                    send ({peer, port, (char const *) & joiner});
+                }
+            }
+            else if (peers.contains (packet.header.sender)) {
+                LOG (INFO) << PRINT_PORT << packet.header.sender << " let me know of " << joiner;
+                peers.insert (joiner);
+            }
+            else {
+                LOG (WARNING) << PRINT_PORT << "Unknown peer " << packet.header.sender << " told me of " << joiner;
+            }
+        }
     }
 }
 
