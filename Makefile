@@ -13,16 +13,21 @@ setup:	CMakeLists.txt
 
 # Build the project (lib and src)
 build:	setup
-	cmake --build $(BUILD_DIR) --target Bachelor > /dev/zero
+	cmake --build $(BUILD_DIR) --target Peer > /dev/zero
 
 # Build the benchmarking tool
 run:	build
-	./$(BUILD_DIR)/Bachelor
+	GLOG_alsologtostderr=1 ./$(BUILD_DIR)/Peer
+
+# Build and run the tests
+router:	build
+	cmake --build $(BUILD_DIR) --target Router > /dev/zero
+	GLOG_alsologtostderr=1 ./$(BUILD_DIR)/Router
 
 # Build and run the tests
 test:	build
 	cmake --build $(BUILD_DIR) --target Test > /dev/zero
-	./$(BUILD_DIR)/Test
+	GLOG_logtostderr=1 ./$(BUILD_DIR)/Test
 
 # Clean all build files
 clean:
