@@ -21,6 +21,7 @@
 #include "config.h"
 #include "Socket/Socket.h"
 #include "Socket/Peer.h"
+#include "Socket/Router.h"
 
 #define PORT(n) (PORT_PEER_START + n)
 #define PORT_INC port_index++
@@ -32,9 +33,12 @@
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
+    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
+
     std::vector <std::unique_ptr <bt::Peer>> peers;
     for (int i = 0; i < PEERS; i++) {
         peers.push_back (std::make_unique <bt::Peer> (PORT(i)));
+        peers.back()->router = PORT_ROUTER;
     }
     for (int i = 1; i < PEERS; i++) {
         peers[i]->join (PORT(i - 1));

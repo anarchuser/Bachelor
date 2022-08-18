@@ -37,6 +37,8 @@ namespace bt {
         virtual void send (Packet const & packet, port_t receiver);
         virtual void send (Packet const & packet);
 
+        port_t router = 0;
+
     protected:
         virtual void process (Packet const & packet, port_t sender);
         std::atomic <bool> is_destroyed = false;

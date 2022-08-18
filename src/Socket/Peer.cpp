@@ -42,8 +42,8 @@ namespace bt {
         }
     }
 
-    void Peer::join (bt::port_t peer) {
-        send ({peer, port, (char const *) & port});
+    void Peer::join (port_t peer) {
+        send ({peer, port, (char const *) & port}, router ?: peer);
         peers.insert (peer);
     }
 

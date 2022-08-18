@@ -14,7 +14,7 @@ namespace bt {
         Socket::process (packet, sender);
         LOG (INFO) << PRINT_PORT << "[ROUT|" << sender << " -> " << packet.header.receiver << "]";
 
-//        std::this_thread::sleep_for (std::chrono::microseconds (LATENCY_US));
+        std::this_thread::sleep_for (std::chrono::microseconds (LATENCY_US));
 
         send (packet, packet.header.receiver);
     }
