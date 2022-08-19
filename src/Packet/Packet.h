@@ -9,15 +9,11 @@
 #include <cmath>
 
 #include <glog/logging.h>
+#include "Payload.h"
 
 namespace bt {
     typedef int32_t port_t;
     typedef uint16_t size_t;
-
-    enum Action {
-        PING,       // Check for life signs
-        CONNECT     // Tell of the existence of a peer
-    };
 
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation
      * -  60 = Maximum IP header size
@@ -26,22 +22,21 @@ namespace bt {
     static constexpr size_t MAX_PAYLOAD_BYTES = 576 - 60 - 8;
 
     /* [--,--|--,--,--,--|--,--,--,--|--,--,...]
-     * [ size| receiver  | sender    | content ]
+     * [ size| receiver  | sender    | payload ]
      */
     struct __attribute__((__packed__)) Packet {
         struct __attribute__((__packed__)) Header {
             size_t const size;
             port_t const receiver;
             port_t const sender;
-            Action const action = CONNECT;
         } header;
-        char content [MAX_PAYLOAD_BYTES - sizeof (Header)];
+        char payload [MAX_PAYLOAD_BYTES - sizeof (Header)];
 
         Packet (port_t receiver, port_t sender, std::string const & msg);
 
-        /// Interpret 0-terminated string as Packet
+        // Interpret 0-terminated string as Packet
         static Packet const & from_buffer (char const * buffer);
-        /// Retrieve this Packet as 0-terminated string
+        // Retrieve this Packet as 0-terminated string
         [[nodiscard]] char const * c_str() const;
 
 //        std::ostream & operator << (std::ostream & os) const;

@@ -41,7 +41,7 @@ namespace bt {
 
     protected:
         virtual void process (Packet const & packet, port_t sender);
-        std::atomic <bool> is_destroyed = false;
+        std::atomic <bool> const & is_destroyed_view = is_destroyed;
 
     private:
         struct sockaddr_in address = {0};
@@ -49,6 +49,7 @@ namespace bt {
 
         std::thread thread;
         std::atomic <bool> should_stop = false;
+        std::atomic <bool> is_destroyed = false;
         Timeout timeout;
     };
 }

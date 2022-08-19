@@ -1,19 +1,19 @@
 #include "Packet.h"
 
 namespace bt {
-    Packet::Packet (int receiver, int sender, std::string const & msg)
+    Packet::Packet (port_t receiver, port_t sender, std::string const & msg)
             : header { std::min (size_t (MAX_PAYLOAD_BYTES - 1), size_t (sizeof (Header) + msg.length()))
                      , receiver
                      , sender
                      }
             {
                 if (msg.length() >= MAX_CONTENT_BYTES) {
-                    LOG (WARNING) << "Message exceeds maximum safe content of " << MAX_CONTENT_BYTES << " bytes";
+                    LOG (WARNING) << "Message exceeds maximum safe payload of " << MAX_CONTENT_BYTES << " bytes";
                 }
 
                 auto msg_size = std::min (MAX_CONTENT_BYTES, size_t (msg.length()));
-                msg.copy (content, msg_size);
-                content [msg_size] = 0;
+                msg.copy (payload, msg_size);
+                payload [msg_size] = 0;
             }
 
     Packet const & Packet::from_buffer (char const * buffer) {
@@ -27,7 +27,7 @@ namespace bt {
         os << '[' << packet.header.size;
         os << '|' << packet.header.receiver;
         os << '|' << packet.header.sender;
-        os << '|' << packet.content;
+        os << '|' << (Payload const *) packet.payload;
         os << ']';
         return os;
     }

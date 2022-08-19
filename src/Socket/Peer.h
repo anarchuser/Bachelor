@@ -9,6 +9,8 @@
 #include "config.h"
 #include "Socket.h"
 
+#include "Packet/Payload.h"
+
 #define PEER_TIMEOUT_MS 5000
 
 namespace bt {
@@ -26,6 +28,8 @@ namespace bt {
         std::set <port_t> peers;
 
         void process (Packet const & packet, port_t sender) override;
+        void process_ping (Packet const & packet, port_t sender);
+        void process_connect (Packet const & packet, port_t sender);
     };
 }
 

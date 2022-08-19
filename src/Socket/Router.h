@@ -6,7 +6,7 @@
 
 #include "Socket.h"
 
-#define LATENCY_US 1000000
+#define LATENCY_US 50000
 #define ROUTER_TIMEOUT_MS -1
 
 namespace bt {

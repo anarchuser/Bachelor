@@ -36,7 +36,6 @@ int main (int argc, char * argv[]) {
     bt::Router r (PORT_ROUTER, TIMEOUT_MS);
     bt::Socket::router = PORT_ROUTER;
 
-
     std::vector <std::unique_ptr <bt::Peer>> peers;
     for (int i = 0; i < PEERS; i++) {
         peers.push_back (std::make_unique <bt::Peer> (PORT(i)));
@@ -45,9 +44,11 @@ int main (int argc, char * argv[]) {
         peers[i]->join (PORT(i - 1));
     }
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (500));
-
+    std::this_thread::sleep_for (std::chrono::seconds (1));
+    LOG (INFO) << "Who knows whom?";
+    LOG (INFO) << "--------------------------------\\";
     for (int i = 0; i < PEERS; i++) {
         peers[i]->operator << (LOG (INFO));
     }
+    LOG (INFO) << "--------------------------------/";
 }
