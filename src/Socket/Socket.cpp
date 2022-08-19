@@ -1,6 +1,8 @@
 #include "Socket.h"
 
 namespace bt {
+    port_t Socket::router = 0;
+
     Socket::Socket (port_t port, int timeout)
             : port {port}
             , address { .sin_family = AF_INET

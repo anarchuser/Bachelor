@@ -22,6 +22,8 @@ namespace bt {
     public:
         port_t const port;
 
+        static port_t router;
+
         /* Bind a duplex socket to the port.
          * Timeout specifies how to behave on destruction:
          * Negative: Never time out, run forever
@@ -36,8 +38,6 @@ namespace bt {
 
         virtual void send (Packet const & packet, port_t receiver);
         virtual void send (Packet const & packet);
-
-        port_t router = 0;
 
     protected:
         virtual void process (Packet const & packet, port_t sender);
