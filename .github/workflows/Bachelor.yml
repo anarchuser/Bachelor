@@ -17,9 +17,9 @@ jobs:
       - name: configure cmake
         run:  cmake -H. -Bbuild
       - name: Build src and lib files
-        run:  cmake --build build --target Bachelor
+        run:  cmake --build build --target Peer
       - name: Run the benchmarks
-        run: ./build/Bachelor
+        run: ./build/Peer
 
   tests:
     needs:    dependencies
