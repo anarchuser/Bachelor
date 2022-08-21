@@ -7,7 +7,7 @@ set(CMAKE_CXX_COMPILER g++)
 
 # Linker & compiler flags
 set(CMAKE_REQUIRED_LIBRARIES "-lglog")
-set(CMAKE_CXX_FLAGS "-fconcepts")
+set(CMAKE_CXX_FLAGS "-pthread --std=c++20")
 
 # List source files and define target
 file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*)
