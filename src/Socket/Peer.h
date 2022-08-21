@@ -2,8 +2,8 @@
 #define BACHELOR_PEER_H
 
 #include <chrono>
+#include <map>
 #include <set>
-#include <unordered_map>
 #include <thread>
 #include <ostream>
 
@@ -21,15 +21,14 @@ namespace bt {
         Peer (Peer const &) = delete;
         ~Peer() noexcept override;
 
-        void connect (port_t peer);
+        bool connect (port_t peer);
 
         std::ostream & operator << (std::ostream & os) const;
 
     private:
-        std::unordered_map <port_t, std::set <port_t>> requested_peers;
-        std::set <port_t> consistent_peers;
+        std::map <port_t, std::set <port_t>> peers;
 
-        void connect (port_t a, port_t b);
+        void tell (port_t whom, port_t about);
         void process (Packet const & packet, port_t sender) override;
         void process_ping (Packet const & packet);
         void process_connect (Packet const & packet);

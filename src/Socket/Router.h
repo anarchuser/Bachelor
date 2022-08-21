@@ -7,7 +7,7 @@
 #include "Socket.h"
 
 #define LATENCY_US 50000
-#define ROUTER_TIMEOUT_MS -1
+#define ROUTER_TIMEOUT_MS 4000
 
 namespace bt {
     class Router : public Socket {

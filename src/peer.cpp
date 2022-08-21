@@ -28,7 +28,7 @@
 
 #define TIMEOUT_MS 4000
 
-#define PEERS 5
+#define PEERS 10
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
@@ -41,17 +41,16 @@ int main (int argc, char * argv[]) {
         peers.push_back (std::make_unique <bt::Peer> (PORT(i)));
     }
     for (int i = 1; i < PEERS; i++) {
-//        peers[i]->connect (PORT(i - 1));
-        peers[i]->connect (PORT(0));
-        std::this_thread::sleep_for (std::chrono::milliseconds (1000));
+        peers[i]->connect (PORT(i - 1));
+        std::this_thread::sleep_for (std::chrono::milliseconds (500));
     }
 
-    std::this_thread::sleep_for (std::chrono::seconds (1));
+    std::this_thread::sleep_for (std::chrono::seconds (2));
     std::cout << "Who knows whom?\n";
-    std::cout << "----------------------------------------\\\n";
+    std::cout << "-----------------------------------\\\n";
     for (int i = 0; i < PEERS; i++) {
-        if (i) std::cout << "----------------------------------------|\n";
+        if (i) std::cout << "-----------------------------------|\n";
         peers[i]->operator << (std::cout) << "\n";
     }
-    std::cout << "----------------------------------------/" << std::endl;
+    std::cout << "-----------------------------------/" << std::endl;
 }

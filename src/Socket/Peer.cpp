@@ -44,60 +44,48 @@ namespace bt {
         auto joiner = ((ConnectPayload const *) packet.payload)->joiner;
         auto sender = packet.header.sender;
 
+//        std::lock_guard <std::mutex> guard (mx);
         if (joiner == port || sender == port) return;
-        if (consistent_peers.contains (joiner)) return;
         if (joiner == sender) {
-            if (requested_peers.contains (joiner)) return;
-
-            for (auto peer : consistent_peers) {
-                connect (joiner, peer);
-            }
-            connect (sender);
-        } else if (consistent_peers.contains (sender)) {
-            // sender tells me about joiner:
             connect (joiner);
-            LOG_ASSERT (requested_peers.contains (joiner));
-            requested_peers [joiner].erase (sender);
-            if (requested_peers [joiner].empty()) {
-                consistent_peers.insert (joiner);
-                requested_peers.erase (joiner);
+            for (auto const & peer : peers) {
+                tell (peer.first, joiner);
+                tell (joiner, peer.first);
             }
-
-            for (auto peer : consistent_peers) {
-                connect (joiner, peer);
-            }
+        } else if (peers.contains (sender) || !peers [sender].contains (joiner)) {
+            connect (joiner);
+            tell (sender, joiner);
+            peers [sender].insert (joiner);
         } else {
             LOG (WARNING) << PRINT_PORT << "Received connect request from unknown peer " << sender;
             LOG (WARNING) << PRINT_PORT << packet;
         }
     }
 
-    void Peer::connect (port_t peer) {
+    bool Peer::connect (port_t peer) {
+        if (peers.contains (peer)) return false;
+        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
+
         send ({peer, port, ConnectPayload (port).c_str()}, router ?: peer);
-        if (consistent_peers.empty()) {
-            consistent_peers.insert (peer);
-        } else {
-            if (! requested_peers.contains (peer)) {
-                requested_peers.insert ({peer, consistent_peers});
-            }
-        }
+        peers.insert ({peer, {}});
+        return true;
     }
 
-    void Peer::connect (port_t a, port_t b) {
-        send ({a, port, ConnectPayload (b).c_str()}, router ?: a);
-        send ({b, port, ConnectPayload (a).c_str()}, router ?: b);
+    void Peer::tell (port_t whom, port_t about) {
+        if (whom == about) return;
+        if (peers [whom].contains (about)) return;
+        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
+        send ({whom, port, ConnectPayload (about).c_str()}, router ?: whom);
     }
 
     std::ostream & Peer::operator << (std::ostream & os) const {
-        os << PRINT_PORT << "!";
-        for (auto peer : consistent_peers) {
-            os << peer << "|";
-        }
-        for (auto const & requester : requested_peers) {
-            os << "\n\t" << requester.first << ": ?";
+        os << PRINT_PORT << "[LIST|peers|contacts]";
+        for (auto const & requester : peers) {
+            os << "\n\t" << requester.first << ": [";
             for (auto pending : requester.second) {
                 os << pending << "|";
             }
+            os << "]";
         }
         return os;
     }
