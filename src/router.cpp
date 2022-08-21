@@ -17,12 +17,11 @@
 
 #include <glog/logging.h>
 
-#include "Server/Server.h"
-
-#define PORT 50000
+#include "config.h"
+#include "Socket/Router.h"
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Server (PORT).run();
+    bt::Router (PORT_ROUTER);
 }

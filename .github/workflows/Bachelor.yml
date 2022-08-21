@@ -11,24 +11,28 @@ jobs:
     needs:    dependencies
     runs-on:  ubuntu-latest
     steps:
+      - name: Ensure gc++ v10 for stdc++20 support is used
+        run:  sudo apt remove g++-9 && sudo apt install g++-10 && sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
       - name: install google logging library
         run:  sudo apt install -y libgoogle-glog-dev
       - uses: actions/checkout@v2
       - name: configure cmake
         run:  cmake -H. -Bbuild
       - name: Build src and lib files
-        run:  cmake --build build --target Bachelor
+        run:  cmake --build build --target Peer
       - name: Run the benchmarks
-        run: ./build/Bachelor
+        run: ./build/Peer
 
   tests:
     needs:    dependencies
     runs-on:  ubuntu-latest
     steps:
+      - name: Ensure gc++ v10 for stdc++20 support is used
+        run:  sudo apt remove g++-9 && sudo apt install g++-10 && sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
       - name: install google logging library
         run:  sudo apt install -y libgoogle-glog-dev
       - name: download catch2 v2
-        run:  git clone -b v2.x https://github.com/catchorg/Catch2.git
+        run:  git clone https://github.com/catchorg/Catch2.git
       - name: setup catch2
         run:  cmake -BCatch2/build -HCatch2 -DBUILD_TESTING=OFF
       - name: build and install catch2
