@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <set>
+#include <unordered_map>
 #include <thread>
 #include <ostream>
 
@@ -20,16 +21,18 @@ namespace bt {
         Peer (Peer const &) = delete;
         ~Peer() noexcept override;
 
-        void join (port_t peer);
+        void connect (port_t peer);
 
         std::ostream & operator << (std::ostream & os) const;
 
     private:
-        std::set <port_t> peers;
+        std::unordered_map <port_t, std::set <port_t>> requested_peers;
+        std::set <port_t> consistent_peers;
 
+        void connect (port_t a, port_t b);
         void process (Packet const & packet, port_t sender) override;
-        void process_ping (Packet const & packet, port_t sender);
-        void process_connect (Packet const & packet, port_t sender);
+        void process_ping (Packet const & packet);
+        void process_connect (Packet const & packet);
     };
 }
 

@@ -33,22 +33,25 @@
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
-    bt::Socket::router = PORT_ROUTER;
+//    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
+//    bt::Socket::router = PORT_ROUTER;
 
     std::vector <std::unique_ptr <bt::Peer>> peers;
     for (int i = 0; i < PEERS; i++) {
         peers.push_back (std::make_unique <bt::Peer> (PORT(i)));
     }
     for (int i = 1; i < PEERS; i++) {
-        peers[i]->join (PORT(i - 1));
+//        peers[i]->connect (PORT(i - 1));
+        peers[i]->connect (PORT(0));
+        std::this_thread::sleep_for (std::chrono::milliseconds (1000));
     }
 
     std::this_thread::sleep_for (std::chrono::seconds (1));
-    LOG (INFO) << "Who knows whom?";
-    LOG (INFO) << "--------------------------------\\";
+    std::cout << "Who knows whom?\n";
+    std::cout << "----------------------------------------\\\n";
     for (int i = 0; i < PEERS; i++) {
-        peers[i]->operator << (LOG (INFO));
+        if (i) std::cout << "----------------------------------------|\n";
+        peers[i]->operator << (std::cout) << "\n";
     }
-    LOG (INFO) << "--------------------------------/";
+    std::cout << "----------------------------------------/" << std::endl;
 }
