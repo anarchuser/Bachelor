@@ -10,26 +10,24 @@
 
 #include <glog/logging.h>
 
-namespace bt {
-    // TODO: put this in some config file
-    typedef int32_t port_t;
+#include "port.h"
 
-    enum Action {
-        PING,       // Check for life signs
-        CONNECT,    // Tell of the existence of a peer
-        ACK,        // Acknowledge an action (approve)
-        NACK,       // Do not acknowledge an action (reject)
-    };
+#include "Action.h"
+
+namespace bt {
 
     struct __attribute__((__packed__)) Payload {
-        Action const action: 8;
+        std::uint64_t timestamp;
+        ActionType const type: 8;
 
         [[nodiscard]] char const * c_str() const;
+
+        static ActionType get_type (char const * buffer);
 
         Payload() = delete;
 
     protected:
-        explicit Payload (Action action);
+        explicit Payload (ActionType action);
     };
 
     struct __attribute__((__packed__)) PingPayload: public Payload {
@@ -43,6 +41,8 @@ namespace bt {
     };
 
     std::ostream & operator << (std::ostream & os, Payload const * payload);
+
+    std::size_t get_timestamp();
 } // bt
 
 #endif //BACHELOR_PAYLOAD_H

@@ -2,7 +2,7 @@
 
 namespace bt {
     Packet::Packet (port_t receiver, port_t sender, std::string const & msg)
-            : header { std::min (size_t (MAX_PAYLOAD_BYTES - 1), size_t (sizeof (Header) + msg.length()))
+            : header { std::min (size_t (MAX_PAYLOAD_BYTES - 1), size_t (sizeof (header) + msg.length()))
                      , receiver
                      , sender
                      }

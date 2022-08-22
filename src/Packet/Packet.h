@@ -10,11 +10,9 @@
 
 #include <glog/logging.h>
 #include "Payload.h"
+#include "port.h"
 
 namespace bt {
-    typedef int32_t port_t;
-    typedef uint16_t size_t;
-
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation
      * -  60 = Maximum IP header size
      * -   8 = UDP header
@@ -24,7 +22,7 @@ namespace bt {
     /* [--,--|--,--,--,--|--,--,--,--|--,--,...]
      * [ size| receiver  | sender    | payload ]
      */
-    struct __attribute__((__packed__)) Packet {
+    struct __attribute__((__packed__)) Packet final {
         struct __attribute__((__packed__)) Header {
             size_t const size;
             port_t const receiver;
@@ -38,8 +36,6 @@ namespace bt {
         static Packet const & from_buffer (char const * buffer);
         // Retrieve this Packet as 0-terminated string
         [[nodiscard]] char const * c_str() const;
-
-//        std::ostream & operator << (std::ostream & os) const;
     };
 
     static constexpr size_t MAX_CONTENT_BYTES = MAX_PAYLOAD_BYTES - sizeof (Packet::Header);

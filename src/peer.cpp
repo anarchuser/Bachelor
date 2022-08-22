@@ -26,29 +26,24 @@
 #define PORT(n) (PORT_PEER_START + n)
 #define PORT_INC port_index++
 
-#define TIMEOUT_MS 4000
+#define TIMEOUT_MS 8000
 
 #define PEERS 10
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
+    int const kPeers = argc > 1 ? std::stoi (argv[1]) : PEERS;
+
 //    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
 //    bt::Socket::router = PORT_ROUTER;
 
     std::vector <std::unique_ptr <bt::Peer>> peers;
-    for (int i = 0; i < PEERS; i++) {
-        peers.push_back (std::make_unique <bt::Peer> (PORT(i)));
+    for (int i = 0; i < kPeers; i++) {
+        peers.push_back (std::make_unique <bt::Peer> (PORT(i), TIMEOUT_MS));
     }
-    for (int i = 1; i < PEERS; i++) {
+    for (int i = 1; i < kPeers; i++) {
         peers[i]->connect (PORT(i - 1));
     }
-
-    for (auto const & peer : peers) {
-        while (peer->num_of_peers + 1 < PEERS) std::this_thread::yield();
-    }
-    std::cout << "Who knows whom?\n";
-    for (int i = 0; i < PEERS; i++) {
-        peers[i]->operator << (std::cout) << "\n";
-    }
+    while (peers[0]->num_of_peers != kPeers - 1) continue;
 }

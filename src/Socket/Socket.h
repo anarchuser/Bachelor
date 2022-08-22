@@ -13,6 +13,8 @@
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 
+#include "Packet/uuid.h"
+
 #define SOCKET_TIMEOUT_MS 0
 
 #define PRINT_PORT "\t" << port << ": "

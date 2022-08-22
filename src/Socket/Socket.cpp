@@ -80,7 +80,7 @@ namespace bt {
     }
 
     void Socket::process (Packet const & packet, port_t sender) {
-//        LOG (INFO) << '\t' << port << ": [RECV|" << packet;
+        LOG (INFO) << '\t' << port << ": [RECV|" << "UUID" << UUID::instance (packet) << "]\t" << packet;
     }
 }
 

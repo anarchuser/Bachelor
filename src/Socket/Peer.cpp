@@ -8,6 +8,7 @@ namespace bt {
     Peer::~Peer () noexcept {
         Socket::~Socket();
         while (!is_destroyed_view) std::this_thread::yield();
+        this->operator << (std::cout) << std::endl;
     }
 
     void Peer::process (Packet const & packet, port_t sender) {
@@ -22,7 +23,7 @@ namespace bt {
             return;
         }
         auto const & payload = * (Payload const *) packet.payload;
-        switch (payload.action) {
+        switch (payload.type) {
             case PING:
                 process_ping (packet);
                 break;
@@ -32,7 +33,7 @@ namespace bt {
             case ACK:
             case NACK:
             default:
-                LOG (WARNING) << PRINT_PORT << "Cannot handle action " << payload.action;
+                LOG (WARNING) << PRINT_PORT << "Cannot handle type " << payload.type;
         }
     }
 
