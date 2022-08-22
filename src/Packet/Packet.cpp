@@ -1,20 +1,17 @@
 #include "Packet.h"
 
 namespace bt {
-    Packet::Packet (port_t receiver, port_t sender, std::string const & msg)
-            : header { std::min (size_t (MAX_PAYLOAD_BYTES - 1), size_t (sizeof (header) + msg.length()))
-                     , receiver
-                     , sender
-                     }
-            {
-                if (msg.length() >= MAX_CONTENT_BYTES) {
-                    LOG (WARNING) << "Message exceeds maximum safe payload of " << MAX_CONTENT_BYTES << " bytes";
-                }
+    Packet::Packet (port_t receiver, port_t sender)
+            : Packet (sizeof (* this), receiver, sender, PING)
+            {}
 
-                auto msg_size = std::min (MAX_CONTENT_BYTES, size_t (msg.length()));
-                msg.copy (payload, msg_size);
-                payload [msg_size] = 0;
-            }
+    Packet::Packet (size_t size, port_t receiver, port_t sender, ActionType type)
+            : size {size}
+            , receiver {receiver}
+            , sender {sender}
+            , type {type}
+            , timestamp {get_timestamp()}
+            {}
 
     Packet const & Packet::from_buffer (char const * buffer) {
         return * (Packet const *) buffer;
@@ -23,12 +20,11 @@ namespace bt {
         return (char const *) this;
     }
 
-    std::ostream  & operator << (std::ostream & os, bt::Packet const & packet) {
-        os << '[' << packet.header.size;
-        os << '|' << packet.header.receiver;
-        os << '|' << packet.header.sender;
-        os << '|' << (Payload const *) packet.payload;
-        os << ']';
+    std::ostream & operator << (std::ostream & os, bt::Packet const & packet) {
+        os << packet.size     << "|";
+        os << packet.receiver << "|";
+        os << packet.sender   << "|";
+        os << packet.type;
         return os;
     }
 }

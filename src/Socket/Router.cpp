@@ -12,9 +12,9 @@ namespace bt {
 
     void Router::process (Packet const & packet, port_t sender) {
         Socket::process (packet, sender);
-        LOG (INFO) << PRINT_PORT << "[ROUT|" << sender << " -> " << packet.header.receiver << "]";
+        LOG (INFO) << PRINT_PORT << "[ROUT|" << sender << " -> " << packet.receiver << "]";
 
-        send (packet, packet.header.receiver);
+        send (packet, packet.receiver);
     }
 }
 

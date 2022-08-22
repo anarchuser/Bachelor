@@ -10,7 +10,8 @@
 #include "config.h"
 #include "Socket.h"
 
-#include "Packet/Payload.h"
+#include "Packet/Packet.h"
+#include "Packet/ConnectPacket.h"
 
 #define PEER_TIMEOUT_MS 5000
 
@@ -35,7 +36,7 @@ namespace bt {
         void tell (port_t whom, port_t about);
         void process (Packet const & packet, port_t sender) override;
         void process_ping (Packet const & packet);
-        void process_connect (Packet const & packet);
+        void process_connect (ConnectPacket const & packet);
     };
 }
 

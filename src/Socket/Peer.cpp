@@ -12,41 +12,40 @@ namespace bt {
     }
 
     void Peer::process (Packet const & packet, port_t sender) {
-        Socket::process (packet, sender);
-
-        if (packet.header.sender < PORT_PEER_START || packet.header.sender > PORT_PEER_END) {
+        if (packet.sender < PORT_PEER_START || packet.sender > PORT_PEER_END) {
             LOG (WARNING) << PRINT_PORT << "Received packet from suspicious port - " << packet;
             return;
         }
-        if (packet.header.receiver != port) {
+        if (packet.receiver != port) {
             LOG (WARNING) << PRINT_PORT << "Received packet with foreign recipient - " << packet;
             return;
         }
-        auto const & payload = * (Payload const *) packet.payload;
-        switch (payload.type) {
+        switch (packet.type) {
             case PING:
                 process_ping (packet);
                 break;
             case CONNECT:
-                process_connect (packet);
+                process_connect (dynamic_cast <ConnectPacket const &> (packet));
                 break;
             case ACK:
             case NACK:
             default:
-                LOG (WARNING) << PRINT_PORT << "Cannot handle type " << payload.type;
+                LOG (WARNING) << PRINT_PORT << "Cannot handle type " << packet.type;
         }
     }
 
     void Peer::process_ping (Packet const & packet) {
-
+        LOG (INFO) << '\t' << port << ": [RECV]\t[" << packet << "]";
     }
 
-    void Peer::process_connect (Packet const & packet) {
-        auto joiner = ((ConnectPayload const *) packet.payload)->joiner;
-        auto sender = packet.header.sender;
+    void Peer::process_connect (ConnectPacket const & packet) {
+        auto sender = packet.sender;
+        auto joiner = packet.joiner;
 
         if (peers.contains (joiner)) return;
         if (joiner == port || sender == port) return;
+
+        LOG (INFO) << '\t' << port << ": [RECV]\t[" << packet << "]";
 
         for (auto peer : peers) {
             tell (peer, joiner);
@@ -59,7 +58,8 @@ namespace bt {
         if (peers.contains (peer)) return;
 
         LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
-        send ({peer, port, ConnectPayload (port).c_str()}, router ?: peer);
+        ConnectPacket msg (peer, port, port);
+        send (msg, router ?: peer);
         peers.insert (peer);
         ++num_of_peers;
     }
@@ -67,8 +67,9 @@ namespace bt {
     void Peer::tell (port_t whom, port_t about) {
         if (whom == about) return;
 
-//        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
-        send ({whom, port, ConnectPayload (about).c_str()}, router ?: whom);
+        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
+        ConnectPacket msg (whom, port, about);
+        send (msg, router ?: whom);
     }
 
     std::set <port_t> const & Peer::get_peers() const {

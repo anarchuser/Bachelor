@@ -26,7 +26,7 @@
 #define PORT(n) (PORT_PEER_START + n)
 #define PORT_INC port_index++
 
-#define TIMEOUT_MS 8000
+#define TIMEOUT_MS 400
 
 #define PEERS 10
 
@@ -45,5 +45,9 @@ int main (int argc, char * argv[]) {
     for (int i = 1; i < kPeers; i++) {
         peers[i]->connect (PORT(i - 1));
     }
-    while (peers[0]->num_of_peers != kPeers - 1) continue;
+    for (auto const & peer : peers) {
+        while (peer->num_of_peers < kPeers - 1) {
+            std::this_thread::sleep_for (std::chrono::milliseconds (10));
+        }
+    }
 }
