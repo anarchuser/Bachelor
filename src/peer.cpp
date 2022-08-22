@@ -42,15 +42,13 @@ int main (int argc, char * argv[]) {
     }
     for (int i = 1; i < PEERS; i++) {
         peers[i]->connect (PORT(i - 1));
-        std::this_thread::sleep_for (std::chrono::milliseconds (500));
     }
 
-    std::this_thread::sleep_for (std::chrono::seconds (2));
+    for (auto const & peer : peers) {
+        while (peer->num_of_peers + 1 < PEERS) std::this_thread::yield();
+    }
     std::cout << "Who knows whom?\n";
-    std::cout << "-----------------------------------\\\n";
     for (int i = 0; i < PEERS; i++) {
-        if (i) std::cout << "-----------------------------------|\n";
         peers[i]->operator << (std::cout) << "\n";
     }
-    std::cout << "-----------------------------------/" << std::endl;
 }

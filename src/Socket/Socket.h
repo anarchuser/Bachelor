@@ -43,8 +43,6 @@ namespace bt {
         virtual void process (Packet const & packet, port_t sender);
         std::atomic <bool> const & is_destroyed_view = is_destroyed;
 
-        std::mutex mx;
-
     private:
         struct sockaddr_in address = {0};
         int const socket_fd;

@@ -18,7 +18,7 @@ namespace bt {
         PING,       // Check for life signs
         CONNECT,    // Tell of the existence of a peer
         ACK,        // Acknowledge an action (approve)
-        NACK,       // Do not acknowledge an action (deny)
+        NACK,       // Do not acknowledge an action (reject)
     };
 
     struct __attribute__((__packed__)) Payload {

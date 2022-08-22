@@ -21,12 +21,16 @@ namespace bt {
         Peer (Peer const &) = delete;
         ~Peer() noexcept override;
 
-        bool connect (port_t peer);
+        void connect (port_t peer);
+
+        [[nodiscard]] std::set <port_t> const & get_peers() const;
 
         std::ostream & operator << (std::ostream & os) const;
 
+        std::atomic <std::size_t> num_of_peers = 0;
+
     private:
-        std::map <port_t, std::set <port_t>> peers;
+        std::set <port_t> peers;
 
         void tell (port_t whom, port_t about);
         void process (Packet const & packet, port_t sender) override;

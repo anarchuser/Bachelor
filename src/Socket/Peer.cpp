@@ -44,50 +44,43 @@ namespace bt {
         auto joiner = ((ConnectPayload const *) packet.payload)->joiner;
         auto sender = packet.header.sender;
 
-//        std::lock_guard <std::mutex> guard (mx);
+        if (peers.contains (joiner)) return;
         if (joiner == port || sender == port) return;
-        if (joiner == sender) {
-            connect (joiner);
-            for (auto const & peer : peers) {
-                tell (peer.first, joiner);
-                tell (joiner, peer.first);
-            }
-        } else if (peers.contains (sender) || !peers [sender].contains (joiner)) {
-            connect (joiner);
-            tell (sender, joiner);
-            peers [sender].insert (joiner);
-        } else {
-            LOG (WARNING) << PRINT_PORT << "Received connect request from unknown peer " << sender;
-            LOG (WARNING) << PRINT_PORT << packet;
+
+        for (auto peer : peers) {
+            tell (peer, joiner);
+            tell (joiner, peer);
         }
+        connect (joiner);
     }
 
-    bool Peer::connect (port_t peer) {
-        if (peers.contains (peer)) return false;
-        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
+    void Peer::connect (port_t peer) {
+        if (peers.contains (peer)) return;
 
+        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
         send ({peer, port, ConnectPayload (port).c_str()}, router ?: peer);
-        peers.insert ({peer, {}});
-        return true;
+        peers.insert (peer);
+        ++num_of_peers;
     }
 
     void Peer::tell (port_t whom, port_t about) {
         if (whom == about) return;
-        if (peers [whom].contains (about)) return;
-        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
+
+//        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
         send ({whom, port, ConnectPayload (about).c_str()}, router ?: whom);
     }
 
+    std::set <port_t> const & Peer::get_peers() const {
+        return peers;
+    }
+
     std::ostream & Peer::operator << (std::ostream & os) const {
-        os << PRINT_PORT << "[LIST|peers|contacts]";
-        for (auto const & requester : peers) {
-            os << "\n\t" << requester.first << ": [";
-            for (auto pending : requester.second) {
-                os << pending << "|";
-            }
-            os << "]";
+        os << PRINT_PORT << "[PEER|";
+        os << "Σ" << num_of_peers;
+        for (auto peer : peers) {
+            os << "|" << peer;
         }
-        return os;
+        return os << ']';
     }
 }
 
