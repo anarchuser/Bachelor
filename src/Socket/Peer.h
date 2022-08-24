@@ -32,6 +32,7 @@ namespace bt {
 
     private:
         std::set <port_t> peers;
+        std::atomic <std::uint32_t> message_counter = 0;
 
         void tell (port_t whom, port_t about);
         void process (Packet const & packet, port_t sender) override;

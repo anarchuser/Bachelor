@@ -35,7 +35,7 @@ namespace bt {
     }
 
     void Peer::process_ping (Packet const & packet) {
-        LOG (INFO) << '\t' << port << ": [RECV]\t[" << packet << "]";
+//        LOG (INFO) << PRINT_PORT << "[RECV]\t[" << packet << "]";
     }
 
     void Peer::process_connect (ConnectPacket const & packet) {
@@ -45,7 +45,7 @@ namespace bt {
         if (peers.contains (joiner)) return;
         if (joiner == port || sender == port) return;
 
-        LOG (INFO) << '\t' << port << ": [RECV]\t[" << packet << "]";
+//        LOG (INFO) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
         for (auto peer : peers) {
             tell (peer, joiner);
@@ -57,8 +57,8 @@ namespace bt {
     void Peer::connect (port_t peer) {
         if (peers.contains (peer)) return;
 
-        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
-        ConnectPacket msg (peer, port, port);
+//        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
+        ConnectPacket msg (peer, port, port, message_counter++);
         send (msg, router ?: peer);
         peers.insert (peer);
         ++num_of_peers;
@@ -67,8 +67,8 @@ namespace bt {
     void Peer::tell (port_t whom, port_t about) {
         if (whom == about) return;
 
-        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
-        ConnectPacket msg (whom, port, about);
+//        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
+        ConnectPacket msg (whom, port, about, message_counter++);
         send (msg, router ?: whom);
     }
 

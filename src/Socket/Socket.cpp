@@ -71,7 +71,7 @@ namespace bt {
         send (packet, packet.receiver);
     }
     void Socket::send (Packet const & packet, port_t receiver) {
-//        LOG (INFO) << '\t' << port << ": [SEND|" << packet;
+        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (receiver)
                                        , .sin_addr = {.s_addr = INADDR_ANY}};

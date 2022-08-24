@@ -8,12 +8,9 @@ namespace bt {
 
     struct ConnectPacket : public Packet {
     public:
-        ConnectPacket (port_t receiver, port_t sender, port_t joiner);
+        ConnectPacket (port_t receiver, port_t sender, port_t joiner, std::uint32_t counter);
 
         port_t const joiner;
-
-    private:
-        [[nodiscard]] std::uint32_t instance_counter() const override;
     };
 
     std::ostream & operator << (std::ostream & os, bt::ConnectPacket const & packet);

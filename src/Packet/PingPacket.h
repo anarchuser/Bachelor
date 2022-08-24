@@ -8,10 +8,7 @@ namespace bt {
 
     struct PingPacket : public Packet {
     public:
-        PingPacket (port_t receiver, port_t sender);
-
-    private:
-        [[nodiscard]] std::uint32_t instance_counter() const override;
+        PingPacket (port_t receiver, port_t sender, std::uint32_t counter);
     };
 
     std::ostream & operator << (std::ostream & os, bt::PingPacket const & packet);

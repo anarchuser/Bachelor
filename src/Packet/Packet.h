@@ -28,23 +28,19 @@ namespace bt {
         size_t const size;
         port_t const receiver;
         port_t const sender;
-        ActionType const type: 16;
+        std::uint32_t counter;
         std::uint64_t timestamp;
+        ActionType const type: 8;
 
-        // TODO: turn Packet into an interface
-        // TODO: give each subclass a thread_local counter
-        // TODO: serialise a message number as separate field
-
+        // Cast the given string to a Packet
         static Packet const & from_buffer (char const * buffer);
-        // Retrieve this Packet as 0-terminated string
+        // Retrieve this Packet as const char string
         [[nodiscard]] char const * c_str() const;
 
         virtual ~Packet() = 0;
 
     protected:
-        Packet (size_t size, port_t receiver, port_t sender, ActionType type);
-
-        [[nodiscard]] virtual std::uint32_t instance_counter() const = 0;
+        Packet (size_t size, port_t receiver, port_t sender, ActionType type, std::uint32_t counter);
     };
 
     std::ostream & operator << (std::ostream & os, bt::Packet const & packet);

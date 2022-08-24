@@ -1,12 +1,13 @@
 #include "Packet.h"
 
 namespace bt {
-    Packet::Packet (size_t size, port_t receiver, port_t sender, ActionType type)
+    Packet::Packet (size_t size, port_t receiver, port_t sender, ActionType type, std::uint32_t counter)
             : size {size}
             , receiver {receiver}
             , sender {sender}
-            , type {type}
+            , counter {counter}
             , timestamp {get_timestamp()}
+            , type {type}
             {}
 
     Packet::~Packet () = default;
@@ -22,7 +23,8 @@ namespace bt {
         os << packet.size     << "|";
         os << packet.receiver << "|";
         os << packet.sender   << "|";
-        os << packet.type;
+        os << packet.type     << "|";
+        os << packet.counter;
         return os;
     }
 }

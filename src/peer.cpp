@@ -24,7 +24,6 @@
 #include "Socket/Router.h"
 
 #define PORT(n) (PORT_PEER_START + n)
-#define PORT_INC port_index++
 
 #define TIMEOUT_MS 400
 
