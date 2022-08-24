@@ -6,7 +6,7 @@
 
 namespace bt {
 
-    struct PingPacket : public Packet {
+    struct __attribute__((__packed__)) PingPacket : public Packet {
     public:
         PingPacket (port_t receiver, port_t sender, std::uint32_t counter);
     };

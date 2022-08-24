@@ -6,7 +6,7 @@
 
 namespace bt {
 
-    struct ConnectPacket : public Packet {
+    struct __attribute__((__packed__)) ConnectPacket : public Packet {
     public:
         ConnectPacket (port_t receiver, port_t sender, port_t joiner, std::uint32_t counter);
 
