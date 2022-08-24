@@ -8,71 +8,81 @@ namespace bt {
     Peer::~Peer () noexcept {
         Socket::~Socket();
         while (!is_destroyed_view) std::this_thread::yield();
+        this->operator << (std::cout) << std::endl;
     }
 
     void Peer::process (Packet const & packet, port_t sender) {
-        Socket::process (packet, sender);
-
-        if (packet.header.sender < PORT_PEER_START || packet.header.sender > PORT_PEER_END) {
+        if (packet.sender < PORT_PEER_START || packet.sender > PORT_PEER_END) {
             LOG (WARNING) << PRINT_PORT << "Received packet from suspicious port - " << packet;
             return;
         }
-        if (packet.header.receiver != port) {
+        if (packet.receiver != port) {
             LOG (WARNING) << PRINT_PORT << "Received packet with foreign recipient - " << packet;
             return;
         }
-        auto const & payload = * (Payload const *) packet.payload;
-        switch (payload.action) {
+        switch (packet.type) {
             case PING:
-                process_ping (packet, sender);
+                process_ping (packet);
                 break;
             case CONNECT:
-                process_connect (packet, sender);
+                process_connect (dynamic_cast <ConnectPacket const &> (packet));
                 break;
             case ACK:
             case NACK:
             default:
-                LOG (WARNING) << PRINT_PORT << "Cannot handle action " << payload.action;
+                LOG (WARNING) << PRINT_PORT << "Cannot handle type " << packet.type;
         }
     }
 
-    void Peer::process_ping (Packet const & packet, port_t sender) {
-
+    void Peer::process_ping (Packet const & packet) {
+//        LOG (INFO) << PRINT_PORT << "[RECV]\t[" << packet << "]";
     }
 
-    void Peer::process_connect (Packet const & packet, port_t sender) {
-        // TODO: only apply joins permanently if all other known peers agree
+    void Peer::process_connect (ConnectPacket const & packet) {
+        auto sender = packet.sender;
+        auto joiner = packet.joiner;
 
-        auto joiner = ((ConnectPayload const *) packet.payload)->joiner;
         if (peers.contains (joiner)) return;
+        if (joiner == port || sender == port) return;
 
-        if (packet.header.sender == joiner) {
-            LOG (INFO) << PRINT_PORT << joiner << " joined the network";
-            for (auto peer : peers) {
-                send ({peer, port, ConnectPayload (joiner).c_str()});
-            }
-            peers.insert (joiner);
+//        LOG (INFO) << PRINT_PORT << "[RECV]\t[" << packet << "]";
+
+        for (auto peer : peers) {
+            tell (peer, joiner);
+            tell (joiner, peer);
         }
-        else if (peers.contains (packet.header.sender)) {
-            LOG (INFO) << PRINT_PORT << packet.header.sender << " let me know of " << joiner;
-            join (joiner);
-        }
-        else {
-            LOG (WARNING) << PRINT_PORT << "Unknown peer " << packet.header.sender << " told me of " << joiner;
-        }
+        connect (joiner);
     }
 
-    void Peer::join (port_t peer) {
-        send ({peer, port, ConnectPayload (port).c_str()}, router ?: peer);
+    void Peer::connect (port_t peer) {
+        if (peers.contains (peer)) return;
+
+//        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
+        ConnectPacket msg (peer, port, port, message_counter++);
+        send (msg, router ?: peer);
         peers.insert (peer);
+        ++num_of_peers;
+    }
+
+    void Peer::tell (port_t whom, port_t about) {
+        if (whom == about) return;
+
+//        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
+        ConnectPacket msg (whom, port, about, message_counter++);
+        send (msg, router ?: whom);
+    }
+
+    std::set <port_t> const & Peer::get_peers() const {
+        return peers;
     }
 
     std::ostream & Peer::operator << (std::ostream & os) const {
-        os << PRINT_PORT << "|";
+        os << PRINT_PORT << "[PEER|";
+        os << "Σ" << num_of_peers;
         for (auto peer : peers) {
-            os << peer << "|";
+            os << "|" << peer;
         }
-        return os;
+        return os << ']';
     }
 }
 

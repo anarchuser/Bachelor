@@ -25,11 +25,11 @@ namespace bt {
 
     Socket::~Socket () {
         if (!should_stop) {
+            LOG (INFO) << PRINT_PORT << "[DTOR]";
             should_stop = true;
             thread.join ();
             close (socket_fd);
             is_destroyed = true;
-            LOG (INFO) << PRINT_PORT << "[DTOR]";
         }
     }
 
@@ -68,19 +68,19 @@ namespace bt {
     }
 
     void Socket::send (Packet const & packet) {
-        send (packet, packet.header.receiver);
+        send (packet, packet.receiver);
     }
     void Socket::send (Packet const & packet, port_t receiver) {
-        LOG (INFO) << '\t' << port << ": [SEND|" << packet;
+        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (receiver)
                                        , .sin_addr = {.s_addr = INADDR_ANY}};
 
-        sendto (socket_fd, packet.c_str(), packet.header.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+        sendto (socket_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
 
     void Socket::process (Packet const & packet, port_t sender) {
-        LOG (INFO) << '\t' << port << ": [RECV|" << packet;
+        LOG (INFO) << '\t' << port << ": [RECV]\t[" << packet << "]";
     }
 }
 

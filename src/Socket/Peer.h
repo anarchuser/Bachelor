@@ -2,6 +2,7 @@
 #define BACHELOR_PEER_H
 
 #include <chrono>
+#include <map>
 #include <set>
 #include <thread>
 #include <ostream>
@@ -9,7 +10,8 @@
 #include "config.h"
 #include "Socket.h"
 
-#include "Packet/Payload.h"
+#include "Packet/Packet.h"
+#include "Packet/ConnectPacket.h"
 
 #define PEER_TIMEOUT_MS 5000
 
@@ -20,16 +22,22 @@ namespace bt {
         Peer (Peer const &) = delete;
         ~Peer() noexcept override;
 
-        void join (port_t peer);
+        void connect (port_t peer);
+
+        [[nodiscard]] std::set <port_t> const & get_peers() const;
 
         std::ostream & operator << (std::ostream & os) const;
 
+        std::atomic <std::size_t> num_of_peers = 0;
+
     private:
         std::set <port_t> peers;
+        std::atomic <std::uint32_t> message_counter = 0;
 
+        void tell (port_t whom, port_t about);
         void process (Packet const & packet, port_t sender) override;
-        void process_ping (Packet const & packet, port_t sender);
-        void process_connect (Packet const & packet, port_t sender);
+        void process_ping (Packet const & packet);
+        void process_connect (ConnectPacket const & packet);
     };
 }
 
