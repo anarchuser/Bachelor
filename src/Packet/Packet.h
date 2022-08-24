@@ -31,16 +31,20 @@ namespace bt {
         ActionType const type: 16;
         std::uint64_t timestamp;
 
-        Packet (port_t receiver, port_t sender);
-        // Interpret 0-terminated string as Packet
+        // TODO: turn Packet into an interface
+        // TODO: give each subclass a thread_local counter
+        // TODO: serialise a message number as separate field
+
         static Packet const & from_buffer (char const * buffer);
         // Retrieve this Packet as 0-terminated string
         [[nodiscard]] char const * c_str() const;
 
-        virtual ~Packet() = default;
+        virtual ~Packet() = 0;
 
     protected:
         Packet (size_t size, port_t receiver, port_t sender, ActionType type);
+
+        [[nodiscard]] virtual std::uint32_t instance_counter() const = 0;
     };
 
     std::ostream & operator << (std::ostream & os, bt::Packet const & packet);

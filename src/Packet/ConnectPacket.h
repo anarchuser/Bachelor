@@ -11,6 +11,9 @@ namespace bt {
         ConnectPacket (port_t receiver, port_t sender, port_t joiner);
 
         port_t const joiner;
+
+    private:
+        [[nodiscard]] std::uint32_t instance_counter() const override;
     };
 
     std::ostream & operator << (std::ostream & os, bt::ConnectPacket const & packet);

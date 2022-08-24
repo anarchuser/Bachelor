@@ -11,6 +11,11 @@ namespace bt {
         os << "|" << packet.joiner;
         return os;
     }
+
+    std::uint32_t ConnectPacket::instance_counter () const {
+        thread_local std::uint32_t counter = 0;
+        return counter++;
+    }
 }
 
 /* Copyright © 2022 Aaron Alef */

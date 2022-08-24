@@ -1,10 +1,6 @@
 #include "Packet.h"
 
 namespace bt {
-    Packet::Packet (port_t receiver, port_t sender)
-            : Packet (sizeof (* this), receiver, sender, PING)
-            {}
-
     Packet::Packet (size_t size, port_t receiver, port_t sender, ActionType type)
             : size {size}
             , receiver {receiver}
@@ -12,6 +8,8 @@ namespace bt {
             , type {type}
             , timestamp {get_timestamp()}
             {}
+
+    Packet::~Packet () = default;
 
     Packet const & Packet::from_buffer (char const * buffer) {
         return * (Packet const *) buffer;
