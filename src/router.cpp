@@ -23,5 +23,8 @@
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Router (PORT_ROUTER);
+    char hostname[HOST_NAME_MAX];
+    gethostname (hostname, sizeof (hostname));
+
+    bt::Router (hostname, PORT_ROUTER);
 }

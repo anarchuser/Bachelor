@@ -29,13 +29,36 @@
 
 #define PEERS 10
 
+#define ROUTER
+#define ROUTER_REQUIRED
+
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
     int const kPeers = argc > 1 ? std::stoi (argv[1]) : PEERS;
 
-//    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
-//    bt::Socket::router = PORT_ROUTER;
+#ifdef ROUTER
+    char const * kRouterAddress = argc > 2 ? argv [2] : "localhost";
+
+    auto router_host = gethostbyname (kRouterAddress);
+    bt::Socket::router_address = router_host ? * (in_addr_t *) (router_host->h_addr_list[0]) : INADDR_ANY;
+    bt::Socket::router_port = PORT_ROUTER;
+
+#ifdef ROUTER_REQUIRED
+    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
+#endif
+
+    auto const * addr_cp = (char const *) & bt::Socket::router_address;
+    LOG (INFO) << "Router: " << kRouterAddress << " ["
+               << (int) addr_cp[0] << "."
+               << (int) addr_cp[1] << "."
+               << (int) addr_cp[2] << "."
+               << (int) addr_cp[3] << ":"
+               << PORT_ROUTER << "]";
+
+#else
+    LOG (INFO) << "No router in use.";
+#endif
 
     std::vector <std::unique_ptr <bt::Peer>> peers;
     for (int i = 0; i < kPeers; i++) {

@@ -10,6 +10,8 @@
 #include <atomic>
 #include <thread>
 
+#include <netdb.h>
+
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 
@@ -22,7 +24,8 @@ namespace bt {
     public:
         port_t const port;
 
-        static port_t router;
+        static in_addr_t router_address;
+        static port_t router_port;
 
         /* Bind a duplex socket to the port.
          * Timeout specifies how to behave on destruction:

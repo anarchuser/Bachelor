@@ -1,7 +1,8 @@
 #include "Socket.h"
 
 namespace bt {
-    port_t Socket::router = 0;
+    in_addr_t Socket::router_address = INADDR_ANY;
+    port_t Socket::router_port = 0;
 
     Socket::Socket (port_t port, int timeout)
             : port {port}
@@ -72,9 +73,10 @@ namespace bt {
     }
     void Socket::send (Packet const & packet, port_t receiver) {
         LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
+
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (receiver)
-                                       , .sin_addr = {.s_addr = INADDR_ANY}};
+                                       , .sin_addr = {.s_addr = router_address}};
 
         sendto (socket_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
