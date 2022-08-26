@@ -13,6 +13,7 @@
 #include "Packet/port.h"
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
+#include "Packet/port.h"
 
 #define PRINT_PORT "\t" << port << ": "
 

@@ -7,7 +7,7 @@ namespace bt {
                       , .sin_port = htons (port)
                       , .sin_addr = {.s_addr = INADDR_ANY}
                       }
-            , socket_fd {[=] () {
+            , socket_fd {[&] () {
                 auto fd = socket (AF_INET, SOCK_DGRAM, 0);
                 if (fd < 0) {
                     LOG (ERROR) << PRINT_PORT << "Could not create socket";
@@ -23,13 +23,8 @@ namespace bt {
                 char hostname[HOST_NAME_MAX];
                 gethostname (hostname, sizeof (hostname));
                 auto router_host = gethostbyname (hostname);
-                auto const * addr_cp = (char const *) router_host->h_addr_list;
-                LOG (INFO) << "Router: " << hostname << " ["
-                           << (int) addr_cp[0] << "."
-                           << (int) addr_cp[1] << "."
-                           << (int) addr_cp[2] << "."
-                           << (int) addr_cp[3] << ":"
-                           << PORT_ROUTER << "]";
+                auto const * addr_cp = (in_addr_t const *) router_host->h_addr_list[0];
+                LOG (INFO) << "Router: " << addr2str (* addr_cp, port);
             }
 
     Router::~Router() {
@@ -71,6 +66,7 @@ namespace bt {
 
             buffer [read] = 0;
             auto const & packet = bt::Packet::from_buffer (buffer);
+            LOG (INFO) << "Received packet: " << packet;
             if (sender.sin_port != packet.sender) {
                 LOG (WARNING) << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
                 LOG (WARNING) << "Packet: " << packet;

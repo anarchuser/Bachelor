@@ -19,10 +19,10 @@
 #include <glog/logging.h>
 
 #include "Socket/Router.h"
-auto const kTimeout = std::chrono::milliseconds (8000);
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    bt::Router (PORT_ROUTER);
+    auto const kTimeout = argc > 1 ? std::stoi (argv[1]) : ROUTER_TIMEOUT_MS;
+    bt::Router (PORT_ROUTER, kTimeout);
 }

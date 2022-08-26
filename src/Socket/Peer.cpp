@@ -59,7 +59,7 @@ namespace bt {
 
 //        LOG (INFO) << PRINT_PORT << "[JOIN|" << peer << "]";
         ConnectPacket msg (peer, port, port, message_counter++);
-        send (msg, router_port ?: peer);
+        send (msg, router_port.load() ?: peer);
         peers.insert (peer);
         ++num_of_peers;
     }
@@ -69,7 +69,7 @@ namespace bt {
 
 //        LOG (INFO) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
         ConnectPacket msg (whom, port, about, message_counter++);
-        send (msg, router_port ?: whom);
+        send (msg, router_port.load() ?: whom);
     }
 
     std::set <port_t> const & Peer::get_peers() const {
