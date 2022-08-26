@@ -63,7 +63,6 @@ namespace bt {
             }
 
             buffer [read] = 0;
-            LOG (INFO) << "Received packet from " << addr2str (ntohl (sender.sin_addr.s_addr), ntohs (sender.sin_port));
             process (Packet::from_buffer (buffer), ntohs (sender.sin_port));
             timeout.refresh();
         } while (! (should_stop && timeout.is_expired()));
@@ -73,14 +72,11 @@ namespace bt {
         send (packet, packet.receiver);
     }
     void Socket::send (Packet const & packet, port_t receiver) {
-        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
+//        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
 
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
-                                       , .sin_port = router_address ? router_port.load() : packet.receiver
+                                       , .sin_port = htons (router_address ? router_port.load() : packet.receiver)
                                        , .sin_addr = {.s_addr = router_address}};
-
-        LOG (INFO) << "Sending package to " << addr2str (recv_addr.sin_addr.s_addr, recv_addr.sin_port);
-        LOG (INFO) << packet;
 
         sendto (socket_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }

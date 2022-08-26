@@ -60,16 +60,15 @@ namespace bt {
                         std::this_thread::yield();
                         continue;
                     default:
-                        LOG (WARNING) << "Unknown error: " << errno;
+                        LOG (WARNING) << PRINT_PORT << "Unknown error: " << errno;
                 }
             }
 
             buffer [read] = 0;
             auto const & packet = bt::Packet::from_buffer (buffer);
-            LOG (INFO) << "Received packet: " << packet;
-            if (sender.sin_port != packet.sender) {
-                LOG (WARNING) << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
-                LOG (WARNING) << "Packet: " << packet;
+            if (ntohs (sender.sin_port) != packet.sender) {
+                LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
+                LOG (WARNING) << PRINT_PORT << "Packet: " << packet;
             }
             send (packet, sender.sin_addr.s_addr);
             timeout.refresh();
@@ -77,7 +76,7 @@ namespace bt {
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
-        LOG (INFO) << "[ROUT|" << packet.sender << "->" << packet.receiver << "]";
+        LOG (INFO) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << packet << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};

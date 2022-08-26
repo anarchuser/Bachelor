@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <glog/logging.h>
+#include <limits>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -14,6 +15,10 @@
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 #include "Packet/port.h"
+
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX 64
+#endif
 
 #define PRINT_PORT "\t" << port << ": "
 

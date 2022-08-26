@@ -29,7 +29,7 @@
 
 #define PEERS 10
 
-//#define ROUTER
+#define ROUTER
 #define ROUTER_REQUIRED
 
 int main (int argc, char * argv[]) {
