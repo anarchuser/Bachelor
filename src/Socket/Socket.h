@@ -20,12 +20,11 @@
 #define PRINT_PORT "\t" << port << ": "
 
 namespace bt {
-    struct Socket {
+    struct Socket final {
     public:
         port_t const port;
-
-        static in_addr_t router_address;
-        static port_t router_port;
+        std::atomic <in_addr_t> router_address = INADDR_ANY;
+        std::atomic <port_t>    router_port;
 
         /* Bind a duplex socket to the port.
          * Timeout specifies how to behave on destruction:
@@ -35,25 +34,26 @@ namespace bt {
          */
         explicit Socket (port_t port, int timeout_ms = SOCKET_TIMEOUT_MS);
         Socket (Socket const &) = delete;
-        virtual ~Socket();
+        ~Socket();
 
-        virtual void service () final;
+        void setRouter (port_t port, in_addr_t address = INADDR_ANY);
 
-        virtual void send (Packet const & packet, port_t receiver);
-        virtual void send (Packet const & packet);
+        void send (Packet const & packet, port_t receiver);
+        void send (Packet const & packet);
+        void process (Packet const & packet, port_t sender);
 
-    protected:
-        virtual void process (Packet const & packet, port_t sender);
         std::atomic <bool> const & is_destroyed_view = is_destroyed;
 
     private:
-        struct sockaddr_in address = {0};
+        struct sockaddr_in const address;
         int const socket_fd;
 
         std::thread thread;
         std::atomic <bool> should_stop = false;
         std::atomic <bool> is_destroyed = false;
         Timeout timeout;
+
+        void service ();
     };
 }
 

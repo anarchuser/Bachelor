@@ -15,16 +15,14 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <chrono>
 #include <glog/logging.h>
 
-#include "config.h"
 #include "Socket/Router.h"
+auto const kTimeout = std::chrono::milliseconds (8000);
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
-    char hostname[HOST_NAME_MAX];
-    gethostname (hostname, sizeof (hostname));
-
-    bt::Router (hostname, PORT_ROUTER);
+    bt::Router (PORT_ROUTER);
 }

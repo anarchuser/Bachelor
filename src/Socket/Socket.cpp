@@ -1,16 +1,13 @@
 #include "Socket.h"
 
 namespace bt {
-    in_addr_t Socket::router_address = INADDR_ANY;
-    port_t Socket::router_port = 0;
-
-    Socket::Socket (port_t port, int timeout)
+    Socket::Socket (port_t port, int timeout_ms)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
                       , .sin_addr = {.s_addr = INADDR_ANY}
                       }
-            , socket_fd {[&] () {
+            , socket_fd {[=] () {
                 auto fd = socket (AF_INET, SOCK_DGRAM, 0);
                 if (fd < 0) {
                     throw std::domain_error ("Could not create socket");
@@ -20,8 +17,8 @@ namespace bt {
                 }
                 return fd;
             }()}
+            , timeout (std::chrono::milliseconds (timeout_ms))
             , thread {& Socket::service, this}
-            , timeout (std::chrono::milliseconds (timeout))
             {}
 
     Socket::~Socket () {
@@ -34,6 +31,11 @@ namespace bt {
         }
     }
 
+    void Socket::setRouter (port_t rPort, in_addr_t rAddress) {
+        router_port = rPort;
+        router_address = rAddress;
+    }
+
     void Socket::service () {
         LOG (INFO) << PRINT_PORT << "[CTOR]";
 
@@ -43,12 +45,12 @@ namespace bt {
 
         do {
             ssize_t read = recvfrom ( socket_fd
-                                        , buffer
-                                        , MAX_PAYLOAD_BYTES - 1
-                                        , MSG_DONTWAIT
-                                        , (struct sockaddr *) & sender
-                                        , & length
-                                        );
+                                    , buffer
+                                    , MAX_PAYLOAD_BYTES - 1
+                                    , MSG_DONTWAIT
+                                    , (struct sockaddr *) & sender
+                                    , & length
+                                    );
             if (read < 0) {
                 switch (errno) {
 #if EAGAIN != EWOULDBLOCK  // POSIX.1-2001 does not require these to have the same value
