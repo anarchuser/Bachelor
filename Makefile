@@ -20,7 +20,7 @@ run:	build
 	GLOG_alsologtostderr=1 ./$(BUILD_DIR)/Peer
 
 # Build and run the tests
-router:	build
+router:	setup
 	cmake --build $(BUILD_DIR) --target Router > /dev/zero
 	GLOG_alsologtostderr=1 ./$(BUILD_DIR)/Router
 

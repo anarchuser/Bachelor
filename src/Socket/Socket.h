@@ -10,6 +10,8 @@
 #include <atomic>
 #include <thread>
 
+#include <netdb.h>
+
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 
@@ -21,8 +23,8 @@ namespace bt {
     struct Socket {
     public:
         port_t const port;
-
-        static port_t router;
+        static std::atomic <in_addr_t> router_address;
+        static std::atomic <port_t>    router_port;
 
         /* Bind a duplex socket to the port.
          * Timeout specifies how to behave on destruction:
@@ -34,23 +36,24 @@ namespace bt {
         Socket (Socket const &) = delete;
         virtual ~Socket();
 
-        virtual void service () final;
-
-        virtual void send (Packet const & packet, port_t receiver);
-        virtual void send (Packet const & packet);
+        virtual void send (Packet const & packet, port_t receiver) final;
+        virtual void send (Packet const & packet) final;
 
     protected:
         virtual void process (Packet const & packet, port_t sender);
+
         std::atomic <bool> const & is_destroyed_view = is_destroyed;
 
     private:
-        struct sockaddr_in address = {0};
+        struct sockaddr_in const address;
         int const socket_fd;
 
         std::thread thread;
         std::atomic <bool> should_stop = false;
         std::atomic <bool> is_destroyed = false;
         Timeout timeout;
+
+        void service ();
     };
 }
 
