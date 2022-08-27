@@ -39,23 +39,16 @@ int main (int argc, char * argv[]) {
 
 #ifdef ROUTER
     char const * kRouterAddress = argc > 2 ? argv [2] : "localhost";
-
     auto router_host = gethostbyname (kRouterAddress);
     bt::Socket::router_address = router_host ? * (in_addr_t *) (router_host->h_addr_list[0]) : INADDR_ANY;
     bt::Socket::router_port = PORT_ROUTER;
 
+
 #ifdef ROUTER_REQUIRED
     bt::Router r (PORT_ROUTER, TIMEOUT_MS);
+#else
+    LOG (INFO) << "Router: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
 #endif
-
-    auto const * addr_cp = (char const *) & bt::Socket::router_address;
-    LOG (INFO) << "Router: " << kRouterAddress << " ["
-               << (int) addr_cp[0] << "."
-               << (int) addr_cp[1] << "."
-               << (int) addr_cp[2] << "."
-               << (int) addr_cp[3] << ":"
-               << PORT_ROUTER << "]";
-
 #else
     LOG (INFO) << "No router in use.";
 #endif

@@ -1,10 +1,10 @@
 #include "Socket.h"
 
 namespace bt {
-    in_addr_t Socket::router_address = INADDR_ANY;
-    port_t Socket::router_port = 0;
+    std::atomic <in_addr_t> Socket::router_address = INADDR_ANY;
+    std::atomic <port_t> Socket::router_port = 0;
 
-    Socket::Socket (port_t port, int timeout)
+    Socket::Socket (port_t port, int timeout_ms)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -20,8 +20,8 @@ namespace bt {
                 }
                 return fd;
             }()}
+            , timeout (std::chrono::milliseconds (timeout_ms))
             , thread {& Socket::service, this}
-            , timeout (std::chrono::milliseconds (timeout))
             {}
 
     Socket::~Socket () {
@@ -43,12 +43,12 @@ namespace bt {
 
         do {
             ssize_t read = recvfrom ( socket_fd
-                                        , buffer
-                                        , MAX_PAYLOAD_BYTES - 1
-                                        , MSG_DONTWAIT
-                                        , (struct sockaddr *) & sender
-                                        , & length
-                                        );
+                                    , buffer
+                                    , MAX_PAYLOAD_BYTES - 1
+                                    , MSG_DONTWAIT
+                                    , (struct sockaddr *) & sender
+                                    , & length
+                                    );
             if (read < 0) {
                 switch (errno) {
 #if EAGAIN != EWOULDBLOCK  // POSIX.1-2001 does not require these to have the same value
@@ -72,17 +72,17 @@ namespace bt {
         send (packet, packet.receiver);
     }
     void Socket::send (Packet const & packet, port_t receiver) {
-        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
+//        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
 
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
-                                       , .sin_port = htons (receiver)
+                                       , .sin_port = htons (router_address ? router_port.load() : packet.receiver)
                                        , .sin_addr = {.s_addr = router_address}};
 
         sendto (socket_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
 
     void Socket::process (Packet const & packet, port_t sender) {
-        LOG (INFO) << '\t' << port << ": [RECV]\t[" << packet << "]";
+        LOG (INFO) << '\t' << port << ": [RECV|" << sender << "]\t[" << packet << "]";
     }
 }
 
