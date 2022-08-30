@@ -79,7 +79,12 @@ int main (int argc, char * argv[]) {
             }
         }
         LOG (INFO) << bt::get_time_string() << " ns: initialise";
+
+        peers[0]->send (bt::ActionPacket (PORT(0), PORT(0), {bt::get_timestamp(), PORT(0), bt::ALLOW_THIS}, 0));
+
         LOG (INFO) << bt::get_time_string() << " ns: destruct";
+
+        std::this_thread::sleep_for (std::chrono::seconds (2));
     }
     LOG (INFO) << bt::get_time_string() << " ns: end";
 }

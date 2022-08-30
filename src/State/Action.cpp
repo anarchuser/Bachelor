@@ -10,7 +10,8 @@ namespace bt {
     }
 
     std::ostream & operator << (std::ostream & os, Action const & action) {
-        os << action.type;
+        os << action.who;
+        os << "|@" << action.when;
         return os;
     }
 }

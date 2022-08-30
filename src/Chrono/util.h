@@ -9,10 +9,8 @@
 namespace bt {
     typedef std::uint64_t timestamp_t;
 
-    timestamp_t get_timestamp();
-
     std::string separate_thousands (timestamp_t timestamp);
-
+    timestamp_t get_timestamp();
     std::string get_time_string();
 }
 

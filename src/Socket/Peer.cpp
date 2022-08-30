@@ -8,7 +8,6 @@ namespace bt {
     Peer::~Peer () noexcept {
         Socket::~Socket();
         while (!is_destroyed_view) std::this_thread::yield();
-        consistent_state.apply ({get_timestamp(), port, ALLOW_THIS});
         std::cout << * this << std::endl;
     }
 
@@ -45,7 +44,11 @@ namespace bt {
     }
 
     void Peer::process (ActionPacket const & packet) {
+        LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
+        // TODO: broadcast an ACK
+
+        consistent_state.apply (packet.action);
     }
 
     void Peer::connect (port_t peer) {

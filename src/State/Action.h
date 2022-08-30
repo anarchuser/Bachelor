@@ -13,9 +13,9 @@ namespace bt {
     };
 
     struct __attribute__((__packed__)) Action {
-        timestamp_t const timestamp;
-        port_t const port;
-        ActionType const type: 8;
+        timestamp_t const when;
+        port_t const who;
+        ActionType const what: 8;
     };
 
     std::ostream & operator << (std::ostream & os, ActionType type);

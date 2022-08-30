@@ -16,10 +16,10 @@ namespace bt {
             return os << "[UNINITIALISED]\n";
         }
         for (auto const & [action, timestamp] : state.getActions()) {
-            os << "\t" << action.port;
+            os << "\t" << action.who;
             os << " @" << timestamp;
-            os << ": " << action.type;
-            os << " @" << action.timestamp;
+            os << ": " << action.what;
+            os << " @" << action.when;
             os << "\n";
         }
     }

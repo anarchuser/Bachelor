@@ -72,7 +72,7 @@ namespace bt {
         send (packet, packet.receiver);
     }
     void Socket::send (Packet const & packet, port_t receiver) {
-        LOG_IF (INFO, kLogSend) << PRINT_PORT << "[SEND]\t[" << to_string (packet) << "]";
+        LOG_IF (INFO, kLogSend) << PRINT_PORT << "[SEND|" << receiver << "]\t[" << to_string (packet) << "]";
 
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (router_address ? router_port.load() : packet.receiver)

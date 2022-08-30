@@ -9,7 +9,7 @@ bool const kLogCDtor = false;
 bool const kLogRoute = false;
 // Send / Receive
 bool const kLogSend = true;
-bool const kLogRecv = false;
+bool const kLogRecv = true;
 // Interconnecting
 bool const kLogJoin = false;
 bool const kLogTell = false;
