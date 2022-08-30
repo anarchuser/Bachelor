@@ -10,6 +10,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "log.h"
 #include "config.h"
 #include "Packet/port.h"
 #include "Packet/Packet.h"
@@ -19,8 +20,6 @@
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 64
 #endif
-
-#define PRINT_PORT "\t" << port << ": "
 
 #define ROUTER_TIMEOUT_MS 8000
 

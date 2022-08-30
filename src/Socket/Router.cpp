@@ -29,7 +29,7 @@ namespace bt {
 
     Router::~Router() {
         if (!should_stop) {
-            LOG (INFO) << PRINT_PORT << "[DTOR]";
+            LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[DTOR]";
             should_stop = true;
             thread.join ();
             close (socket_fd);
@@ -37,7 +37,7 @@ namespace bt {
     }
 
     void Router::service () {
-        LOG (INFO) << PRINT_PORT << "[CTOR]";
+        LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[CTOR]";
 
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
@@ -76,7 +76,7 @@ namespace bt {
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
-        LOG (INFO) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRoute) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << packet << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};

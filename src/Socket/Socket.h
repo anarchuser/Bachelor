@@ -12,12 +12,11 @@
 
 #include <netdb.h>
 
+#include "log.h"
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 
 #define SOCKET_TIMEOUT_MS 0
-
-#define PRINT_PORT "\t" << port << ": "
 
 namespace bt {
     struct Socket {

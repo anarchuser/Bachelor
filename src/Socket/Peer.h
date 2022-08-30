@@ -9,7 +9,7 @@
 
 #include "config.h"
 #include "Socket.h"
-
+#include "log.h"
 #include "Packet/Packet.h"
 #include "Packet/ConnectPacket.h"
 

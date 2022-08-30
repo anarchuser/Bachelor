@@ -26,7 +26,7 @@ namespace bt {
 
     Socket::~Socket () {
         if (!should_stop) {
-            LOG (INFO) << PRINT_PORT << "[DTOR]";
+            LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[DTOR]";
             should_stop = true;
             thread.join ();
             close (socket_fd);
@@ -35,7 +35,7 @@ namespace bt {
     }
 
     void Socket::service () {
-        LOG (INFO) << PRINT_PORT << "[CTOR]";
+        LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[CTOR]";
 
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
@@ -72,7 +72,7 @@ namespace bt {
         send (packet, packet.receiver);
     }
     void Socket::send (Packet const & packet, port_t receiver) {
-//        LOG (INFO) << PRINT_PORT << "[SEND]\t[" << packet << "]";
+        LOG_IF (INFO, kLogSend) << PRINT_PORT << "[SEND]\t[" << packet << "]";
 
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                                        , .sin_port = htons (router_address ? router_port.load() : packet.receiver)
@@ -82,7 +82,7 @@ namespace bt {
     }
 
     void Socket::process (Packet const & packet, port_t sender) {
-        LOG (INFO) << '\t' << port << ": [RECV|" << sender << "]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRecv) << '\t' << port << ": [RECV|" << sender << "]\t[" << packet << "]";
     }
 }
 

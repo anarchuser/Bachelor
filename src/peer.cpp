@@ -15,8 +15,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <glog/logging.h>
+#include <algorithm>
 #include <memory>
+#include <vector>
+
+#include <glog/logging.h>
 
 #include "config.h"
 #include "Socket/Socket.h"
@@ -29,7 +32,7 @@
 
 #define PEERS 10
 
-#define ROUTER
+//#define ROUTER
 #define ROUTER_REQUIRED
 
 int main (int argc, char * argv[]) {
@@ -47,10 +50,10 @@ int main (int argc, char * argv[]) {
 #ifdef ROUTER_REQUIRED
     bt::Router r (PORT_ROUTER, TIMEOUT_MS);
 #else
-    LOG (INFO) << "Router: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
+    LOG (INFO) << "\tRouter: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
 #endif
 #else
-    LOG (INFO) << "No router in use.";
+    LOG (INFO) << "\tNo router in use.";
 #endif
 
     std::vector <std::unique_ptr <bt::Peer>> peers;
@@ -60,9 +63,13 @@ int main (int argc, char * argv[]) {
     for (int i = 1; i < kPeers; i++) {
         peers[i]->connect (PORT(i - 1));
     }
-    for (auto const & peer : peers) {
-        while (peer->num_of_peers < kPeers - 1) {
-            std::this_thread::sleep_for (std::chrono::milliseconds (10));
+
+    for (int i = 0; i < 5; i++) {
+        while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
+            return peer->num_of_peers < kPeers - 1;
+        })) {
+            std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
         }
     }
+    LOG (INFO) << "\t==== Network synchronised ====";
 }
