@@ -8,6 +8,11 @@ namespace bt {
         }
         return os;
     }
+
+    std::ostream & operator << (std::ostream & os, Action const & action) {
+        os << action.type;
+        return os;
+    }
 }
 
 /* Copyright © 2022 Aaron Alef */

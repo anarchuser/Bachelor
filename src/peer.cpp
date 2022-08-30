@@ -22,6 +22,7 @@
 #include <glog/logging.h>
 
 #include "config.h"
+#include "Chrono/util.h"
 #include "Socket/Socket.h"
 #include "Socket/Peer.h"
 #include "Socket/Router.h"
@@ -42,6 +43,8 @@ int main (int argc, char * argv[]) {
 
     int const kPeers = argc > 1 ? std::stoi (argv[1]) : PEERS;
 
+    LOG (INFO) << bt::get_time_string() << " ns: start";
+
 #ifdef ROUTER
     char const * kRouterAddress = argc > 2 ? argv [2] : "localhost";
     auto router_host = gethostbyname (kRouterAddress);
@@ -58,22 +61,25 @@ int main (int argc, char * argv[]) {
     LOG (INFO) << "\tNo router in use.";
 #endif
 
-    std::vector <std::unique_ptr <bt::Peer>> peers;
-    for (int i = 0; i < kPeers; i++) {
-        peers.push_back (std::make_unique <bt::Peer> (PORT(i), TIMEOUT_MS));
-    }
-    for (int i = 1; i < kPeers; i++) {
-        peers[i]->connect (PORT(i - 1));
-    }
-
-    for (int i = 0; i < 5; i++) {
-        while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
-            return peer->num_of_peers < kPeers - 1;
-        })) {
-            std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
+    LOG (INFO) << bt::get_time_string() << " ns: connect";
+    {
+        std::vector<std::unique_ptr<bt::Peer>> peers;
+        for (int i = 0; i < kPeers; i++) {
+            peers.push_back (std::make_unique<bt::Peer> (PORT(i), TIMEOUT_MS));
         }
-    }
-    LOG (INFO) << "\t==== Network synchronised ====";
+        for (int i = 1; i < kPeers; i++) {
+            peers[i]->connect (PORT(i - 1));
+        }
 
-    peers[0]->send (bt::ActionPacket (PORT(0), PORT(0), bt::ALLOW_THIS, 0));
+        for (int i = 0; i < 5; i++) {
+            while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
+                return peer->num_of_peers < kPeers - 1;
+            })) {
+                std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
+            }
+        }
+        LOG (INFO) << bt::get_time_string() << " ns: initialise";
+        LOG (INFO) << bt::get_time_string() << " ns: destruct";
+    }
+    LOG (INFO) << bt::get_time_string() << " ns: end";
 }

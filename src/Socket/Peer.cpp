@@ -8,7 +8,8 @@ namespace bt {
     Peer::~Peer () noexcept {
         Socket::~Socket();
         while (!is_destroyed_view) std::this_thread::yield();
-        this->operator << (std::cout) << std::endl;
+        consistent_state.apply ({get_timestamp(), port, ALLOW_THIS});
+        std::cout << * this << std::endl;
     }
 
     void Peer::process (Packet const & packet, port_t sender) {
@@ -65,17 +66,21 @@ namespace bt {
         send (msg, router_port.load() ?: whom);
     }
 
-    std::set <port_t> const & Peer::get_peers() const {
+    std::set <port_t> const & Peer::getPeers() const {
         return peers;
     }
 
-    std::ostream & Peer::operator << (std::ostream & os) const {
-        os << PRINT_PORT << "[PEER|";
-        os << "Σ" << num_of_peers;
-        for (auto peer : peers) {
-            os << "|" << peer;
-        }
-        return os << ']';
+    std::ostream & operator << (std::ostream & os, Peer const & peer) {
+        os << peer.port << ": [PEER|";
+        os << "Σ" << peer.num_of_peers;
+        for (auto neighbour : peer.getPeers()) os << "|" << neighbour;
+        os << "]\n";
+        os << peer.getState();
+        return os;
+    }
+
+    State Peer::getState () const {
+        return consistent_state;
     }
 }
 

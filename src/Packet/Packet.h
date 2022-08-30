@@ -10,16 +10,15 @@
 
 #include <glog/logging.h>
 #include "port.h"
-#include "Action.h"
 #include "Chrono/util.h"
 
 namespace bt {
     enum PacketType {
         PING,       // Check for life signs
         CONNECT,    // Tell of the existence of a peer
-        ACTION,     // Perform an action
-        ACK,        // Acknowledge an action (approve)
-        NACK,       // Do not acknowledge an action (reject)
+        ACTION,     // Perform an type
+        ACK,        // Acknowledge an type (approve)
+        NACK,       // Do not acknowledge an type (reject)
     };
 
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation
@@ -37,7 +36,7 @@ namespace bt {
         port_t const receiver;
         port_t const sender;
         std::uint32_t counter;
-        std::uint64_t timestamp;
+        timestamp_t timestamp;
         PacketType const type: 8;
 
         // Cast the given string to a Packet
