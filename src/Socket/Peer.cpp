@@ -20,25 +20,14 @@ namespace bt {
             LOG (WARNING) << PRINT_PORT << "Received packet with foreign recipient - " << packet;
             return;
         }
-        switch (packet.type) {
-            case PING:
-                process_ping (packet);
-                break;
-            case CONNECT:
-                process_connect (dynamic_cast <ConnectPacket const &> (packet));
-                break;
-            case ACK:
-            case NACK:
-            default:
-                LOG (WARNING) << PRINT_PORT << "Cannot handle type " << packet.type;
-        }
+        DISPATCH (process, packet);
     }
 
-    void Peer::process_ping (Packet const & packet) {
+    void Peer::process (PingPacket const & packet) {
         LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV]\t[" << packet << "]";
     }
 
-    void Peer::process_connect (ConnectPacket const & packet) {
+    void Peer::process (ConnectPacket const & packet) {
         auto sender = packet.sender;
         auto joiner = packet.joiner;
 
@@ -52,6 +41,10 @@ namespace bt {
             tell (joiner, peer);
         }
         connect (joiner);
+    }
+
+    void Peer::process (ActionPacket const & packet) {
+
     }
 
     void Peer::connect (port_t peer) {

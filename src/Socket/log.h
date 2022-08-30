@@ -8,7 +8,7 @@ bool const kLogCDtor = false;
 // Router
 bool const kLogRoute = false;
 // Send / Receive
-bool const kLogSend = false;
+bool const kLogSend = true;
 bool const kLogRecv = false;
 // Interconnecting
 bool const kLogJoin = false;

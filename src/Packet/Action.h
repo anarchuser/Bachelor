@@ -5,11 +5,8 @@
 
 namespace bt {
     enum ActionType {
-        PING,       // Check for life signs
-        CONNECT,    // Tell of the existence of a peer
-        ACTION,     // Perform an action
-        ACK,        // Acknowledge an action (approve)
-        NACK,       // Do not acknowledge an action (reject)
+        ALLOW_THIS,
+        REJECT_THIS,
     };
 
     std::ostream & operator << (std::ostream & os, ActionType type);

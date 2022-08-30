@@ -26,6 +26,8 @@
 #include "Socket/Peer.h"
 #include "Socket/Router.h"
 
+#include "Packet/helper.h"
+
 #define PORT(n) (PORT_PEER_START + n)
 
 #define TIMEOUT_MS 400
@@ -72,4 +74,6 @@ int main (int argc, char * argv[]) {
         }
     }
     LOG (INFO) << "\t==== Network synchronised ====";
+
+    peers[0]->send (bt::ActionPacket (PORT(0), PORT(0), bt::ALLOW_THIS, 0));
 }

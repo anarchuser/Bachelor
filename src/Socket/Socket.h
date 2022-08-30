@@ -13,6 +13,7 @@
 #include <netdb.h>
 
 #include "log.h"
+#include "Packet/helper.h"
 #include "Packet/Packet.h"
 #include "Chrono/Timeout.h"
 

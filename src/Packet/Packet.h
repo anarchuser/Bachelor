@@ -3,7 +3,7 @@
 
 #include <string>
 #include <sstream>
-
+#include <iomanip>
 #include <cstring>
 #include <cstdint>
 #include <cmath>
@@ -14,6 +14,14 @@
 #include "Chrono/util.h"
 
 namespace bt {
+    enum PacketType {
+        PING,       // Check for life signs
+        CONNECT,    // Tell of the existence of a peer
+        ACTION,     // Perform an action
+        ACK,        // Acknowledge an action (approve)
+        NACK,       // Do not acknowledge an action (reject)
+    };
+
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation
      * -  60 = Maximum IP header size
      * -   8 = UDP header
@@ -30,7 +38,7 @@ namespace bt {
         port_t const sender;
         std::uint32_t counter;
         std::uint64_t timestamp;
-        ActionType const type: 8;
+        PacketType const type: 8;
 
         // Cast the given string to a Packet
         static Packet const & from_buffer (char const * buffer);
@@ -40,9 +48,10 @@ namespace bt {
         virtual ~Packet() = 0;
 
     protected:
-        Packet (size_t size, port_t receiver, port_t sender, ActionType type, std::uint32_t counter);
+        Packet (size_t size, port_t receiver, port_t sender, PacketType type, std::uint32_t counter);
     };
 
+    std::ostream & operator << (std::ostream & os, PacketType type);
     std::ostream & operator << (std::ostream & os, bt::Packet const & packet);
 };
 
