@@ -4,7 +4,7 @@ namespace bt {
     std::atomic <in_addr_t> Socket::router_address = INADDR_ANY;
     std::atomic <port_t> Socket::router_port = 0;
 
-    Socket::Socket (port_t port, int timeout_ms)
+    Socket::Socket (port_t port, timestamp_t timeout_ms)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -64,8 +64,8 @@ namespace bt {
 
             buffer [read] = 0;
             process (Packet::from_buffer (buffer), ntohs (sender.sin_port));
-            timeout.refresh();
-        } while (! (should_stop && timeout.is_expired()));
+            checkpoint.refresh();
+        } while (! (should_stop && checkpoint.has_elapsed (timeout)));
     }
 
     void Socket::send (Packet const & packet) {

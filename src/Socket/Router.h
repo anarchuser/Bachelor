@@ -14,7 +14,7 @@
 #include "config.h"
 #include "Packet/port.h"
 #include "Packet/Packet.h"
-#include "Chrono/Timeout.h"
+#include "Chrono/Checkpoint.h"
 #include "Packet/port.h"
 
 #ifndef HOST_NAME_MAX
@@ -28,10 +28,12 @@ namespace bt {
     public:
         port_t const port;
 
-        explicit Router (port_t port, int timeout_ms = ROUTER_TIMEOUT_MS);
+        explicit Router (port_t port, timestamp_t timeout_ms = ROUTER_TIMEOUT_MS);
         Router (Router const &) = delete;
         Router (Router &&) = delete;
         ~Router();
+
+        void await_idle (timestamp_t idle) const;
 
     private:
         void service ();
@@ -42,7 +44,8 @@ namespace bt {
 
         std::thread thread;
         std::atomic <bool> should_stop = false;
-        Timeout timeout;
+        Checkpoint checkpoint;
+        std::chrono::milliseconds const timeout;
     };
 }
 

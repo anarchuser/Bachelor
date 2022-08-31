@@ -33,6 +33,7 @@
 #define PORT(n) (PORT_PEER_START + n)
 
 #define TIMEOUT_MS 400
+#define IDLE_MS    100
 
 #define PEERS 10
 
@@ -85,7 +86,11 @@ int main (int argc, char * argv[]) {
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
+#ifdef ROUTER_REQUIRED
+        r.await_idle (IDLE_MS);
+#else
         std::this_thread::sleep_for (std::chrono::seconds (2));
+#endif
 
         std::vector <bt::State> result;
         for (auto const & peer : peers) {

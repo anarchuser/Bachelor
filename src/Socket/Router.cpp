@@ -1,7 +1,7 @@
 #include "Router.h"
 
 namespace bt {
-    Router::Router (port_t port, int timeout_ms)
+    Router::Router (port_t port, timestamp_t timeout_ms)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -34,6 +34,11 @@ namespace bt {
             thread.join ();
             close (socket_fd);
         }
+    }
+
+    void Router::await_idle (timestamp_t idle) const {
+        if (should_stop) return;
+        if (checkpoint.has_elapsed (std::chrono::milliseconds (idle))) return;
     }
 
     void Router::service () {
@@ -71,8 +76,8 @@ namespace bt {
                 LOG (WARNING) << PRINT_PORT << "Packet: " << packet;
             }
             send (packet, sender.sin_addr.s_addr);
-            timeout.refresh();
-        } while (! (should_stop && timeout.is_expired()));
+            checkpoint.refresh();
+        } while (! (should_stop && checkpoint.has_elapsed (timeout)));
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {

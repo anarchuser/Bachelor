@@ -15,7 +15,7 @@
 #include "log.h"
 #include "Packet/helper.h"
 #include "Packet/Packet.h"
-#include "Chrono/Timeout.h"
+#include "Chrono/Checkpoint.h"
 
 #define SOCKET_TIMEOUT_MS 0
 
@@ -27,12 +27,12 @@ namespace bt {
         static std::atomic <port_t>    router_port;
 
         /* Bind a duplex socket to the port.
-         * Timeout specifies how to behave on destruction:
+         * Checkpoint specifies how to behave on destruction:
          * Negative: Never time out, run forever
          * Zero:     Instantly time out
          * Positive: Stop if no message within this time arrived
          */
-        explicit Socket (port_t port, int timeout_ms = SOCKET_TIMEOUT_MS);
+        explicit Socket (port_t port, timestamp_t timeout_ms = SOCKET_TIMEOUT_MS);
         Socket (Socket const &) = delete;
         virtual ~Socket();
 
@@ -51,7 +51,8 @@ namespace bt {
         std::thread thread;
         std::atomic <bool> should_stop = false;
         std::atomic <bool> is_destroyed = false;
-        Timeout timeout;
+        Checkpoint checkpoint;
+        std::chrono::milliseconds const timeout;
 
         void service ();
     };
