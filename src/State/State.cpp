@@ -1,13 +1,23 @@
 #include "State.h"
 
 namespace bt {
+    State::State (State const & other) {
+        std::lock_guard other_lock (other.mx);
+        std::lock_guard own_lock (mx);
+        for (auto action : other.actions) {
+            actions.push_back (action);
+        }
+    }
+
     timestamp_t State::apply (Action action) {
+        std::lock_guard guard (mx);
         timestamp_t now = get_timestamp();
         actions.emplace_back (action);
         return now;
     }
 
     std::vector <Action> const & State::getActions() const {
+        std::lock_guard guard (mx);
         return actions;
     }
 

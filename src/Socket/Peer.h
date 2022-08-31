@@ -29,14 +29,12 @@ namespace bt {
         void connect (port_t peer);
         timestamp_t act (ActionType what);
 
-        [[nodiscard]] std::set <port_t> const & getPeers() const;
-        [[nodiscard]] State getState() const;
+        [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
+        [[nodiscard]] inline State getState() const { return consistent_state; }
 
         std::atomic <std::size_t> num_of_peers = 0;
 
     private:
-        mutable std::mutex mx;
-
         std::set <port_t> peers;
         State consistent_state;
 

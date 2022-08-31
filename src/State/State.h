@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <vector>
+#include <mutex>
 
 #include <glog/logging.h>
 
@@ -14,6 +15,7 @@ namespace bt {
     class State {
     public:
         State () = default;
+        State (State const & other);
 
         timestamp_t apply (Action action);
         [[nodiscard]] std::vector <Action> const & getActions() const;
@@ -21,6 +23,8 @@ namespace bt {
         inline bool operator == (State const & other) const { return actions == other.actions; }
 
     private:
+        mutable std::mutex mx;
+
         std::vector <Action> actions;
     };
 

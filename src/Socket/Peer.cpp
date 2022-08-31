@@ -54,19 +54,13 @@ namespace bt {
         LOG_IF (INFO, kLogJoin) << PRINT_PORT << "[JOIN|" << peer << "]";
         ConnectPacket msg (peer, port, port, count_msg());
         send (msg, router_port.load() ?: peer);
-        {
-            std::lock_guard guard (mx);
-            peers.insert (peer);
-        }
+        peers.insert (peer);
         ++num_of_peers;
     }
 
     timestamp_t Peer::act (ActionType what) {
         Action action (port, what);
-        {
-            std::lock_guard guard (mx);
-            consistent_state.apply (action);
-        }
+        consistent_state.apply (action);
         for (auto peer : peers) {
             send (ActionPacket (peer, port, action, count_msg()));
         }
@@ -94,16 +88,6 @@ namespace bt {
         os << "]\n";
         os << peer.getState();
         return os;
-    }
-
-    std::set <port_t> const & Peer::getPeers () const {
-        std::lock_guard guard (mx);
-        return peers;
-    }
-
-    State Peer::getState () const {
-        std::lock_guard guard (mx);
-        return consistent_state;
     }
 }
 
