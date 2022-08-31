@@ -18,6 +18,10 @@ namespace bt {
         timestamp_t const when;
         port_t const who;
         ActionType const what: 8;
+
+        inline bool operator == (Action const & other) const {
+            return when == other.when && who == other.who && what == other.what;
+        }
     };
 
     std::ostream & operator << (std::ostream & os, ActionType type);

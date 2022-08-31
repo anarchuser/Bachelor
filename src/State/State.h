@@ -16,10 +16,12 @@ namespace bt {
         State () = default;
 
         timestamp_t apply (Action action);
-        [[nodiscard]] std::vector <std::pair <Action, timestamp_t>> const & getActions() const;
+        [[nodiscard]] std::vector <Action> const & getActions() const;
+
+        inline bool operator == (State const & other) const { return actions == other.actions; }
 
     private:
-        std::vector <std::pair <Action, timestamp_t>> actions;
+        std::vector <Action> actions;
     };
 
     std::ostream & operator << (std::ostream & os, State const & state);

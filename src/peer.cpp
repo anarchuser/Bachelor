@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <unordered_set>
 #include <memory>
 #include <vector>
 
@@ -23,11 +24,11 @@
 
 #include "config.h"
 #include "Chrono/util.h"
+#include "Packet/helper.h"
 #include "Socket/Socket.h"
 #include "Socket/Peer.h"
 #include "Socket/Router.h"
-
-#include "Packet/helper.h"
+#include "State/State.h"
 
 #define PORT(n) (PORT_PEER_START + n)
 
@@ -35,7 +36,7 @@
 
 #define PEERS 10
 
-//#define ROUTER
+#define ROUTER
 #define ROUTER_REQUIRED
 
 int main (int argc, char * argv[]) {
@@ -43,7 +44,7 @@ int main (int argc, char * argv[]) {
 
     int const kPeers = argc > 1 ? std::stoi (argv[1]) : PEERS;
 
-    LOG (INFO) << bt::get_time_string() << " ns: start";
+    LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
 
 #ifdef ROUTER
     char const * kRouterAddress = argc > 2 ? argv [2] : "localhost";
@@ -61,7 +62,7 @@ int main (int argc, char * argv[]) {
     LOG (INFO) << "\tNo router in use.";
 #endif
 
-    LOG (INFO) << bt::get_time_string() << " ns: connect";
+    LOG (INFO) << "\t" << bt::get_time_string() << " ns: connect";
     {
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
@@ -78,13 +79,22 @@ int main (int argc, char * argv[]) {
                 std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
             }
         }
-        LOG (INFO) << bt::get_time_string() << " ns: initialise";
+        LOG (INFO) << "\t" << bt::get_time_string() << " ns: initialise";
 
-        LOG (INFO) << bt::separate_thousands (peers [0]->act (bt::ALLOW_THIS)) << " ns: act";
+        LOG (INFO) << "\t" << bt::separate_thousands (peers [0]->act (bt::ALLOW_THIS)) << " ns: act";
 
-        LOG (INFO) << bt::get_time_string() << " ns: destruct";
+        LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
         std::this_thread::sleep_for (std::chrono::seconds (2));
+
+        std::vector <bt::State> result;
+        for (auto const & peer : peers) {
+            auto state = peer->getState();
+            for (auto const & other : result) {
+                CHECK_EQ (state, other);
+            }
+            result.emplace_back (std::move (state));
+        }
     }
-    LOG (INFO) << bt::get_time_string() << " ns: end";
+    LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
 }

@@ -3,11 +3,11 @@
 namespace bt {
     timestamp_t State::apply (Action action) {
         timestamp_t now = get_timestamp();
-        actions.emplace_back (action, now);
+        actions.emplace_back (action);
         return now;
     }
 
-    std::vector <std::pair <Action, timestamp_t>> const & State::getActions() const {
+    std::vector <Action> const & State::getActions() const {
         return actions;
     }
 
@@ -15,13 +15,14 @@ namespace bt {
         if (state.getActions().empty()) {
             return os << "[UNINITIALISED]\n";
         }
-        for (auto const & [action, timestamp] : state.getActions()) {
+        for (auto action : state.getActions()) {
             os << "\t" << action.who;
-            os << " @" << timestamp;
+//            os << " @" << timestamp;
             os << ": " << action.what;
             os << " @" << action.when;
             os << "\n";
         }
+        return os;
     }
 }
 
