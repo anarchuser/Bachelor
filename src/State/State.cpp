@@ -13,7 +13,7 @@ namespace bt {
 
     std::ostream & operator << (std::ostream & os, State const & state) {
         if (state.getActions().empty()) {
-            return os << "[UNINITIALISED]\n";
+            return os << "\t[UNINITIALISED]\n";
         }
         for (auto action : state.getActions()) {
             os << "\t" << action.who;

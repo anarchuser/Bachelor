@@ -38,7 +38,7 @@ namespace bt {
 
     void Router::await_idle (timestamp_t idle) const {
         if (should_stop) return;
-        if (checkpoint.has_elapsed (std::chrono::milliseconds (idle))) return;
+        while (!checkpoint.has_elapsed (std::chrono::milliseconds (idle))) std::this_thread::yield();
     }
 
     void Router::service () {
@@ -73,7 +73,7 @@ namespace bt {
             auto const & packet = bt::Packet::from_buffer (buffer);
             if (ntohs (sender.sin_port) != packet.sender) {
                 LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
-                LOG (WARNING) << PRINT_PORT << "Packet: " << packet;
+                LOG (WARNING) << PRINT_PORT << "Packet: " << to_string (packet);
             }
             send (packet, sender.sin_addr.s_addr);
             checkpoint.refresh();
@@ -81,7 +81,7 @@ namespace bt {
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
-        LOG_IF (INFO, kLogRoute) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRoute) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << to_string (packet) << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};

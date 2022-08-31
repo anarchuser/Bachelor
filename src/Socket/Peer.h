@@ -29,12 +29,14 @@ namespace bt {
         void connect (port_t peer);
         timestamp_t act (ActionType what);
 
-        [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
-        [[nodiscard]] inline State getState() const { return consistent_state; }
+        [[nodiscard]] std::set <port_t> const & getPeers() const;
+        [[nodiscard]] State getState() const;
 
         std::atomic <std::size_t> num_of_peers = 0;
 
     private:
+        mutable std::mutex mx;
+
         std::set <port_t> peers;
         State consistent_state;
 
@@ -44,7 +46,9 @@ namespace bt {
         void process (PingPacket const & packet);
         void process (ConnectPacket const & packet);
         void process (ActionPacket const & packet);
-        [[nodiscard]] std::uint32_t count_msg () const;
+
+        std::atomic <std::uint32_t> msg_counter = 0;
+        [[nodiscard]] inline std::uint32_t count_msg () { return msg_counter++; }
     };
 
     std::ostream & operator << (std::ostream & os, Peer const & peer);

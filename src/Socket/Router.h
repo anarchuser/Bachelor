@@ -14,8 +14,9 @@
 #include "config.h"
 #include "Packet/port.h"
 #include "Packet/Packet.h"
-#include "Chrono/Checkpoint.h"
 #include "Packet/port.h"
+#include "Packet/helper.h"
+#include "Chrono/Checkpoint.h"
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 64
