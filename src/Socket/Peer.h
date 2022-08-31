@@ -27,24 +27,24 @@ namespace bt {
         ~Peer() noexcept override;
 
         void connect (port_t peer);
+        timestamp_t act (ActionType what);
 
-        [[nodiscard]] std::set <port_t> const & getPeers() const;
+        [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
+        [[nodiscard]] inline State getState() const { return consistent_state; }
 
         std::atomic <std::size_t> num_of_peers = 0;
 
-        [[nodiscard]] State getState() const;
-
     private:
         std::set <port_t> peers;
-        std::atomic <std::uint32_t> message_counter = 0;
-
         State consistent_state;
 
-        void tell (port_t whom, port_t about);
+        void introduce (port_t whom);
+        void introduce (port_t new_peer, port_t old_peer);
         void process (Packet const & packet, port_t sender) override;
         void process (PingPacket const & packet);
         void process (ConnectPacket const & packet);
         void process (ActionPacket const & packet);
+        [[nodiscard]] std::uint32_t count_msg () const;
     };
 
     std::ostream & operator << (std::ostream & os, Peer const & peer);

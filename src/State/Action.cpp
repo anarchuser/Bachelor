@@ -1,6 +1,12 @@
 #include "Action.h"
 
 namespace bt {
+    Action::Action (port_t who, ActionType what)
+            : when {get_timestamp()}
+            , who {who}
+            , what {what}
+            {}
+
     std::ostream & operator << (std::ostream & os, ActionType type) {
         switch (type) {
             case ALLOW_THIS:  return os << "ALLOW THIS";

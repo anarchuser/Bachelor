@@ -36,10 +36,7 @@ namespace bt {
 
         LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
-        for (auto peer : peers) {
-            tell (peer, joiner);
-            tell (joiner, peer);
-        }
+        introduce (joiner);
         connect (joiner);
     }
 
@@ -55,22 +52,33 @@ namespace bt {
         if (peers.contains (peer)) return;
 
         LOG_IF (INFO, kLogJoin) << PRINT_PORT << "[JOIN|" << peer << "]";
-        ConnectPacket msg (peer, port, port, message_counter++);
+        ConnectPacket msg (peer, port, port, count_msg());
         send (msg, router_port.load() ?: peer);
         peers.insert (peer);
         ++num_of_peers;
     }
 
-    void Peer::tell (port_t whom, port_t about) {
-        if (whom == about) return;
-
-        LOG_IF (INFO, kLogTell) << PRINT_PORT << "[TELL|" << whom << "|" << about << "]";
-        ConnectPacket msg (whom, port, about, message_counter++);
-        send (msg, router_port.load() ?: whom);
+    timestamp_t Peer::act (ActionType what) {
+        Action action (port, what);
+        consistent_state.apply (action);
+        for (auto peer : peers) {
+            send (ActionPacket (peer, port, action, count_msg()));
+        }
+        return action.when;
     }
 
-    std::set <port_t> const & Peer::getPeers() const {
-        return peers;
+    void Peer::introduce (port_t new_peer, port_t old_peer) {
+        if (new_peer == old_peer) return;
+
+        LOG_IF (INFO, kLogTell) << PRINT_PORT << "[TELL|" << old_peer << "|" << new_peer << "]";
+        ConnectPacket msg (old_peer, port, new_peer, count_msg ());
+        send (msg, router_port.load() ?: new_peer);
+    }
+    void Peer::introduce (port_t whom) {
+        for (auto peer : peers) {
+            introduce (peer, whom);
+            introduce (whom, peer);
+        }
     }
 
     std::ostream & operator << (std::ostream & os, Peer const & peer) {
@@ -82,8 +90,9 @@ namespace bt {
         return os;
     }
 
-    State Peer::getState () const {
-        return consistent_state;
+    std::uint32_t Peer::count_msg () const {
+        static std::atomic <std::uint32_t> counter = 0;
+        return counter++;
     }
 }
 

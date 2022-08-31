@@ -13,6 +13,8 @@ namespace bt {
     };
 
     struct __attribute__((__packed__)) Action {
+        Action (port_t who, ActionType what);
+
         timestamp_t const when;
         port_t const who;
         ActionType const what: 8;
