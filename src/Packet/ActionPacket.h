@@ -3,16 +3,18 @@
 
 #include "Packet.h"
 #include "port.h"
-#include "Action.h"
+#include "State/Action.h"
 
 namespace bt {
 
     struct __attribute__((__packed__)) ActionPacket : public Packet {
     public:
-        ActionPacket (port_t receiver, port_t sender, std::uint32_t counter);
+        ActionPacket (port_t receiver, port_t sender, Action action, std::uint32_t counter);
+
+        Action const action;
     };
 
-    std::ostream & operator << (std::ostream & os, bt::ActionPacket const & packet);
+    std::ostream & operator << (std::ostream & os, ActionPacket const & packet);
 
 } // bt
 

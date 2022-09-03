@@ -9,36 +9,48 @@
 
 #include "config.h"
 #include "Socket.h"
-
+#include "log.h"
+#include "Packet/helper.h"
 #include "Packet/Packet.h"
+#include "Packet/ActionPacket.h"
 #include "Packet/ConnectPacket.h"
+#include "Packet/PingPacket.h"
+#include "State/IntState.h"
 
 #define PEER_TIMEOUT_MS 5000
 
 namespace bt {
     class Peer: public Socket {
     public:
-        explicit Peer (port_t port, int timeout_ms = PEER_TIMEOUT_MS);
+        explicit Peer (port_t port, int state, int timeout_ms = PEER_TIMEOUT_MS);
         Peer (Peer const &) = delete;
         ~Peer() noexcept override;
 
         void connect (port_t peer);
+        timestamp_t act (ActionType what);
+        timestamp_t act (state_t value);
 
-        [[nodiscard]] std::set <port_t> const & get_peers() const;
-
-        std::ostream & operator << (std::ostream & os) const;
+        [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
+        [[nodiscard]] inline IntState getState() const { return consistent_state; }
 
         std::atomic <std::size_t> num_of_peers = 0;
 
     private:
         std::set <port_t> peers;
-        std::atomic <std::uint32_t> message_counter = 0;
+        IntState consistent_state;
 
-        void tell (port_t whom, port_t about);
+        void introduce (port_t whom);
+        void introduce (port_t new_peer, port_t old_peer);
         void process (Packet const & packet, port_t sender) override;
-        void process_ping (Packet const & packet);
-        void process_connect (ConnectPacket const & packet);
+        void process (PingPacket const & packet);
+        void process (ConnectPacket const & packet);
+        void process (ActionPacket const & packet);
+
+        std::atomic <std::uint32_t> msg_counter = 0;
+        [[nodiscard]] inline std::uint32_t count_msg () { return msg_counter++; }
     };
+
+    std::ostream & operator << (std::ostream & os, Peer const & peer);
 }
 
 

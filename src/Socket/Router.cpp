@@ -1,7 +1,7 @@
 #include "Router.h"
 
 namespace bt {
-    Router::Router (port_t port, int timeout_ms)
+    Router::Router (port_t port, timestamp_t timeout_ms)
             : port {port}
             , address { .sin_family = AF_INET
                       , .sin_port = htons (port)
@@ -24,20 +24,25 @@ namespace bt {
                 gethostname (hostname, sizeof (hostname));
                 auto router_host = gethostbyname (hostname);
                 auto const * addr_cp = (in_addr_t const *) router_host->h_addr_list[0];
-                LOG (INFO) << "Router: " << addr2str (* addr_cp, port);
+                LOG (INFO) << "\tRouter: " << addr2str (* addr_cp, port);
             }
 
     Router::~Router() {
         if (!should_stop) {
-            LOG (INFO) << PRINT_PORT << "[DTOR]";
+            LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[DTOR]";
             should_stop = true;
             thread.join ();
             close (socket_fd);
         }
     }
 
+    void Router::await_idle (timestamp_t idle) const {
+        if (should_stop) return;
+        while (!checkpoint.has_elapsed (std::chrono::milliseconds (idle))) std::this_thread::yield();
+    }
+
     void Router::service () {
-        LOG (INFO) << PRINT_PORT << "[CTOR]";
+        LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[CTOR]";
 
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
@@ -68,15 +73,15 @@ namespace bt {
             auto const & packet = bt::Packet::from_buffer (buffer);
             if (ntohs (sender.sin_port) != packet.sender) {
                 LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
-                LOG (WARNING) << PRINT_PORT << "Packet: " << packet;
+                LOG (WARNING) << PRINT_PORT << "Packet: " << to_string (packet);
             }
             send (packet, sender.sin_addr.s_addr);
-            timeout.refresh();
-        } while (! (should_stop && timeout.is_expired()));
+            checkpoint.refresh();
+        } while (! (should_stop && checkpoint.has_elapsed (timeout)));
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
-        LOG (INFO) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRoute) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << to_string (packet) << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};
