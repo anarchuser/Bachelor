@@ -22,6 +22,9 @@ namespace bt {
         inline bool operator == (Action const & other) const {
             return when == other.when && who == other.who && what == other.what;
         }
+        inline bool operator <  (Action const & other) const {
+            return when < other.when;
+        }
     };
 
     std::ostream & operator << (std::ostream & os, ActionType type);

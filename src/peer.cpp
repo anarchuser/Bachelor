@@ -82,9 +82,12 @@ int main (int argc, char * argv[]) {
                 std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
             }
         }
-        LOG (INFO) << "\t" << bt::get_time_string() << " ns: initialise";
+        LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
+//        LOG (INFO) << "\t" << bt::separate_thousands (peers [0]->act (bt::NOOP)) << " ns: first";
 
-        LOG (INFO) << "\t" << bt::separate_thousands (peers [0]->act (bt::NOOP)) << " ns: act";
+        for (auto const & peer : peers) {
+            peer->act (bt::NOOP);
+        }
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
@@ -94,7 +97,7 @@ int main (int argc, char * argv[]) {
         std::this_thread::sleep_for (std::chrono::seconds (2));
 #endif
 
-        std::vector <bt::State> result;
+        std::vector <bt::IntState> result;
         for (auto const & peer : peers) {
             auto state = peer->getState();
             for (auto const & other : result) {

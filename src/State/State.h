@@ -2,8 +2,8 @@
 #define BACHELOR_STATE_H
 
 #include <chrono>
-#include <vector>
 #include <mutex>
+#include <set>
 
 #include <glog/logging.h>
 
@@ -18,14 +18,14 @@ namespace bt {
         State (State const & other);
 
         virtual timestamp_t apply (Action action);
-        [[nodiscard]] virtual std::vector <Action> const & getActions() const final;
+        [[nodiscard]] virtual std::set <Action> const & getActions() const final;
 
         inline bool operator == (State const & other) const { return actions == other.actions; }
 
     protected:
         mutable std::mutex mx;
 
-        std::vector <Action> actions;
+        std::set <Action> actions;
     };
 
     std::ostream & operator << (std::ostream & os, State const & state);

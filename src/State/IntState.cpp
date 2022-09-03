@@ -6,7 +6,7 @@ namespace bt {
         std::lock_guard own_lock (mx);
         state = other.state.load();
         for (auto action : other.actions) {
-            actions.push_back (action);
+            actions.insert (action);
         }
     }
 
@@ -23,7 +23,7 @@ namespace bt {
                 LOG (WARNING) << "\tRequested unrecognisable action!";
                 return 0;
         }
-        actions.emplace_back (action);
+        actions.insert (action);
         return now;
     }
 
