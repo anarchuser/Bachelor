@@ -20,11 +20,13 @@ namespace bt {
             LOG (WARNING) << PRINT_PORT << "Received packet with foreign recipient - " << packet;
             return;
         }
+        LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV|" << sender << "]\t[" << to_string (packet) << "]";
+
         DISPATCH (process, packet);
     }
 
     void Peer::process (PingPacket const & packet) {
-        LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRecvPing) << PRINT_PORT << "[RECV]\t[" << packet << "]";
     }
 
     void Peer::process (ConnectPacket const & packet) {
@@ -34,14 +36,14 @@ namespace bt {
         if (peers.contains (joiner)) return;
         if (joiner == port || sender == port) return;
 
-        LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRecvConnect) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
         introduce (joiner);
         connect (joiner);
     }
 
     void Peer::process (ActionPacket const & packet) {
-        LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV]\t[" << packet << "]";
+        LOG_IF (INFO, kLogRecvAction) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
         // TODO: broadcast an ACK
 
