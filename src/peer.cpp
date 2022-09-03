@@ -30,6 +30,8 @@
 #include "Socket/Router.h"
 #include "State/State.h"
 
+#include "Random/RNG.h"
+
 #define PORT(n) (PORT_PEER_START + n)
 
 #define TIMEOUT_MS 400
@@ -41,6 +43,8 @@
 #define ROUTER_REQUIRED
 
 #define INIT_STATE 100
+#define MSG_NUM 1000
+#define MSG_DELAY_MS 10
 
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
@@ -83,9 +87,11 @@ int main (int argc, char * argv[]) {
             }
         }
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
+        RNG rng;
 
-        for (int i = 0; i < kPeers; i++) {
-            peers [i]->act (i);
+        for (int i = 0; i < MSG_NUM; i++) {
+            peers [rng.random ({0, double (kPeers)})]->act (rng.random ({-5, 5}));
+            std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));
         }
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";

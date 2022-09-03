@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <chrono>
+#include <string>
+#include <locale>
 
 #define SEPARATE_THOUSANDS
 

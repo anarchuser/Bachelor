@@ -16,7 +16,8 @@ bool const kLogRecvAction =  !kLogRecv && false;
 // Interconnecting
 bool const kLogJoin = false;
 bool const kLogTell = false;
-// Initialisation
+// State
+bool const kLogState = false;
 //TODO: log actions being applied persistently
 
 #endif //BACHELOR_LOG_H

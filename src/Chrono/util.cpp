@@ -2,12 +2,12 @@
 
 namespace bt {
     std::string separate_thousands (timestamp_t timestamp) {
-        std::ostringstream oss;
+        std::stringstream ss;
 #ifdef SEPARATE_THOUSANDS
-        oss.imbue (std::locale (""));
+        ss.imbue (std::locale (""));
 #endif
-        oss << timestamp;
-        return oss.str();
+        ss << timestamp;
+        return ss.str();
     }
 
     timestamp_t get_timestamp() {

@@ -20,9 +20,12 @@ namespace bt {
     }
 
     std::ostream & operator << (std::ostream & os, IntState const & state) {
-        os << "\tState: " << state.getState() << "\n";
-        for (auto action : state.getActions()) {
-            os << "\t" << action << "\n";
+        os << "\tState: " << state.getState();
+        if (kLogState) {
+            os << "\n";
+            for (auto action: state.getActions ()) {
+                os << "\t" << action << "\n";
+            }
         }
         return os;
     }

@@ -5,6 +5,7 @@
 
 #include <numeric>
 
+#include "Socket/log.h"
 #include "Action.h"
 #include "State.h"
 
