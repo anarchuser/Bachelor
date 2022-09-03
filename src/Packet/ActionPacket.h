@@ -14,7 +14,7 @@ namespace bt {
         Action const action;
     };
 
-    std::ostream & operator << (std::ostream & os, bt::ActionPacket const & packet);
+    std::ostream & operator << (std::ostream & os, ActionPacket const & packet);
 
 } // bt
 

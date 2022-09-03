@@ -10,16 +10,13 @@ namespace bt {
 
     class IntState final : public State {
     public:
-        IntState () = default;
+        inline IntState (int state): state {state} {}
         IntState (IntState const & other);
 
-        timestamp_t init (int state);
         timestamp_t apply (Action action) override;
-        [[nodiscard]] inline bool isInitialised() const { return isInit; }
-        [[nodiscard]] int getState() const;
+        [[nodiscard]] inline int getState() const { return state; }
 
     private:
-        std::atomic <bool> isInit = false;
         std::atomic <int> state = 0;
     };
 

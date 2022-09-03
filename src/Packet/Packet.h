@@ -16,9 +16,9 @@ namespace bt {
     enum PacketType {
         PING,       // Check for life signs
         CONNECT,    // Tell of the existence of a peer
-        ACTION,     // Perform an type
-        ACK,        // Acknowledge an type (approve)
-        NACK,       // Do not acknowledge an type (reject)
+        ACTION,     // Perform a type
+        ACK,        // Acknowledge a type (approve)
+        NACK,       // Do not acknowledge a type (reject)
     };
 
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation

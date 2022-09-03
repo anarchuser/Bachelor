@@ -22,7 +22,7 @@
 namespace bt {
     class Peer: public Socket {
     public:
-        explicit Peer (port_t port, int timeout_ms = PEER_TIMEOUT_MS);
+        explicit Peer (port_t port, int state, int timeout_ms = PEER_TIMEOUT_MS);
         Peer (Peer const &) = delete;
         ~Peer() noexcept override;
 

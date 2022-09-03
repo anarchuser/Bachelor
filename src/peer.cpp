@@ -40,6 +40,8 @@
 #define ROUTER
 #define ROUTER_REQUIRED
 
+#define INIT_STATE 100
+
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
@@ -67,7 +69,7 @@ int main (int argc, char * argv[]) {
     {
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
-            peers.push_back (std::make_unique<bt::Peer> (PORT(i), TIMEOUT_MS));
+            peers.push_back (std::make_unique<bt::Peer> (PORT(i), INIT_STATE, TIMEOUT_MS));
         }
         for (int i = 1; i < kPeers; i++) {
             peers[i]->connect (PORT(i - 1));

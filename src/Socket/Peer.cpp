@@ -1,8 +1,9 @@
 #include "Peer.h"
 
 namespace bt {
-    Peer::Peer (bt::port_t port, int timeout_ms)
+    Peer::Peer (bt::port_t port, int state, int timeout_ms)
             : Socket (port, timeout_ms)
+            , consistent_state {state}
             {}
 
     Peer::~Peer () noexcept {
