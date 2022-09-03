@@ -3,21 +3,25 @@
 
 #include <glog/logging.h>
 
+#include <numeric>
+
 #include "Action.h"
 #include "State.h"
 
 namespace bt {
 
+    typedef std::int32_t state_t;
+
     class IntState final : public State {
     public:
-        inline IntState (int state): state {state} {}
+        inline IntState (state_t state): state {state} {}
         IntState (IntState const & other);
 
         timestamp_t apply (Action action) override;
-        [[nodiscard]] inline int getState() const { return state; }
+        [[nodiscard]] state_t getState() const;
 
     private:
-        std::atomic <int> state = 0;
+        state_t const state = 0;
     };
 
     std::ostream & operator << (std::ostream & os, IntState const & state);
