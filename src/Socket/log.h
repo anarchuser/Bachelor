@@ -1,23 +1,26 @@
 #ifndef BACHELOR_LOG_H
 #define BACHELOR_LOG_H
 
+#include <atomic>
+
 #define PRINT_PORT "\t" << port << ": "
 
 // Ctor / Dtor
-bool const kLogCDtor = false;
+static bool const kLogCDtor = false;
 // Router
-bool const kLogRoute = false;
+static bool const kLogRoute = false;
 // Send / Receive
-bool const kLogSend = false;
-bool const kLogRecv = false;
-bool const kLogRecvPing =    !kLogRecv && false;
-bool const kLogRecvConnect = !kLogRecv && false;
-bool const kLogRecvAction =  !kLogRecv && false;
+static bool const kLogSend = false;
+static bool const kLogRecv = false;
+static bool const kLogRecvPing =    !kLogRecv && false;
+static bool const kLogRecvConnect = !kLogRecv && false;
+static bool const kLogRecvAction =  !kLogRecv && false;
 // Interconnecting
-bool const kLogJoin = false;
-bool const kLogTell = false;
+static bool const kLogJoin = false;
+static bool const kLogTell = false;
 // State
-bool const kLogState = false;
+static bool const kLogState = false;
+static std::atomic <bool> kLogPeerDtorState = true;
 //TODO: log actions being applied persistently
 
 #endif //BACHELOR_LOG_H

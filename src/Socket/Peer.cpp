@@ -9,7 +9,8 @@ namespace bt {
     Peer::~Peer () noexcept {
         Socket::~Socket();
         while (!is_destroyed_view) std::this_thread::yield();
-        std::cout << * this << std::endl;
+
+        if (kLogPeerDtorState) std::cout << * this << std::endl;
     }
 
     void Peer::process (Packet const & packet, port_t sender) {

@@ -79,16 +79,13 @@ int main (int argc, char * argv[]) {
             peers[i]->connect (PORT(i - 1));
         }
 
-        for (int i = 0; i < 5; i++) {
-            while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
-                return peer->num_of_peers < kPeers - 1;
-            })) {
-                std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
-            }
-        }
-        LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
-        RNG rng;
+        while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
+            return peer->num_of_peers < kPeers - 1;
+        })) std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
 
+        LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
+
+        RNG rng;
         for (int i = 0; i < MSG_NUM; i++) {
             peers [rng.random ({0, double (kPeers)})]->act (rng.random ({-5, 5}));
             std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));

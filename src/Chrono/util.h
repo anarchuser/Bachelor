@@ -3,8 +3,9 @@
 
 #include <cstdint>
 #include <chrono>
-#include <string>
 #include <locale>
+#include <string>
+#include <sstream>
 
 #define SEPARATE_THOUSANDS
 
