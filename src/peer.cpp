@@ -83,10 +83,9 @@ int main (int argc, char * argv[]) {
             }
         }
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
-//        LOG (INFO) << "\t" << bt::separate_thousands (peers [0]->act (bt::NOOP)) << " ns: first";
 
-        for (auto const & peer : peers) {
-            peer->act (bt::NOOP);
+        for (int i = 0; i < kPeers; i++) {
+            peers [i]->act (i);
         }
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";

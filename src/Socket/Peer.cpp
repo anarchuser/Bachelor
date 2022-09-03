@@ -69,6 +69,14 @@ namespace bt {
         }
         return action.when;
     }
+    timestamp_t Peer::act (state_t value) {
+        Action action (port, value);
+        consistent_state.apply (action);
+        for (auto peer : peers) {
+            send (ActionPacket (peer, port, action, count_msg()));
+        }
+        return action.when;
+    }
 
     void Peer::introduce (port_t new_peer, port_t old_peer) {
         if (new_peer == old_peer) return;

@@ -13,15 +13,17 @@ namespace bt {
     enum ActionType {
         NOOP,
         FORBIDDEN,
+        ADD,
     };
 
     struct __attribute__((__packed__)) Action {
-        Action (port_t who, ActionType what, std::int32_t value = ACTION_DEFAULT);
+        explicit Action (port_t who, ActionType what);
+        explicit Action (port_t who, std::int32_t value);
 
         timestamp_t const when;
         port_t const who;
         ActionType const what: 8;
-        std::int32_t const value;
+        std::int32_t const value = ACTION_DEFAULT;
 
         inline bool operator == (Action const & other) const {
             return when == other.when && who == other.who && what == other.what;

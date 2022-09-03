@@ -28,6 +28,7 @@ namespace bt {
 
         void connect (port_t peer);
         timestamp_t act (ActionType what);
+        timestamp_t act (state_t value);
 
         [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
         [[nodiscard]] inline IntState getState() const { return consistent_state; }

@@ -12,7 +12,7 @@ bool const kLogSend = false;
 bool const kLogRecv = false;
 bool const kLogRecvPing =    !kLogRecv && false;
 bool const kLogRecvConnect = !kLogRecv && false;
-bool const kLogRecvAction =  !kLogRecv && true;
+bool const kLogRecvAction =  !kLogRecv && false;
 // Interconnecting
 bool const kLogJoin = false;
 bool const kLogTell = false;

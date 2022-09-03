@@ -22,11 +22,7 @@ namespace bt {
     std::ostream & operator << (std::ostream & os, IntState const & state) {
         os << "\tState: " << state.getState() << "\n";
         for (auto action : state.getActions()) {
-            os << "\t" << action.who;
-//            os << " @" << timestamp;
-            os << ": " << action.what;
-            os << " @" << action.when;
-            os << "\n";
+            os << "\t" << action << "\n";
         }
         return os;
     }
