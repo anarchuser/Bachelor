@@ -82,7 +82,7 @@ int main (int argc, char * argv[]) {
         }
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: initialise";
 
-        LOG (INFO) << "\t" << bt::separate_thousands (peers [0]->act (bt::ALLOW_THIS)) << " ns: act";
+        LOG (INFO) << "\t" << bt::separate_thousands (peers [0]->act (bt::NOOP)) << " ns: act";
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 

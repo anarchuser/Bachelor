@@ -17,12 +17,12 @@ namespace bt {
         State () = default;
         State (State const & other);
 
-        timestamp_t apply (Action action);
-        [[nodiscard]] std::vector <Action> const & getActions() const;
+        virtual timestamp_t apply (Action action);
+        [[nodiscard]] virtual std::vector <Action> const & getActions() const final;
 
         inline bool operator == (State const & other) const { return actions == other.actions; }
 
-    private:
+    protected:
         mutable std::mutex mx;
 
         std::vector <Action> actions;

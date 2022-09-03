@@ -9,8 +9,8 @@ namespace bt {
 
     std::ostream & operator << (std::ostream & os, ActionType type) {
         switch (type) {
-            case ALLOW_THIS:  return os << "ALLOW THIS";
-            case REJECT_THIS: return os << "REJECT THIS";
+            case NOOP:  return os << "NOOP";
+            case FORBIDDEN: return os << "FORBIDDEN";
         }
         return os;
     }

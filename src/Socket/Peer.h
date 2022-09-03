@@ -15,7 +15,7 @@
 #include "Packet/ActionPacket.h"
 #include "Packet/ConnectPacket.h"
 #include "Packet/PingPacket.h"
-#include "State/State.h"
+#include "State/IntState.h"
 
 #define PEER_TIMEOUT_MS 5000
 
@@ -30,13 +30,13 @@ namespace bt {
         timestamp_t act (ActionType what);
 
         [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
-        [[nodiscard]] inline State getState() const { return consistent_state; }
+        [[nodiscard]] inline IntState getState() const { return consistent_state; }
 
         std::atomic <std::size_t> num_of_peers = 0;
 
     private:
         std::set <port_t> peers;
-        State consistent_state;
+        IntState consistent_state;
 
         void introduce (port_t whom);
         void introduce (port_t new_peer, port_t old_peer);

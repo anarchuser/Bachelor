@@ -8,8 +8,8 @@
 
 namespace bt {
     enum ActionType {
-        ALLOW_THIS,
-        REJECT_THIS,
+        NOOP,
+        FORBIDDEN,
     };
 
     struct __attribute__((__packed__)) Action {
