@@ -45,7 +45,7 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
                 std::vector <bt::IntState> result;
                 for (auto const & peer : peers) {
                     auto state = peer->getState();
-                    for (auto const & other : result) CHECK (state == other);
+                    for (auto const & other : result) REQUIRE (state == other);
                     result.emplace_back (std::move (state));
                 }
             }
@@ -54,8 +54,9 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
                     auto const & finalState = peer->getState();
                     auto state = finalState.initialState;
                     for (auto action : finalState.getActions()) {
-                        CHECK (action.what != bt::FORBIDDEN);
-                        CHECK (state += action.value >= 0);
+                        REQUIRE (action.what != bt::FORBIDDEN);
+                        state += action.value;
+                        REQUIRE (state >= 0);
                     }
                 }
             }

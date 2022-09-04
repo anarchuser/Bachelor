@@ -20,13 +20,14 @@ static bool const kLogRecv = false;
 static bool const kLogRecvPing    = !kLogRecv && false;
 static bool const kLogRecvConnect = !kLogRecv && false;
 static bool const kLogRecvAction  = !kLogRecv && false;
-static bool const kLogRecvVote    = !kLogRecv && true;
+static bool const kLogRecvVote    = !kLogRecv && false;
 // Interconnecting
 static bool const kLogJoin = false;
 static bool const kLogTell = false;
 // State
 static bool const kLogState = false;
 static std::atomic <bool> kLogPeerDtorState = true;
+static bool const kLogInvalidAction = false;
 //TODO: log actions being applied persistently
 
 #endif //BACHELOR_LOG_H

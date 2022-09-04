@@ -21,7 +21,7 @@ namespace bt {
         std::lock_guard guard (mx);
         auto canApply = try_apply (action, initialState, getActions());
         if (!canApply) {
-            LOG (WARNING) << "\tProhibited action requested: " << action;
+            LOG_IF (WARNING, kLogInvalidAction) << "\tProhibited action requested: " << action;
             return 0;
         }
 
