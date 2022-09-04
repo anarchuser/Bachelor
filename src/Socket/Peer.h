@@ -45,6 +45,8 @@ namespace bt {
         void process (PingPacket const & packet);
         void process (ConnectPacket const & packet);
         void process (ActionPacket const & packet);
+        void process (VotePacket const & packet);
+        void vote (Action action, Vote vote);
 
         std::atomic <std::uint32_t> msg_counter = 0;
         [[nodiscard]] inline std::uint32_t count_msg () { return msg_counter++; }

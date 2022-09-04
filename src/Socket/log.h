@@ -9,18 +9,24 @@
 static bool const kLogCDtor = false;
 // Router
 static bool const kLogRoute = false;
-// Send / Receive
+// Send
 static bool const kLogSend = false;
+static bool const kLogSendPing    = !kLogSend && false;
+static bool const kLogSendConnect = !kLogSend && false;
+static bool const kLogSendAction  = !kLogSend && false;
+static bool const kLogSendVote    = !kLogSend && true;
+// Receive
 static bool const kLogRecv = false;
-static bool const kLogRecvPing =    !kLogRecv && false;
+static bool const kLogRecvPing    = !kLogRecv && false;
 static bool const kLogRecvConnect = !kLogRecv && false;
-static bool const kLogRecvAction =  !kLogRecv && false;
+static bool const kLogRecvAction  = !kLogRecv && false;
+static bool const kLogRecvVote    = !kLogRecv && true;
 // Interconnecting
 static bool const kLogJoin = false;
 static bool const kLogTell = false;
 // State
 static bool const kLogState = false;
-static std::atomic <bool> kLogPeerDtorState = true;
+static std::atomic <bool> kLogPeerDtorState = false;
 //TODO: log actions being applied persistently
 
 #endif //BACHELOR_LOG_H

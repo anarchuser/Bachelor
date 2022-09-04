@@ -17,8 +17,8 @@ namespace bt {
     };
 
     struct __attribute__((__packed__)) Action {
-        explicit Action (port_t who, ActionType what);
-        explicit Action (port_t who, std::int32_t value);
+        Action (port_t who, ActionType what);
+        Action (port_t who, std::int32_t value);
 
         timestamp_t const when;
         port_t const who;

@@ -47,9 +47,24 @@ namespace bt {
     void Peer::process (ActionPacket const & packet) {
         LOG_IF (INFO, kLogRecvAction) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
-        // TODO: broadcast an ACK
+        bool shouldReject = false;
+        if (packet.action.what == FORBIDDEN) shouldReject = true;
+        vote (packet.action, shouldReject ? REJECT : APPROVE);
 
         consistent_state.apply (packet.action);
+    }
+
+    void Peer::process (VotePacket const & packet) {
+        LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
+
+        // TODO: process vote
+    }
+
+    void Peer::vote (Action action, Vote vote) {
+        LOG_IF (INFO, kLogSendVote) << PRINT_PORT << "[SEND]\t" << action;
+        for (auto peer : peers) {
+            send (VotePacket (peer, port, vote, action, count_msg()));
+        }
     }
 
     void Peer::connect (port_t peer) {

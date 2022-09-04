@@ -49,6 +49,8 @@
 int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
+    RNG rng;
+
     int const kPeers = argc > 1 ? std::stoi (argv[1]) : PEERS;
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
@@ -85,11 +87,8 @@ int main (int argc, char * argv[]) {
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
-        RNG rng;
-        for (int i = 0; i < MSG_NUM; i++) {
-            peers [rng.random ({0, double (kPeers)})]->act (rng.random ({-5, 5}));
-            std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));
-        }
+        peers[0]->act (bt::NOOP);
+        peers[0]->act (bt::FORBIDDEN);
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
