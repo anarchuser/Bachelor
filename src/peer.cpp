@@ -98,6 +98,7 @@ int main (int argc, char * argv[]) {
         std::this_thread::sleep_for (std::chrono::seconds (2));
 #endif
 
+        // Check that all states are actually the same in the end:
         std::vector <bt::IntState> result;
         for (auto const & peer : peers) {
             auto state = peer->getState();

@@ -8,19 +8,18 @@
 #include "Random/RNG.h"
 
 #define PORT(n) (PORT_PEER_START + n)
-#define PEERS 10
+#define PEERS 3
 #define ROUTER
 
 #define TIMEOUT_MS 400
 #define IDLE_MS    100
 
-#define INIT_STATE 100
-#define MSG_NUM 1000
+#define INIT_STATE 00
+#define MSG_NUM 100
 #define MSG_DELAY_MS 10
 
 SCENARIO ("Random packets between peers get synchronised perfectly") {
     GIVEN ("Peers connected to a network") {
-        kLogPeerDtorState = false;
 
         RNG rng;
         bt::Router r (PORT_ROUTER, TIMEOUT_MS);
@@ -35,7 +34,7 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
             return peer->num_of_peers < PEERS - 1;
         })) std::this_thread::sleep_for (std::chrono::milliseconds (PEERS * PEERS));
 
-        WHEN ("Random ADD actions are performed") {
+        WHEN ("Random ADD actions are performed (if allowed") {
             for (int i = 0; i < MSG_NUM; i++) {
                 peers[rng.random ({0, PEERS})]->act (rng.random ({-5, 5}));
                 std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));
@@ -50,7 +49,6 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
                 }
             }
         }
-
     }
 }
 

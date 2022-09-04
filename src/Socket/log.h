@@ -14,7 +14,7 @@ static bool const kLogSend = false;
 static bool const kLogSendPing    = !kLogSend && false;
 static bool const kLogSendConnect = !kLogSend && false;
 static bool const kLogSendAction  = !kLogSend && false;
-static bool const kLogSendVote    = !kLogSend && true;
+static bool const kLogSendVote    = !kLogSend && false;
 // Receive
 static bool const kLogRecv = false;
 static bool const kLogRecvPing    = !kLogRecv && false;
@@ -25,8 +25,8 @@ static bool const kLogRecvVote    = !kLogRecv && true;
 static bool const kLogJoin = false;
 static bool const kLogTell = false;
 // State
-static bool const kLogState = false;
-static std::atomic <bool> kLogPeerDtorState = false;
+static bool const kLogState = true;
+static std::atomic <bool> kLogPeerDtorState = true;
 //TODO: log actions being applied persistently
 
 #endif //BACHELOR_LOG_H

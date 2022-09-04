@@ -1,16 +1,31 @@
 #include "IntState.h"
 
 namespace bt {
-    IntState::IntState (IntState const & other)
-            : State (other)
-            , state {other.state}
-            {}
+    bool IntState::try_apply (Action action, state_t state, std::set<Action> actions) {
+        if (action.what != ADD) return action.what == NOOP;
+        if (actions.contains (action)) return * actions.find (action) == action;
+
+        auto [action_pos, _] = actions.insert (action);
+        for (auto trav = actions.begin(); trav != action_pos; trav++) {
+            state += trav->value;
+            LOG_IF (WARNING, state < 0) << "Given actions cannot be applied iteratively onto the given state!";
+        }
+        for (auto trav = action_pos; trav != actions.end(); trav++) {
+            state += trav->value;
+            if (state < 0) return false;
+        }
+        return true;
+    }
 
     timestamp_t IntState::apply (Action action) {
         std::lock_guard guard (mx);
+        auto canApply = try_apply (action, state, getActions());
+        if (!canApply) {
+            LOG (WARNING) << "\tProhibited action requested: " << action;
+            return 0;
+        }
+
         auto now = get_timestamp();
-        // TODO: make a function "is_allowed"
-        LOG_IF (WARNING, action.what == FORBIDDEN) << "\tRequested prohibited action!";
         actions.insert (action);
         return now;
     }

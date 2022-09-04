@@ -47,11 +47,8 @@ namespace bt {
     void Peer::process (ActionPacket const & packet) {
         LOG_IF (INFO, kLogRecvAction) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
-        bool shouldReject = false;
-        if (packet.action.what == FORBIDDEN) shouldReject = true;
+        bool shouldReject = !consistent_state.apply (packet.action);
         vote (packet.action, shouldReject ? REJECT : APPROVE);
-
-        consistent_state.apply (packet.action);
     }
 
     void Peer::process (VotePacket const & packet) {
@@ -79,11 +76,10 @@ namespace bt {
 
     timestamp_t Peer::act (ActionType what) {
         Action action (port, what);
-        consistent_state.apply (action);
         for (auto peer : peers) {
             send (ActionPacket (peer, port, action, count_msg()));
         }
-        return action.when;
+        return consistent_state.apply (action);
     }
     timestamp_t Peer::act (state_t value) {
         Action action (port, value);

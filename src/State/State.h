@@ -18,7 +18,7 @@ namespace bt {
         State (State const & other);
 
         virtual timestamp_t apply (Action action);
-        [[nodiscard]] virtual std::set <Action> const & getActions() const final;
+        [[nodiscard]] virtual std::set <Action> getActions() const final;
 
         inline bool operator == (State const & other) const { return actions == other.actions; }
 
@@ -26,6 +26,8 @@ namespace bt {
         mutable std::mutex mx;
 
         std::set <Action> actions;
+
+        [[nodiscard]] virtual std::set <Action> getActions() final;
     };
 
     std::ostream & operator << (std::ostream & os, State const & state);
