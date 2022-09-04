@@ -25,7 +25,7 @@ static bool const kLogRecvVote    = !kLogRecv && true;
 static bool const kLogJoin = false;
 static bool const kLogTell = false;
 // State
-static bool const kLogState = true;
+static bool const kLogState = false;
 static std::atomic <bool> kLogPeerDtorState = true;
 //TODO: log actions being applied persistently
 

@@ -8,18 +8,19 @@
 #include "Random/RNG.h"
 
 #define PORT(n) (PORT_PEER_START + n)
-#define PEERS 3
+#define PEERS 10
 #define ROUTER
 
 #define TIMEOUT_MS 400
 #define IDLE_MS    100
 
 #define INIT_STATE 00
-#define MSG_NUM 100
+#define MSG_NUM 1000
 #define MSG_DELAY_MS 10
 
 SCENARIO ("Random packets between peers get synchronised perfectly") {
     GIVEN ("Peers connected to a network") {
+        kLogPeerDtorState = false;
 
         RNG rng;
         bt::Router r (PORT_ROUTER, TIMEOUT_MS);
@@ -46,6 +47,16 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
                     auto state = peer->getState();
                     for (auto const & other : result) CHECK (state == other);
                     result.emplace_back (std::move (state));
+                }
+            }
+            THEN ("All actions are permitted") {
+                for (auto const & peer : peers) {
+                    auto const & finalState = peer->getState();
+                    auto state = finalState.initialState;
+                    for (auto action : finalState.getActions()) {
+                        CHECK (action.what != bt::FORBIDDEN);
+                        CHECK (state += action.value >= 0);
+                    }
                 }
             }
         }
