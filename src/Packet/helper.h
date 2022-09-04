@@ -5,17 +5,18 @@
 #include "PingPacket.h"
 #include "ConnectPacket.h"
 #include "ActionPacket.h"
+#include "VotePacket.h"
 
 #define DISPATCH(function, packet)                                              \
     switch (packet.type) {                                                      \
         case PING:                                                              \
-            function (dynamic_cast <PingPacket const &> (packet)); break;           \
+            function (dynamic_cast <PingPacket const &> (packet)); break;       \
         case CONNECT:                                                           \
-            function (dynamic_cast <ConnectPacket const &> (packet)); break;        \
+            function (dynamic_cast <ConnectPacket const &> (packet)); break;    \
         case ACTION:                                                            \
-            function (dynamic_cast <ActionPacket const &> (packet)); break;         \
-        case ACK:                                                               \
-        case NACK:                                                              \
+            function (dynamic_cast <ActionPacket const &> (packet)); break;     \
+        case VOTE:                                                              \
+            function (dynamic_cast <VotePacket const &> (packet)); break;       \
         default:                                                                \
             LOG (WARNING) << PRINT_PORT << "Cannot handle type " << packet.type;\
     }; false

@@ -17,8 +17,7 @@ namespace bt {
         PING,       // Check for life signs
         CONNECT,    // Tell of the existence of a peer
         ACTION,     // Perform a type
-        ACK,        // Acknowledge a type (approve)
-        NACK,       // Do not acknowledge a type (reject)
+        VOTE,       // Approve or reject an action
     };
 
     /*   576 = Minimum required size to guarantee reassembly in case of fragmentation

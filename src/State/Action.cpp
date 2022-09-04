@@ -24,12 +24,13 @@ namespace bt {
     }
 
     std::ostream & operator << (std::ostream & os, Action const & action) {
-        os << action.who;
+        os << "[" << action.who;
+        os << "|" << action.what;
         if (action.what == ADD) {
-            os << "|" << action.what << "(" << action.value << ")";
+            os << "(" << action.value << ")";
         }
         os << "|@" << action.when;
-        return os;
+        return os << "]";
     }
 
     std::int32_t operator + (std::int32_t state, Action const & action) {

@@ -7,6 +7,7 @@ namespace bt {
             case PING:    ss << dynamic_cast <PingPacket const &> (packet); break;
             case CONNECT: ss << dynamic_cast <ConnectPacket const &> (packet); break;
             case ACTION:  ss << dynamic_cast <ActionPacket const &> (packet); break;
+            case VOTE:    ss << dynamic_cast <VotePacket const &> (packet); break;
             default:      ss << packet;
         }
         return ss.str();
