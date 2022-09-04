@@ -27,7 +27,7 @@ namespace bt {
         os << "[" << action.who;
         os << "|" << action.what;
         if (action.what == ADD) {
-            os << "(" << action.value << ")";
+            os << "(" << std::right << std::setfill (' ') << std::setw(3) << action.value << ")";
         }
         os << "|@" << action.when;
         return os << "]";

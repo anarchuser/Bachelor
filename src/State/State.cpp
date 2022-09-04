@@ -1,13 +1,7 @@
 #include "State.h"
 
 namespace bt {
-    State::State (State const & other) {
-        std::lock_guard other_lock (other.mx);
-        std::lock_guard own_lock (mx);
-        for (auto action : other.actions) {
-            actions.insert (action);
-        }
-    }
+    State::State (State const & other): actions {other.getActions()} {}
 
     timestamp_t State::apply (Action action) {
         std::lock_guard guard (mx);
@@ -16,9 +10,20 @@ namespace bt {
         return now;
     }
 
-    std::set <Action> const & State::getActions() const {
+    std::set <Action> State::getActions() {
+        std::set <Action> copy;
+        for (auto action : actions) {
+            copy.insert (action);
+        }
+        return copy;
+    }
+    std::set <Action> State::getActions() const {
         std::lock_guard guard (mx);
-        return actions;
+        std::set <Action> copy;
+        for (auto action : actions) {
+            copy.insert (action);
+        }
+        return copy;
     }
 
     std::ostream & operator << (std::ostream & os, State const & state) {

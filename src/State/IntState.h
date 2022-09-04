@@ -15,11 +15,13 @@ namespace bt {
 
     class IntState final : public State {
     public:
-        inline IntState (state_t state): state {state} {}
-        IntState (IntState const & other);
+        inline explicit IntState (state_t state): state {state} {}
+        IntState (IntState const & other) = default;
 
         timestamp_t apply (Action action) override;
         [[nodiscard]] state_t getState() const;
+
+        [[nodiscard]] static bool try_apply (Action action, state_t state, std::set <Action> actions);
 
     private:
         state_t const state = 0;
