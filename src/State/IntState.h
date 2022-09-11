@@ -15,7 +15,7 @@ namespace bt {
 
     class IntState final : public State {
     public:
-        inline explicit IntState (state_t state): state {state} {}
+        inline explicit IntState (state_t state): initialState {state} {}
         IntState (IntState const & other) = default;
 
         timestamp_t apply (Action action) override;
@@ -23,8 +23,7 @@ namespace bt {
 
         [[nodiscard]] static bool try_apply (Action action, state_t state, std::set <Action> actions);
 
-    private:
-        state_t const state = 0;
+        state_t const initialState = 0;
     };
 
     std::ostream & operator << (std::ostream & os, IntState const & state);
