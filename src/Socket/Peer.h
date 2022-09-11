@@ -4,6 +4,7 @@
 #include <chrono>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <thread>
 #include <ostream>
 
@@ -12,7 +13,6 @@
 #include "log.h"
 #include "Packet/helper.h"
 #include "Packet/Packet.h"
-#include "Packet/ActionPacket.h"
 #include "Packet/ConnectPacket.h"
 #include "Packet/PingPacket.h"
 #include "State/IntState.h"
@@ -38,13 +38,13 @@ namespace bt {
     private:
         std::set <port_t> peers;
         IntState consistent_state;
+        std::unordered_set <timestamp_t> rejected_actions;
 
         void introduce (port_t whom);
         void introduce (port_t new_peer, port_t old_peer);
         void process (Packet const & packet, port_t sender) override;
         void process (PingPacket const & packet);
         void process (ConnectPacket const & packet);
-        void process (ActionPacket const & packet);
         void process (VotePacket const & packet);
         void vote (Action action, Vote vote);
 

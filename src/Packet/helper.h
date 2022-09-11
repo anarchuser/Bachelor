@@ -4,7 +4,6 @@
 #include "Packet.h"
 #include "PingPacket.h"
 #include "ConnectPacket.h"
-#include "ActionPacket.h"
 #include "VotePacket.h"
 
 #define DISPATCH(function, packet)                                              \
@@ -13,8 +12,6 @@
             function (dynamic_cast <PingPacket const &> (packet)); break;       \
         case CONNECT:                                                           \
             function (dynamic_cast <ConnectPacket const &> (packet)); break;    \
-        case ACTION:                                                            \
-            function (dynamic_cast <ActionPacket const &> (packet)); break;     \
         case VOTE:                                                              \
             function (dynamic_cast <VotePacket const &> (packet)); break;       \
         default:                                                                \

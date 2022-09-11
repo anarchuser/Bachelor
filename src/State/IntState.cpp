@@ -30,6 +30,11 @@ namespace bt {
         return now;
     }
 
+    bool IntState::contains (Action action) const {
+        std::lock_guard guard (mx);
+        return actions.contains (action);
+    }
+
     state_t IntState::getState() const {
         return std::accumulate (actions.begin(), actions.end(), initialState);
     }

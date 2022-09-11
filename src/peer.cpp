@@ -98,6 +98,12 @@ int main (int argc, char * argv[]) {
         std::this_thread::sleep_for (std::chrono::seconds (2));
 #endif
 
+        std::cout << "Peers: |";
+        for (auto const & peer : peers) std::cout << peer->port << "|";
+        std::cout << "\nState: |";
+        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (5) << peer->getState().getState() << "|";
+        std::cout << std::endl;
+
         // Check that all states are actually the same in the end:
         std::vector <bt::IntState> result;
         for (auto const & peer : peers) {

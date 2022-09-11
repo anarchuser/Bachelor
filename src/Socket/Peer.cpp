@@ -44,17 +44,20 @@ namespace bt {
         connect (joiner);
     }
 
-    void Peer::process (ActionPacket const & packet) {
-        LOG_IF (INFO, kLogRecvAction) << PRINT_PORT << "[RECV]\t[" << packet << "]";
-
-        bool shouldReject = !consistent_state.apply (packet.action);
-        vote (packet.action, shouldReject ? REJECT : APPROVE);
-    }
-
     void Peer::process (VotePacket const & packet) {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
-        // TODO: process vote
+        // TODO: make this smarter
+        if (rejected_actions.contains (packet.action.when)) return;
+
+        if (!consistent_state.contains (packet.action)) {
+            // TODO: apply actions temporarily only
+            bool shouldReject = !consistent_state.apply (packet.action);
+            if (shouldReject) rejected_actions.insert (packet.action.when);
+            vote (packet.action, shouldReject ? REJECT : APPROVE);
+        } else {
+            // TODO: Update vote count on temporary action
+        }
     }
 
     void Peer::vote (Action action, Vote vote) {
@@ -76,17 +79,13 @@ namespace bt {
 
     timestamp_t Peer::act (ActionType what) {
         Action action (port, what);
-        for (auto peer : peers) {
-            send (ActionPacket (peer, port, action, count_msg()));
-        }
+        vote (action, APPROVE);
         return consistent_state.apply (action);
     }
     timestamp_t Peer::act (state_t value) {
         Action action (port, value);
+        vote (action, APPROVE);
         consistent_state.apply (action);
-        for (auto peer : peers) {
-            send (ActionPacket (peer, port, action, count_msg()));
-        }
         return action.when;
     }
 
