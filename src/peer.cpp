@@ -62,12 +62,12 @@
 int main (int argc, char * argv[]) {
     /* Init section */
     Args const args {argc, (char const * *) argv};
+    args.isHelp ();
     google::InitGoogleLogging (argv[0]);
     RNG rng;
 
     /* TEST SECTION */
-
-    args.isHelp ();
+    std::cout << "Number of peers: " << (args.getPeers() ?: PEERS);
     return 0;
     /* END OF TEST SECTION */
 

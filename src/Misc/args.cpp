@@ -13,7 +13,7 @@ int Args::getIndex (char const * short_form, char const * long_form) const {
 
 void Args::isHelp() const {
     static bool firstInvoc = true;
-    if (!firstInvoc || !getIndex ("-h", "--help")) return;
+    if (!firstInvoc || !getIndex (ARGS_HELP)) return;
 
     std::cout << "Program arguments:\n";
     std::cout << "  -h --help                 Display this as help\n";
@@ -28,26 +28,39 @@ void Args::isHelp() const {
 }
 
 int Args::getPeers() const {
-    return 0;
+    auto flag_index = getIndex (ARGS_PEERS);
+    auto val_index = flag_index + 1;
+    if (val_index >= argc) return 0;
+    return std::stoi (argv [val_index]);
 }
 
 bool Args::getRouter() const {
+    auto flag_index = getIndex (ARGS_ROUTER);
+
     return false;
 }
 
 char const * Args::getAddress() const {
+    auto flag_index = getIndex (ARGS_ADDRESS);
+
     return "localhost";
 }
 
 int Args::getState() const {
+    auto flag_index = getIndex (ARGS_STATE);
+
     return 0;
 }
 
 int Args::getMessageCount() const {
+    auto flag_index = getIndex (ARGS_MESSAGES);
+
     return 0;
 }
 
 Args::Trust Args::getTrust() const {
+    auto flag_index = getIndex (ARGS_TRUST);
+
     return NAIVE;
 }
 

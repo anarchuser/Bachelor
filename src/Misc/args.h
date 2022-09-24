@@ -5,6 +5,15 @@
 #include <cstdlib>
 #include <cstring>
 
+// Program argument flags:
+#define ARGS_HELP       "-h", "--help"
+#define ARGS_PEERS      "-p", "--peers"
+#define ARGS_ROUTER     "-r", "--router"
+#define ARGS_ADDRESS    "-a", "--address"
+#define ARGS_STATE      "-s", "--state"
+#define ARGS_MESSAGES   "-m", "--msgs"
+#define ARGS_TRUST      "-t", "--trust"
+
 struct Args {
     enum Trust {
         NAIVE = 0,
