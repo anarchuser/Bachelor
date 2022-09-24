@@ -67,7 +67,7 @@ int main (int argc, char * argv[]) {
     RNG rng;
 
     /* TEST SECTION */
-    std::cout << "Use external router? " << args.getRouter() << std::endl;
+    std::cout << "Connect to router at address = " << args.getAddress();
     return 0;
     /* END OF TEST SECTION */
 

@@ -39,8 +39,9 @@ bool Args::getRouter() const {
 
 char const * Args::getAddress() const {
     auto flag_index = getIndex (ARGS_ADDRESS);
-
-    return "localhost";
+    auto val_index = flag_index + 1;
+    if (!flag_index || val_index >= argc) return "localhost";
+    return argv [val_index];
 }
 
 int Args::getState() const {
