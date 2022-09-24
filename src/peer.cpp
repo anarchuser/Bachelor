@@ -23,6 +23,7 @@
 #include <glog/logging.h>
 
 #include "config.h"
+#include "Misc/args.h"
 #include "Chrono/util.h"
 #include "Packet/helper.h"
 #include "Socket/Socket.h"
@@ -48,15 +49,34 @@
 #define MSG_NUM 1000
 #define MSG_DELAY_MS 10
 
-int main (int argc, char * argv[]) {
-    google::InitGoogleLogging (argv[0]);
+/* Program arguments:
+ * -h --help                    Display this as help
+ * -p --peers [n]               Number of peers
+ * -r --router                  Set up a router
+ * -a --address                 Use this address for router
+ * -s --state [n]               Initial state
+ * -m --msgs [n]                Number of messages to be sent
+ * -t --trust [naive|voting]    Select the behaviour of peers
+ */
 
+int main (int argc, char * argv[]) {
+    /* Init section */
+    Args const args {argc, (char const * *) argv};
+    google::InitGoogleLogging (argv[0]);
     RNG rng;
 
-    int const kPeers = argc > 1 ? std::stoi (argv[1]) : PEERS;
+    /* TEST SECTION */
+
+    args.isHelp ();
+    return 0;
+    /* END OF TEST SECTION */
+
+    /* Read program args */
+    int const kPeers = args.getPeers() ?: PEERS;
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
 
+    /* Configure router if needed */
 #ifdef ROUTER
     char const * kRouterAddress = argc > 2 ? argv [2] : "localhost";
     auto router_host = gethostbyname (kRouterAddress);
@@ -75,6 +95,7 @@ int main (int argc, char * argv[]) {
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: connect";
     {
+        /* Build network */
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
             peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
@@ -83,10 +104,12 @@ int main (int argc, char * argv[]) {
             peers[i]->connect (PORT(i - 1));
         }
 
+        /* Wait for network */
         while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
             return peer->num_of_peers < kPeers - 1;
         })) std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
 
+        /* Do any scenario action */
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
         peers[0]->act (bt::NOOP);

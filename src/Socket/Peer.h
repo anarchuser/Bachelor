@@ -15,6 +15,7 @@
 #include "Packet/Packet.h"
 #include "Packet/ConnectPacket.h"
 #include "Packet/PingPacket.h"
+#include "Packet/VotePacket.h"
 #include "State/IntState.h"
 
 #define PEER_TIMEOUT_MS 5000
