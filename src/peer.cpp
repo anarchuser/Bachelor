@@ -95,9 +95,25 @@ int main (int argc, char * argv[]) {
         /* Build network */
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
-            peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), kInitState, TIMEOUT_MS));
+            switch (kTrustProtocol) {
+                case Args::NAIVE:
+                    peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), kInitState, TIMEOUT_MS));
+                    break;
+                case Args::VOTING:
+                    peers.push_back (std::make_unique <bt::VotingPeer> (PORT(i), kInitState, TIMEOUT_MS));
+                    break;
+                case Args::LOCKSTEP:
+                    break;
+                default:;
+            }
         }
-        for (int i = 1; i < kPeers; i++) {
+        /* Do any scenario action */
+        if (peers.empty()) {
+            LOG (WARNING) << "No peer created! Note that Lockstep is not available (yet)";
+            return EXIT_FAILURE;
+        }
+
+        for (int i = 1; i < peers.size(); i++) {
             peers[i]->connect (PORT(i - 1));
         }
 
@@ -106,7 +122,6 @@ int main (int argc, char * argv[]) {
             return peer->num_of_peers < kPeers - 1;
         })) std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
 
-        /* Do any scenario action */
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
         peers[0]->act (bt::NOOP);
