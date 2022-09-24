@@ -14,6 +14,7 @@ int Args::getIndex (char const * short_form, char const * long_form) const {
 void Args::isHelp() const {
     static bool firstInvoc = true;
     if (!firstInvoc || !getIndex (ARGS_HELP)) return;
+    firstInvoc = false;
 
     std::cout << "Program arguments:\n";
     std::cout << "  -h --help                 Display this as help\n";
@@ -23,8 +24,6 @@ void Args::isHelp() const {
     std::cout << "  -s --state [n]            Initial state\n";
     std::cout << "  -m --msgs [n]             Number of messages to be sent\n";
     std::cout << "  -t --trust [naive|voting] Select the behaviour of peers\n" << std::endl;
-
-    firstInvoc = false;
 }
 
 int Args::getPeers() const {
@@ -35,9 +34,7 @@ int Args::getPeers() const {
 }
 
 bool Args::getRouter() const {
-    auto flag_index = getIndex (ARGS_ROUTER);
-
-    return false;
+    return getIndex (ARGS_ROUTER);
 }
 
 char const * Args::getAddress() const {

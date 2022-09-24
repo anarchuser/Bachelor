@@ -67,7 +67,7 @@ int main (int argc, char * argv[]) {
     RNG rng;
 
     /* TEST SECTION */
-    std::cout << "Number of peers: " << (args.getPeers() ?: PEERS);
+    std::cout << "Use external router? " << args.getRouter() << std::endl;
     return 0;
     /* END OF TEST SECTION */
 
