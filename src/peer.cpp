@@ -27,6 +27,8 @@
 #include "Packet/helper.h"
 #include "Socket/Socket.h"
 #include "Socket/Peer.h"
+#include "Socket/NaivePeer.h"
+#include "Socket/VotingPeer.h"
 #include "Socket/Router.h"
 #include "State/State.h"
 
@@ -75,7 +77,7 @@ int main (int argc, char * argv[]) {
     {
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
-            peers.push_back (std::make_unique<bt::Peer> (PORT(i), INIT_STATE, TIMEOUT_MS));
+            peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
         }
         for (int i = 1; i < kPeers; i++) {
             peers[i]->connect (PORT(i - 1));
