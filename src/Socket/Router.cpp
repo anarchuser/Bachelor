@@ -28,9 +28,8 @@ namespace bt {
             }
 
     Router::~Router() {
-        if (!should_stop) {
+        if (!should_stop.exchange (true)) {
             LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[DTOR]";
-            should_stop = true;
             thread.join ();
             close (socket_fd);
         }

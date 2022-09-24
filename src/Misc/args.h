@@ -10,6 +10,7 @@
 #define ARGS_PEERS      'p', "--peers"
 #define ARGS_ROUTER     'r', "--router"
 #define ARGS_ADDRESS    'a', "--address"
+#define ARGS_EXTERNAL   'e', "--external"
 #define ARGS_STATE      's', "--state"
 #define ARGS_MESSAGES   'm', "--msgs"
 #define ARGS_TRUST      't', "--trust"
@@ -29,6 +30,7 @@ struct Args {
     [[nodiscard]] int          getPeers() const;
     [[nodiscard]] bool         getRouter() const;
     [[nodiscard]] char const * getAddress() const;
+    [[nodiscard]] bool         getExternal() const;
     [[nodiscard]] int          getState() const;
     [[nodiscard]] int          getMessageCount() const;
     [[nodiscard]] Trust        getTrust() const;

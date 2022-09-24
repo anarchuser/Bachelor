@@ -42,8 +42,12 @@ bool Args::getRouter() const {
 char const * Args::getAddress() const {
     auto flag_index = getIndex (ARGS_ADDRESS);
     auto val_index = flag_index + 1;
-    if (!flag_index || val_index >= argc) return "localhost";
+    if (!flag_index || val_index >= argc) return nullptr;
     return argv [val_index];
+}
+
+bool Args::getExternal() const {
+    return getIndex (ARGS_EXTERNAL);
 }
 
 int Args::getState() const {

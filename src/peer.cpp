@@ -42,11 +42,8 @@
 
 #define PEERS 10
 
-#define ROUTER
-#define ROUTER_REQUIRED
-
-#define INIT_STATE 100
-#define MSG_NUM 1000
+#define ARGS_INIT_STATE 100
+#define ARGS_MSG_NUM 1000
 #define MSG_DELAY_MS 10
 
 /* Program arguments:
@@ -62,38 +59,43 @@
 int main (int argc, char * argv[]) {
     /* Init section */
     Args const args {argc, (char const * *) argv};
-    args.isHelp ();
     google::InitGoogleLogging (argv[0]);
     RNG rng;
+    std::unique_ptr <bt::Router> r;
 
-    /* Read program args */
-    int const kPeers = args.getPeers() ?: PEERS;
+    /* Read program args, display help if required */
+    args.isHelp ();
+    auto const kPeers = args.getPeers() ?: PEERS;
+    auto const kRouter = args.getRouter();
+    auto const kRouterAddress = args.getAddress() ?: "localhost";
+    auto const kExternalRouter = args.getExternal();
+    auto const kInitState = args.getState() ?: ARGS_INIT_STATE;
+    auto const kMessageCount = args.getMessageCount() ?: ARGS_MSG_NUM;
+    auto const kTrustProtocol = args.getTrust();
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
 
     /* Configure router if needed */
-#ifdef ROUTER
-    char const * kRouterAddress = argc > 2 ? argv [2] : "localhost";
-    auto router_host = gethostbyname (kRouterAddress);
-    bt::Socket::router_address = router_host ? * (in_addr_t *) (router_host->h_addr_list[0]) : INADDR_ANY;
-    bt::Socket::router_port = PORT_ROUTER;
+    if (kRouter) {
+        auto router_host = gethostbyname (kRouterAddress);
+        bt::Socket::router_address = router_host ? * (in_addr_t *) (router_host->h_addr_list[0]) : INADDR_ANY;
+        bt::Socket::router_port = PORT_ROUTER;
 
-
-#ifdef ROUTER_REQUIRED
-    bt::Router r (PORT_ROUTER, TIMEOUT_MS);
-#else
-    LOG (INFO) << "\tRouter: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
-#endif
-#else
-    LOG (INFO) << "\tNo router in use.";
-#endif
+        if (!kExternalRouter || strcmp (kRouterAddress, "localhost")) {
+            r = std::make_unique <bt::Router> (PORT_ROUTER, TIMEOUT_MS);
+        } else {
+            LOG (INFO) << "\tRouter: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
+        }
+    } else {
+        LOG (INFO) << "\tNo router in use.";
+    }
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: connect";
     {
         /* Build network */
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
-            peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
+            peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), kInitState, TIMEOUT_MS));
         }
         for (int i = 1; i < kPeers; i++) {
             peers[i]->connect (PORT(i - 1));
@@ -112,19 +114,18 @@ int main (int argc, char * argv[]) {
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
-#ifdef ROUTER_REQUIRED
-        r.await_idle (IDLE_MS);
-#else
-        std::this_thread::sleep_for (std::chrono::seconds (2));
-#endif
+        /* Wait for sync to finish */
+        if (r) r.reset ();
+        else std::this_thread::sleep_for (std::chrono::seconds (2));
 
+        /* Print all states */
         std::cout << "Peers: |";
         for (auto const & peer : peers) std::cout << peer->port << "|";
         std::cout << "\nState: |";
         for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (5) << peer->getState().getState() << "|";
         std::cout << std::endl;
 
-        // Check that all states are actually the same in the end:
+        /* Check that all states are actually the same in the end */
         std::vector <bt::IntState> result;
         for (auto const & peer : peers) {
             auto state = peer->getState();
