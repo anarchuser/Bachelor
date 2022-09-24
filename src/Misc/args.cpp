@@ -2,11 +2,10 @@
 
 Args::Args (int argc, char const * * argv): argc {argc}, argv {argv} {}
 
-int Args::getIndex (char const * short_form, char const * long_form) const {
+int Args::getIndex (char flag, char const * name) const {
     for (int i = 1; i < argc; i++) {
-        if (!strcmp (short_form, argv[i]) || !strcmp (long_form, argv[i])) {
-            return i;
-        }
+        if (argv[i][0] == '-' && strchr (argv[i] + 1, flag)) return i;
+        if (!strcmp (argv[i], name)) return i;
     }
     return 0;
 }
