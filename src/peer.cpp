@@ -67,7 +67,7 @@ int main (int argc, char * argv[]) {
     RNG rng;
 
     /* TEST SECTION */
-    std::cout << "Connect to router at address = " << args.getAddress();
+    std::cout << "Initial state = " << args.getState() << std::endl;
     return 0;
     /* END OF TEST SECTION */
 

@@ -29,8 +29,11 @@ void Args::isHelp() const {
 int Args::getPeers() const {
     auto flag_index = getIndex (ARGS_PEERS);
     auto val_index = flag_index + 1;
-    if (val_index >= argc) return 0;
-    return std::stoi (argv [val_index]);
+    if (!flag_index || val_index >= argc) return 0;
+    try {
+        return std::stoi (argv [val_index]);
+    } catch (...) {}
+    return 0;
 }
 
 bool Args::getRouter() const {
@@ -46,7 +49,11 @@ char const * Args::getAddress() const {
 
 int Args::getState() const {
     auto flag_index = getIndex (ARGS_STATE);
-
+    auto val_index = flag_index + 1;
+    if (!flag_index || val_index >= argc) return 0;
+    try {
+        return std::stoi (argv [val_index]);
+    } catch (...) {}
     return 0;
 }
 
