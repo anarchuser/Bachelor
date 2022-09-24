@@ -58,13 +58,21 @@ int Args::getState() const {
 
 int Args::getMessageCount() const {
     auto flag_index = getIndex (ARGS_MESSAGES);
-
+    auto val_index = flag_index + 1;
+    if (!flag_index || val_index >= argc) return 0;
+    try {
+        return std::stoi (argv [val_index]);
+    } catch (...) {}
     return 0;
 }
 
 Args::Trust Args::getTrust() const {
     auto flag_index = getIndex (ARGS_TRUST);
-
+    auto val_index = flag_index + 1;
+    if (!flag_index || val_index >= argc) return NAIVE;
+    if (!strcmp (argv[val_index], "naive")) return NAIVE;
+    if (!strcmp (argv[val_index], "voting")) return VOTING;
+    if (!strcmp (argv[val_index], "lockstep")) return LOCKSTEP;
     return NAIVE;
 }
 

@@ -66,14 +66,6 @@ int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
     RNG rng;
 
-    /* TEST SECTION */
-    std::cout << "Number of peers = " << args.getPeers() << std::endl;
-    std::cout << "Use external router? " << args.getRouter() << std::endl;
-    std::cout << "External address = " << args.getAddress() << std::endl;
-    std::cout << "Initial state = " << args.getState() << std::endl;
-    return 0;
-    /* END OF TEST SECTION */
-
     /* Read program args */
     int const kPeers = args.getPeers() ?: PEERS;
 
