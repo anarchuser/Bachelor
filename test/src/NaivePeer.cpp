@@ -5,6 +5,7 @@
 #include "Socket/log.h"
 #include "Socket/Router.h"
 #include "Socket/Peer.h"
+#include "Socket/NaivePeer.h"
 #include "Random/RNG.h"
 
 #define PORT(n) (PORT_PEER_START + n)
@@ -26,7 +27,7 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
         bt::Router r (PORT_ROUTER, TIMEOUT_MS);
         std::vector <std::unique_ptr <bt::Peer>> peers;
         for (int i = 0; i < PEERS; i++) {
-            peers.push_back (std::make_unique<bt::Peer> (PORT(i), INIT_STATE, TIMEOUT_MS));
+            peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
         }
         for (int i = 1; i < PEERS; i++) {
             peers[i]->connect (PORT(i - 1));

@@ -77,18 +77,6 @@ namespace bt {
         ++num_of_peers;
     }
 
-    timestamp_t Peer::act (ActionType what) {
-        Action action (port, what);
-        vote (action, APPROVE);
-        return consistent_state.apply (action);
-    }
-    timestamp_t Peer::act (state_t value) {
-        Action action (port, value);
-        vote (action, APPROVE);
-        consistent_state.apply (action);
-        return action.when;
-    }
-
     void Peer::introduce (port_t new_peer, port_t old_peer) {
         if (new_peer == old_peer) return;
 

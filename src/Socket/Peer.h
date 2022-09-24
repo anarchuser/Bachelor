@@ -15,6 +15,7 @@
 #include "Packet/Packet.h"
 #include "Packet/ConnectPacket.h"
 #include "Packet/PingPacket.h"
+#include "Packet/VotePacket.h"
 #include "State/IntState.h"
 
 #define PEER_TIMEOUT_MS 5000
@@ -24,18 +25,18 @@ namespace bt {
     public:
         explicit Peer (port_t port, int state, int timeout_ms = PEER_TIMEOUT_MS);
         Peer (Peer const &) = delete;
-        ~Peer() noexcept override;
+        ~Peer() noexcept override = 0;
 
         void connect (port_t peer);
-        timestamp_t act (ActionType what);
-        timestamp_t act (state_t value);
+        virtual timestamp_t act (ActionType what) = 0;
+        virtual timestamp_t act (state_t value) = 0;
 
         [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
         [[nodiscard]] inline IntState getState() const { return consistent_state; }
 
         std::atomic <std::size_t> num_of_peers = 0;
 
-    private:
+    protected:
         std::set <port_t> peers;
         IntState consistent_state;
         std::unordered_set <timestamp_t> rejected_actions;

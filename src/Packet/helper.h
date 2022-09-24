@@ -1,4 +1,4 @@
-#ifndef BACHELOR_HELPER_H
+#ifndef BACHELOR_ARGS_H
 #define BACHELOR_HELPER_H
 
 #include "Packet.h"
@@ -23,6 +23,6 @@ namespace bt {
     std::string to_string (Packet const & packet);
 }
 
-#endif //BACHELOR_HELPER_H
+#endif //BACHELOR_ARGS_H
 
 /* Copyright © 2022 Aaron Alef */
