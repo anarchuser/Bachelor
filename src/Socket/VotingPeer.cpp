@@ -16,6 +16,22 @@ namespace bt {
         consistent_state.apply (action);
         return action.when;
     }
+
+    void VotingPeer::process (VotePacket const & packet) {
+        LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
+
+        // TODO: make this smarter
+        if (rejected_actions.contains (packet.action.when)) return;
+
+        if (!consistent_state.contains (packet.action)) {
+            // TODO: apply actions temporarily only
+            bool shouldReject = !consistent_state.apply (packet.action);
+            if (shouldReject) rejected_actions.insert (packet.action.when);
+            vote (packet.action, shouldReject ? REJECT : APPROVE);
+        } else {
+            // TODO: Update vote count on temporary action
+        }
+    }
 }
 
 /* Copyright © 2022 Aaron Alef */
