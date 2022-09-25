@@ -1,6 +1,11 @@
 #ifndef BACHELOR_VOTINGPEER_H
 #define BACHELOR_VOTINGPEER_H
 
+#include <unordered_map>
+
+#include "State/Action.h"
+#include "State/Ballot.h"
+
 #include "Peer.h"
 
 namespace bt {
@@ -11,6 +16,10 @@ namespace bt {
 
         timestamp_t act (ActionType what) override;
         timestamp_t act (state_t value) override;
+        void process (VotePacket const & packet) override;
+
+    private:
+        std::unordered_map <timestamp_t, Ballot> pending_actions;
     };
 
 } // bt

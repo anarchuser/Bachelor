@@ -7,8 +7,8 @@
 
 namespace bt {
     enum Vote {
+        REJECT = 0,
         APPROVE,
-        REJECT,
     };
 
     struct __attribute__((__packed__)) VotePacket : public Packet {

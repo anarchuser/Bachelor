@@ -126,6 +126,7 @@ int main (int argc, char * argv[]) {
 
         peers[0]->act (bt::NOOP);
         peers[0]->act (bt::FORBIDDEN);
+        peers.front()->act (-20);
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
