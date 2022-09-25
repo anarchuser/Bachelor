@@ -1,35 +1,66 @@
 #include "VotingPeer.h"
 
 namespace bt {
-    VotingPeer::VotingPeer (bt::port_t port, int state, int timeout_ms): Peer (port, state, timeout_ms) {}
+    VotingPeer::VotingPeer (bt::port_t port, int state, int timeout_ms)
+            : Peer (port, state, timeout_ms) {}
 
     timestamp_t VotingPeer::act (ActionType what) {
         Action action (port, what);
+        pending_actions.emplace (action.when, action);
         vote (action, APPROVE);
-        // TODO: add to temporary state
-        return consistent_state.apply (action);
+        return action.when;
     }
     timestamp_t VotingPeer::act (state_t value) {
         Action action (port, value);
+        pending_actions.emplace (action.when, action);
         vote (action, APPROVE);
-        // TODO: add to temporary state
-        consistent_state.apply (action);
         return action.when;
     }
 
     void VotingPeer::process (VotePacket const & packet) {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
-        // TODO: make this smarter
-        if (rejected_actions.contains (packet.action.when)) return;
+        auto const & action = packet.action;
 
-        if (!consistent_state.contains (packet.action)) {
-            // TODO: apply actions temporarily only
-            bool shouldReject = !consistent_state.apply (packet.action);
-            if (shouldReject) rejected_actions.insert (packet.action.when);
-            vote (packet.action, shouldReject ? REJECT : APPROVE);
+        if (rejected_actions.contains (action.when)) return;
+        if (consistent_state.contains (action)) return;
+
+        if (!pending_actions.contains (action.when)) {
+            pending_actions.emplace (action.when, action);
+
+            // TODO: determine whether to approve or reject
+            auto ownVote = (Vote) (action.what != FORBIDDEN);
+
+            vote (action, ownVote);
         } else {
-            // TODO: Update vote count on temporary action
+            LOG_IF (WARNING, pending_actions.at (action.when).action != action)
+                    << PRINT_PORT
+                    << "Conflicting actions at time " <<  action.when
+                    << ". Actions are:"
+                    << "\nAlready pending: " << pending_actions.at (action.when).action
+                    << "\nNewly requested: " << action;
+        }
+
+        auto & ballot = pending_actions.at (action.when);
+        bool success = packet.vote
+                ? ballot.approvedBy (packet.sender)
+                : ballot.rejectedBy (packet.sender);
+        LOG_IF (WARNING, !success) << PRINT_PORT << "Conflicting votes received! - " << packet;
+
+        auto majority = (num_of_peers + 1) / 2;
+        LOG_ASSERT (ballot.approvers.size() <= majority || ballot.rejecters.size() <= majority);
+        if (ballot.approvers.size() > majority) {
+            auto timestamp = consistent_state.apply (action);
+            if (timestamp) {
+                // TODO: make this printing better
+                LOG (INFO) << PRINT_PORT << "Consistently applying action @" << timestamp << ": " << action;
+                pending_actions.erase (action.when);
+            }
+        } else if (ballot.rejecters.size() > majority) {
+            pending_actions.erase (action.when);
+            rejected_actions.insert (action.when);
+            // TODO: make this printing better
+            LOG (INFO) << PRINT_PORT << "Rejecting action " << action;
         }
     }
 }
