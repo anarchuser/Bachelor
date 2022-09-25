@@ -60,15 +60,14 @@ namespace bt {
         if (ballot.approvers.size() > majority) {
             auto timestamp = consistent_state.apply (action);
             if (timestamp) {
-                // TODO: make this printing better
-                LOG (INFO) << PRINT_PORT << "Consistently applying action @" << timestamp << ": " << action;
+                LOG_IF (INFO, kLogConsistent) << PRINT_PORT << "Consistently applying action @" << timestamp << ": " << action;
                 pending_actions.erase (action.when);
             }
         } else if (ballot.rejecters.size() > majority) {
             pending_actions.erase (action.when);
             rejected_actions.insert (action.when);
             // TODO: make this printing better
-            LOG (INFO) << PRINT_PORT << "Rejecting action " << action;
+            LOG_IF (INFO, kLogConsistent) << PRINT_PORT << "Rejecting action " << action;
         }
     }
 }

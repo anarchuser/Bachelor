@@ -5,7 +5,7 @@
 #include "Socket/log.h"
 #include "Socket/Router.h"
 #include "Socket/Peer.h"
-#include "Socket/NaivePeer.h"
+#include "Socket/VotingPeer.h"
 #include "Random/RNG.h"
 
 #define PORT(n) (PORT_PEER_START + n)
@@ -19,7 +19,7 @@
 #define MSG_NUM 1000
 #define MSG_DELAY_MS 10
 
-SCENARIO ("Random packets between naive peers get synchronised perfectly") {
+SCENARIO ("Random packets between voting peers get synchronised perfectly") {
     GIVEN ("Peers connected to a network") {
         kLogPeerDtorState = false;
 
@@ -27,8 +27,9 @@ SCENARIO ("Random packets between naive peers get synchronised perfectly") {
         bt::Router r (PORT_ROUTER, TIMEOUT_MS);
         std::vector <std::unique_ptr <bt::Peer>> peers;
         for (int i = 0; i < PEERS; i++) {
-            peers.push_back (std::make_unique <bt::NaivePeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
+            peers.push_back (std::make_unique <bt::VotingPeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
         }
+        REQUIRE_FALSE (peers.empty());
         for (int i = 1; i < PEERS; i++) {
             peers[i]->connect (PORT(i - 1));
         }
@@ -56,7 +57,7 @@ SCENARIO ("Random packets between naive peers get synchronised perfectly") {
                     auto state = finalState.initialState;
                     for (auto action : finalState.getActions()) {
                         REQUIRE (action.what != bt::FORBIDDEN);
-                        state += action.value.change;
+                        state += action.value;
                         REQUIRE (state >= 0);
                     }
                 }
