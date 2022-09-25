@@ -37,19 +37,20 @@ namespace bt {
         std::atomic <std::size_t> num_of_peers = 0;
 
     protected:
-        std::set <port_t> peers;
         IntState consistent_state;
         std::unordered_set <timestamp_t> rejected_actions;
 
+        virtual void process (VotePacket const & packet) = 0;
+        virtual void vote (Action action, Vote vote) final;
+
+    private:
         void introduce (port_t whom);
         void introduce (port_t new_peer, port_t old_peer);
         void process (Packet const & packet, port_t sender) override;
         void process (PingPacket const & packet);
         void process (ConnectPacket const & packet);
-        virtual void process (VotePacket const & packet) = 0;
-        void vote (Action action, Vote vote);
 
-    private:
+        std::set <port_t> peers;
         std::atomic <std::uint32_t> msg_counter = 0;
         [[nodiscard]] inline std::uint32_t count_msg () { return msg_counter++; }
     };
