@@ -124,10 +124,11 @@ int main (int argc, char * argv[]) {
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
-        peers[0]->act (bt::NOOP);
-        peers[0]->act (bt::FORBIDDEN);
-        peers.front()->act (-150);
-        peers.front()->act (100);
+//        peers[0]->act (bt::NOOP);
+//        peers[0]->act (bt::FORBIDDEN);
+//        peers.front()->act (-150);
+//        peers.front()->act (100);
+        peers.front()->move ({{1, 2}, {1, 2}});
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
@@ -140,6 +141,12 @@ int main (int argc, char * argv[]) {
         for (auto const & peer : peers) std::cout << peer->port << "|";
         std::cout << "\nState: |";
         for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (5) << peer->getState().getState() << "|";
+        for (auto const & owner : peers) {
+            std::cout << "\n" << owner->port << ": |";
+            for (auto const & peer : peers) {
+                std::cout << "  " << owner->getState(peer->port) << "|";
+            }
+        }
         std::cout << std::endl;
 
         /* Check that all states are actually the same in the end */

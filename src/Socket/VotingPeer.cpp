@@ -18,7 +18,7 @@ namespace bt {
         return action.when;
     }
 
-    timestamp_t VotingPeer::move (Position move) {
+    timestamp_t VotingPeer::move (PosChange move) {
         Action action (port, move);
         pending_actions.emplace (action.when, action);
         vote (action, APPROVE);

@@ -15,10 +15,10 @@ namespace bt {
         return action.when;
     }
 
-    timestamp_t NaivePeer::move (Position move) {
+    timestamp_t NaivePeer::move (PosChange move) {
         Action action (port, move);
         vote (action, APPROVE);
-        consistent_state.apply (action);
+        positions.at (port).apply (action);
         return action.when;
     }
 
@@ -26,10 +26,18 @@ namespace bt {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
         if (rejected_actions.contains (packet.action.when)) return;
-        if (consistent_state.contains (packet.action)) return;
 
-        bool shouldReject = !consistent_state.apply (packet.action);
-        if (shouldReject) rejected_actions.insert (packet.action.when);
+        if (packet.action.what == MOVE) {
+            if (positions.at (packet.action.who).contains (packet.action)) return;
+
+            bool shouldReject = !positions.at (packet.action.who).apply (packet.action);
+            if (shouldReject) rejected_actions.insert (packet.action.when);
+        } else {
+            if (consistent_state.contains (packet.action)) return;
+
+            bool shouldReject = !consistent_state.apply (packet.action);
+            if (shouldReject) rejected_actions.insert (packet.action.when);
+        }
     }
 }
 

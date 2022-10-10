@@ -19,24 +19,32 @@ namespace bt {
     };
 
     struct __attribute((__packed__)) Position {
-        std::int16_t const x = 0;
-        std::int16_t const y = 0;
-        std::int8_t const dx = 0;
-        std::int8_t const dy = 0;
+        inline Position (std::int16_t x, std::int16_t y): x{x}, y{y} {}
+
+        std::int16_t x = 0;
+        std::int16_t y = 0;
+
+        Position operator + (Position other) const;
+        Position & operator += (Position other);
+        bool operator == (Position other) const;
+    };
+    struct __attribute((__packed__)) PosChange {
+        Position const delta;
+        Position const reference;
     };
 
     union __attribute((__packed__)) Data {
         explicit inline Data (std::int32_t change = ACTION_DEFAULT): change {change} {}
-        explicit inline Data (Position move): move{move} {}
+        explicit inline Data (PosChange move): move{move} {}
 
         std::int32_t const change;
-        Position const move;
+        PosChange const move;
     };
 
     struct __attribute__((__packed__)) Action {
         Action (port_t who, ActionType what);
         Action (port_t who, std::int32_t change);
-        Action (port_t who, Position move);
+        Action (port_t who, PosChange move);
 
         timestamp_t const when;
         port_t const who;
@@ -51,11 +59,13 @@ namespace bt {
         }
     };
 
-    std::ostream & operator << (std::ostream & os, Position move);
+    std::ostream & operator << (std::ostream & os, PosChange move);
+    std::ostream & operator << (std::ostream & os, Position pos);
     std::ostream & operator << (std::ostream & os, ActionType type);
     std::ostream & operator << (std::ostream & os, Action const & action);
 
     std::int32_t operator + (std::int32_t state, Action const & action);
+    Position operator + (Position state, Action const & action);
 } // bt
 
 #endif //BACHELOR_ACTION_H

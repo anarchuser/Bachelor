@@ -14,15 +14,31 @@ namespace bt {
             , value {change}
             {}
 
-    Action::Action (port_t who, Position move)
+    Action::Action (port_t who, PosChange move)
             : when {get_timestamp()}
             , who {who}
             , what {MOVE}
             , value {move}
             {}
 
-    std::ostream & operator << (std::ostream & os, Position move) {
-        return os << "(" << move.x << "->" << move.x + move.dx << "|" << move.y << "->" << move.y + move.dy << ")";
+    Position Position::operator + (Position other) const {
+        return Position (x + other.x, y + other.y);
+    }
+    Position & Position::operator += (Position other) {
+        x += other.x;
+        y += other.y;
+        return * this;
+    }
+    bool Position::operator == (Position other) const {
+        return x == other.x && y == other.y;
+    }
+
+    std::ostream & operator << (std::ostream & os, Position pos) {
+        return os << pos.x << ";" << pos.y;
+    }
+    std::ostream & operator << (std::ostream & os, PosChange move) {
+        Position init (move.reference.x - move.delta.x, move.reference.y - move.delta.y);
+        return os << "(" << init.x << "->" << move.reference.x << "|" << init.y << "->" << move.reference.y << ")";
     }
 
     std::ostream & operator << (std::ostream & os, ActionType type) {
@@ -52,11 +68,25 @@ namespace bt {
             case FORBIDDEN:
                 LOG (WARNING) << "\tTrying to apply a forbidden action!";
             case NOOP:
+            case MOVE:
                 return state;
             case ADD:
                 return state + action.value.change;
-            case MOVE:
+            default:
+                LOG (WARNING) << "\tTrying to apply an unrecognisable action!";
                 return state;
+        }
+    }
+
+    Position operator + (Position state, Action const & action) {
+        switch (action.what) {
+            case FORBIDDEN:
+                LOG (WARNING) << "\tTrying to apply a forbidden action!";
+            case NOOP:
+            case ADD:
+                return state;
+            case MOVE:
+                return state + action.value.move.delta;
             default:
                 LOG (WARNING) << "\tTrying to apply an unrecognisable action!";
                 return state;

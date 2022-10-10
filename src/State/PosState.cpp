@@ -1,18 +1,18 @@
 #include "PosState.h"
 
 namespace bt {
-    bool PosState::try_apply (Action action, state_t state, std::set<Action> actions) {
+    bool PosState::try_apply (Action action, Position state, std::set<Action> actions) {
         if (action.what != ADD) return action.what == NOOP;
         if (actions.contains (action)) return * actions.find (action) == action;
 
         auto [action_pos, _] = actions.insert (action);
         for (auto trav = actions.begin(); trav != action_pos; trav++) {
-//            state += trav->value;
-            LOG_IF (WARNING, state < 0) << "Given actions cannot be applied iteratively onto the given initialState!";
+            state += trav->value.move.delta;
+            LOG_IF (WARNING, state != trav->value.move.reference) << "Given actions cannot be applied iteratively onto the given initialState!";
         }
         for (auto trav = action_pos; trav != actions.end(); trav++) {
-//            state += trav->value;
-            if (state < 0) return false;
+            state += trav->value.move.delta;
+            if (state != trav->value.move.reference) return false;
         }
         return true;
     }
@@ -35,12 +35,12 @@ namespace bt {
         return actions.contains (action);
     }
 
-    state_t PosState::getState() const {
+    Position PosState::getState() const {
         return std::accumulate (actions.begin(), actions.end(), initialState);
     }
 
     std::ostream & operator << (std::ostream & os, PosState const & state) {
-        os << "\tState: " << state.getState();
+        os << state.getState();
         if (kLogState) {
             os << "\n";
             for (auto action: state.getActions ()) {

@@ -5,7 +5,7 @@ namespace bt {
             : Socket (port, timeout_ms)
             , consistent_state {state}
             {
-                positions.emplace (port, PosState(0));
+                positions.emplace (port, PosState());
             }
 
     Peer::~Peer () noexcept {
@@ -60,7 +60,7 @@ namespace bt {
         ConnectPacket msg (peer, port, port, count_msg());
         send (msg, router_port.load() ?: peer);
         peers.insert (peer);
-        positions.emplace (peer, PosState(0));
+        positions.emplace (peer, PosState());
         ++num_of_peers;
     }
 
