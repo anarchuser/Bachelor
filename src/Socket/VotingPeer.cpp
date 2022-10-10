@@ -10,8 +10,16 @@ namespace bt {
         vote (action, APPROVE);
         return action.when;
     }
+
     timestamp_t VotingPeer::act (state_t value) {
         Action action (port, value);
+        pending_actions.emplace (action.when, action);
+        vote (action, APPROVE);
+        return action.when;
+    }
+
+    timestamp_t VotingPeer::move (Position move) {
+        Action action (port, move);
         pending_actions.emplace (action.when, action);
         vote (action, APPROVE);
         return action.when;

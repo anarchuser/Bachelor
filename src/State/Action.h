@@ -15,16 +15,33 @@ namespace bt {
         NOOP,
         FORBIDDEN,
         ADD,
+        MOVE,
+    };
+
+    struct __attribute((__packed__)) Position {
+        std::int16_t const x = 0;
+        std::int16_t const y = 0;
+        std::int8_t const dx = 0;
+        std::int8_t const dy = 0;
+    };
+
+    union __attribute((__packed__)) Data {
+        explicit inline Data (std::int32_t change = ACTION_DEFAULT): change {change} {}
+        explicit inline Data (Position move): move{move} {}
+
+        std::int32_t const change;
+        Position const move;
     };
 
     struct __attribute__((__packed__)) Action {
         Action (port_t who, ActionType what);
-        Action (port_t who, std::int32_t value);
+        Action (port_t who, std::int32_t change);
+        Action (port_t who, Position move);
 
         timestamp_t const when;
         port_t const who;
         ActionType const what: 8;
-        std::int32_t const value = ACTION_DEFAULT;
+        Data const value;
 
         inline bool operator == (Action const & other) const {
             return when == other.when && who == other.who && what == other.what;
@@ -34,6 +51,7 @@ namespace bt {
         }
     };
 
+    std::ostream & operator << (std::ostream & os, Position move);
     std::ostream & operator << (std::ostream & os, ActionType type);
     std::ostream & operator << (std::ostream & os, Action const & action);
 

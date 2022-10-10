@@ -15,6 +15,13 @@ namespace bt {
         return action.when;
     }
 
+    timestamp_t NaivePeer::move (Position move) {
+        Action action (port, move);
+        vote (action, APPROVE);
+        consistent_state.apply (action);
+        return action.when;
+    }
+
     void NaivePeer::process (VotePacket const & packet) {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 

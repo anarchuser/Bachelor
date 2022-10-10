@@ -4,6 +4,7 @@
 #include <chrono>
 #include <map>
 #include <set>
+#include <unordered_map>
 #include <unordered_set>
 #include <thread>
 #include <ostream>
@@ -17,6 +18,7 @@
 #include "Packet/PingPacket.h"
 #include "Packet/VotePacket.h"
 #include "State/IntState.h"
+#include "State/PosState.h"
 
 #define PEER_TIMEOUT_MS 5000
 
@@ -30,6 +32,7 @@ namespace bt {
         void connect (port_t peer);
         virtual timestamp_t act (ActionType what) = 0;
         virtual timestamp_t act (state_t value) = 0;
+        virtual timestamp_t move (Position move) = 0;
 
         [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
         [[nodiscard]] inline IntState getState() const { return consistent_state; }
@@ -39,6 +42,7 @@ namespace bt {
     protected:
         IntState consistent_state;
         std::unordered_set <timestamp_t> rejected_actions;
+        std::unordered_map <port_t, PosState> positions;
 
         virtual void process (VotePacket const & packet) = 0;
         virtual void vote (Action action, Vote vote) final;
