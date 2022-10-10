@@ -56,7 +56,7 @@ SCENARIO ("Random packets between peers get synchronised perfectly") {
                     auto state = finalState.initialState;
                     for (auto action : finalState.getActions()) {
                         REQUIRE (action.what != bt::FORBIDDEN);
-                        state += action.value;
+                        state += action.value.change;
                         REQUIRE (state >= 0);
                     }
                 }

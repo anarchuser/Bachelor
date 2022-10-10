@@ -128,7 +128,14 @@ int main (int argc, char * argv[]) {
 //        peers[0]->act (bt::FORBIDDEN);
 //        peers.front()->act (-150);
 //        peers.front()->act (100);
-        peers.front()->move ({{1, 2}, {1, 2}});
+        for (int i = 0; i < kMessageCount; i++) {
+            int index = std::floor (rng.random (Bounds (0, kPeers)));
+            auto & peer = * peers[index];
+            bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
+            auto pos = peer.getState(peer.port).getState();
+            peer.move ({change, pos + change});
+            std::this_thread::sleep_for (std::chrono::milliseconds (5));
+        }
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
@@ -141,10 +148,11 @@ int main (int argc, char * argv[]) {
         for (auto const & peer : peers) std::cout << peer->port << "|";
         std::cout << "\nState: |";
         for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (5) << peer->getState().getState() << "|";
-        for (auto const & owner : peers) {
+        {
+            auto & owner = peers.front();
             std::cout << "\n" << owner->port << ": |";
-            for (auto const & peer : peers) {
-                std::cout << "  " << owner->getState(peer->port) << "|";
+            for (auto const & peer: peers) {
+                std::cout << owner->getState (peer->port) << "|";
             }
         }
         std::cout << std::endl;
@@ -157,6 +165,18 @@ int main (int argc, char * argv[]) {
                 CHECK_EQ (state, other);
             }
             result.emplace_back (std::move (state));
+        }
+
+        std::unordered_map <bt::port_t, bt::PosState> positions;
+        for (auto const & other : peers) {
+            auto first_pos = peers.front()->getState(other->port);
+            positions.emplace (other->port, std::move (first_pos));
+        }
+        for (auto const & peer : peers) {
+            for (auto const & other : peers) {
+                auto state = peer->getState(other->port);
+                CHECK_EQ (state, positions.at (other->port));
+            }
         }
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
