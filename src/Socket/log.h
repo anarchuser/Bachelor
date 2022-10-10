@@ -27,7 +27,7 @@ static bool const kLogTell = false;
 // State
 static bool const kLogState = false;
 static std::atomic <bool> kLogPeerDtorState = false;
-static bool const kLogInvalidAction = false;
+static bool const kLogInvalidAction = true;
 //TODO: log actions being applied persistently
 
 #endif //BACHELOR_LOG_H

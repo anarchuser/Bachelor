@@ -9,6 +9,8 @@
 #include "Action.h"
 #include "State.h"
 
+#include <iostream>  // remove
+
 namespace bt {
     class PosState final : public State {
     public:

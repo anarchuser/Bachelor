@@ -2,7 +2,15 @@
 
 namespace bt {
     bool PosState::try_apply (Action action, Position state, std::set<Action> actions) {
-        if (action.what != ADD) return action.what == NOOP;
+        switch (action.what) {
+            case NOOP:
+                return true;
+            case FORBIDDEN:
+                return false;
+            case ADD:
+            case MOVE:
+            default:;
+        }
         if (actions.contains (action)) return * actions.find (action) == action;
 
         auto [action_pos, _] = actions.insert (action);
