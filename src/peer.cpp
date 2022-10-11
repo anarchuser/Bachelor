@@ -124,9 +124,18 @@ int main (int argc, char * argv[]) {
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
-        peers[0]->act (bt::NOOP);
-        peers[0]->act (bt::FORBIDDEN);
-        peers.front()->act (-20);
+//        peers[0]->act (bt::NOOP);
+//        peers[0]->act (bt::FORBIDDEN);
+        peers[1]->act (-30);
+
+        for (int i = 0; i < kMessageCount; i++) {
+            int index = std::floor (rng.random (Bounds (0, kPeers)));
+            auto & peer = * peers[index];
+            bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
+            auto pos = peer.getState(peer.port).getState();
+            peer.move ({change, pos + change});
+            std::this_thread::sleep_for (std::chrono::milliseconds (5));
+        }
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
@@ -135,10 +144,17 @@ int main (int argc, char * argv[]) {
         else std::this_thread::sleep_for (std::chrono::seconds (2));
 
         /* Print all states */
-        std::cout << "Peers: |";
-        for (auto const & peer : peers) std::cout << peer->port << "|";
+        std::cout << "Peers: |  ";
+        for (auto const & peer : peers) std::cout << peer->port << "|  ";
         std::cout << "\nState: |";
-        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (5) << peer->getState().getState() << "|";
+        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
+        {
+            auto & owner = peers.front();
+            std::cout << "\n" << "Coord: |";
+            for (auto const & peer: peers) {
+                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
+            }
+        }
         std::cout << std::endl;
 
         /* Check that all states are actually the same in the end */
@@ -149,6 +165,18 @@ int main (int argc, char * argv[]) {
                 CHECK_EQ (state, other);
             }
             result.emplace_back (std::move (state));
+        }
+
+        std::unordered_map <bt::port_t, bt::PosState> positions;
+        for (auto const & other : peers) {
+            auto first_pos = peers.front()->getState(other->port);
+            positions.emplace (other->port, std::move (first_pos));
+        }
+        for (auto const & peer : peers) {
+            for (auto const & other : peers) {
+                auto state = peer->getState(other->port);
+                CHECK_EQ (state, positions.at (other->port));
+            }
         }
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";

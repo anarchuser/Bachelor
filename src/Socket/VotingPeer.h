@@ -16,6 +16,7 @@ namespace bt {
 
         timestamp_t act (ActionType what) override;
         timestamp_t act (state_t value) override;
+        timestamp_t move (PosChange move) override;
         void process (VotePacket const & packet) override;
 
     private:

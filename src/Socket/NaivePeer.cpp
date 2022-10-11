@@ -15,14 +15,31 @@ namespace bt {
         return action.when;
     }
 
+    timestamp_t NaivePeer::move (PosChange move) {
+        Action action (port, move);
+        vote (action, APPROVE);
+        positions.at (port).apply (action);
+        return action.when;
+    }
+
     void NaivePeer::process (VotePacket const & packet) {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
-        if (rejected_actions.contains (packet.action.when)) return;
-        if (consistent_state.contains (packet.action)) return;
+        auto const & action = packet.action;
 
-        bool shouldReject = !consistent_state.apply (packet.action);
-        if (shouldReject) rejected_actions.insert (packet.action.when);
+        if (rejected_actions.contains (action.when)) return;
+
+        if (action.what == MOVE) {
+            if (positions.at (action.who).contains (action)) return;
+
+            bool shouldReject = !positions.at (action.who).apply (action);
+            if (shouldReject) rejected_actions.insert (action.when);
+        } else {
+            if (consistent_state.contains (action)) return;
+
+            bool shouldReject = !consistent_state.apply (action);
+            if (shouldReject) rejected_actions.insert (action.when);
+        }
     }
 }
 

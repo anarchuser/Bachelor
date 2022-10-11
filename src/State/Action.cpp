@@ -7,18 +7,48 @@ namespace bt {
             , what {what}
             {}
 
-    Action::Action (port_t who, std::int32_t value)
+    Action::Action (port_t who, std::int32_t change)
             : when {get_timestamp()}
             , who {who}
             , what {ADD}
-            , value {value}
+            , value {change}
             {}
+
+    Action::Action (port_t who, PosChange move)
+            : when {get_timestamp()}
+            , who {who}
+            , what {MOVE}
+            , value {move}
+            {}
+
+    Position Position::operator + (Position other) const {
+        return Position (x + other.x, y + other.y);
+    }
+    Position & Position::operator += (Position other) {
+        x += other.x;
+        y += other.y;
+        return * this;
+    }
+    bool Position::operator == (Position other) const {
+        return x == other.x && y == other.y;
+    }
+
+    std::ostream & operator << (std::ostream & os, Position pos) {
+        std::stringstream ss;
+        ss << pos.x << ";" << pos.y;
+        return os << ss.str();
+    }
+    std::ostream & operator << (std::ostream & os, PosChange move) {
+        Position init (move.reference.x - move.delta.x, move.reference.y - move.delta.y);
+        return os << "(" << init.x << "->" << move.reference.x << "|" << init.y << "->" << move.reference.y << ")";
+    }
 
     std::ostream & operator << (std::ostream & os, ActionType type) {
         switch (type) {
             case NOOP:      return os << "NOOP";
             case FORBIDDEN: return os << "FORBIDDEN";
             case ADD:       return os << "ADD";
+            case MOVE:      return os << "MOVE";
             default:        return os << "[UNKNOWN]";
         }
     }
@@ -27,7 +57,9 @@ namespace bt {
         os << "[" << action.who;
         os << "|" << action.what;
         if (action.what == ADD) {
-            os << "(" << std::right << std::setfill (' ') << std::setw(3) << action.value << ")";
+            os << "(" << std::right << std::setfill (' ') << std::setw(3) << action.value.change << ")";
+        } else if (action.what == MOVE) {
+            os << "(" << std::right << std::setfill (' ') << std::setw(3) << action.value.move << ")";
         }
         os << "|@" << action.when;
         return os << "]";
@@ -38,9 +70,25 @@ namespace bt {
             case FORBIDDEN:
                 LOG (WARNING) << "\tTrying to apply a forbidden action!";
             case NOOP:
+            case MOVE:
                 return state;
             case ADD:
-                return state + action.value;
+                return state + action.value.change;
+            default:
+                LOG (WARNING) << "\tTrying to apply an unrecognisable action!";
+                return state;
+        }
+    }
+
+    Position operator + (Position state, Action const & action) {
+        switch (action.what) {
+            case FORBIDDEN:
+                LOG (WARNING) << "\tTrying to apply a forbidden action!";
+            case NOOP:
+            case ADD:
+                return state;
+            case MOVE:
+                return state + action.value.move.delta;
             default:
                 LOG (WARNING) << "\tTrying to apply an unrecognisable action!";
                 return state;
