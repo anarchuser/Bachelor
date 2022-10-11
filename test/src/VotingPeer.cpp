@@ -17,14 +17,13 @@
 
 #define INIT_STATE 00
 #define MSG_NUM 1000
-#define MSG_DELAY_MS 10
+#define MSG_DELAY_MS 5
 
 SCENARIO ("Random packets between voting peers get synchronised perfectly") {
     GIVEN ("Peers connected to a network") {
         kLogPeerDtorState = false;
 
         RNG rng;
-        bt::Router r (PORT_ROUTER, TIMEOUT_MS);
         std::vector <std::unique_ptr <bt::Peer>> peers;
         for (int i = 0; i < PEERS; i++) {
             peers.push_back (std::make_unique <bt::VotingPeer> (PORT(i), INIT_STATE, TIMEOUT_MS));
@@ -37,7 +36,7 @@ SCENARIO ("Random packets between voting peers get synchronised perfectly") {
             return peer->num_of_peers < PEERS - 1;
         })) std::this_thread::sleep_for (std::chrono::milliseconds (PEERS * PEERS));
 
-        WHEN ("Random ADD actions are performed (if allowed") {
+        WHEN ("Random ADD actions are performed (if allowed)") {
             for (int i = 0; i < MSG_NUM; i++) {
                 peers[rng.random ({0, PEERS})]->act (rng.random ({-5, 5}));
                 std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));
@@ -49,6 +48,43 @@ SCENARIO ("Random packets between voting peers get synchronised perfectly") {
                     auto state = peer->getState();
                     for (auto const & other : result) REQUIRE (state == other);
                     result.emplace_back (std::move (state));
+                }
+            }
+            THEN ("All actions are permitted") {
+                for (auto const & peer : peers) {
+                    auto const & finalState = peer->getState();
+                    auto state = finalState.initialState;
+                    for (auto action : finalState.getActions()) {
+                        REQUIRE (action.what != bt::FORBIDDEN);
+                        state += action.value.change;
+                        REQUIRE (state >= 0);
+                    }
+                }
+            }
+        }
+        WHEN ("Random MOVE actions are performed") {
+            for (int i = 0; i < MSG_NUM; i++) {
+                int index = std::floor (rng.random (Bounds (0, PEERS)));
+                auto & peer = * peers[index];
+                bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
+                auto pos = peer.getState(peer.port).getState();
+                peer.move ({change, pos + change});
+                std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));
+            }
+            std::this_thread::sleep_for (std::chrono::milliseconds (500));
+
+            std::unordered_map <bt::port_t, bt::PosState> positions;
+            for (auto const & other : peers) {
+                auto first_pos = peers.front()->getState(other->port);
+                positions.emplace (other->port, std::move (first_pos));
+            }
+
+            THEN ("The resulting states are perfectly synchronous") {
+                for (auto const & peer : peers) {
+                    for (auto const & other : peers) {
+                        auto state = peer->getState(other->port);
+                        REQUIRE (state == positions.at (other->port));
+                    }
                 }
             }
             THEN ("All actions are permitted") {
