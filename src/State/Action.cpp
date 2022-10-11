@@ -34,7 +34,9 @@ namespace bt {
     }
 
     std::ostream & operator << (std::ostream & os, Position pos) {
-        return os << pos.x << ";" << pos.y;
+        std::stringstream ss;
+        ss << pos.x << ";" << pos.y;
+        return os << ss.str();
     }
     std::ostream & operator << (std::ostream & os, PosChange move) {
         Position init (move.reference.x - move.delta.x, move.reference.y - move.delta.y);

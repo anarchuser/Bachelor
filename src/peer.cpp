@@ -126,8 +126,8 @@ int main (int argc, char * argv[]) {
 
 //        peers[0]->act (bt::NOOP);
 //        peers[0]->act (bt::FORBIDDEN);
-//        peers.front()->act (-150);
-//        peers.front()->act (100);
+        peers[1]->act (-30);
+
         for (int i = 0; i < kMessageCount; i++) {
             int index = std::floor (rng.random (Bounds (0, kPeers)));
             auto & peer = * peers[index];
@@ -144,15 +144,15 @@ int main (int argc, char * argv[]) {
         else std::this_thread::sleep_for (std::chrono::seconds (2));
 
         /* Print all states */
-        std::cout << "Peers: |";
-        for (auto const & peer : peers) std::cout << peer->port << "|";
+        std::cout << "Peers: |  ";
+        for (auto const & peer : peers) std::cout << peer->port << "|  ";
         std::cout << "\nState: |";
-        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (5) << peer->getState().getState() << "|";
+        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
         {
             auto & owner = peers.front();
             std::cout << "\n" << owner->port << ": |";
             for (auto const & peer: peers) {
-                std::cout << owner->getState (peer->port) << "|";
+                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
             }
         }
         std::cout << std::endl;
