@@ -20,7 +20,7 @@ namespace bt {
 
         timestamp_t apply (Action action) override;
         [[nodiscard]] Position getState() const;
-        [[nodiscard]] bool contains (Action action) const;
+        [[nodiscard]] bool contains (Action action) const override;
 
         [[nodiscard]] static bool try_apply (Action action, Position state, std::set <Action> actions);
 

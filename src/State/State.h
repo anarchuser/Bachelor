@@ -20,6 +20,7 @@ namespace bt {
 
         virtual timestamp_t apply (Action action);
         [[nodiscard]] virtual std::set <Action> getActions() const final;
+        virtual bool contains (Action action) const = 0;
 
         inline bool operator == (State const & other) const { return actions == other.actions; }
 

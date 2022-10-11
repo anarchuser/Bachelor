@@ -150,7 +150,7 @@ int main (int argc, char * argv[]) {
         for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
         {
             auto & owner = peers.front();
-            std::cout << "\n" << owner->port << ": |";
+            std::cout << "\n" << "Coord: |";
             for (auto const & peer: peers) {
                 std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
             }

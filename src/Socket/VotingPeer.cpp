@@ -29,14 +29,18 @@ namespace bt {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
         auto const & action = packet.action;
-
         if (rejected_actions.contains (action.when)) return;
-        if (consistent_state.contains (action)) return;
+
+        State * state = action.what == MOVE
+                ? dynamic_cast <State *> (& positions.at (action.who))
+                : dynamic_cast <State *> (& consistent_state);
+        if (state->contains (action)) return;
 
         if (!pending_actions.contains (action.when)) {
             pending_actions.emplace (action.when, action);
 
             // TODO: determine whether to approve or reject
+            // TODO: let states apply wrong actions
             auto ownVote = (Vote) (action.what != FORBIDDEN);
 
             vote (action, ownVote);
@@ -55,10 +59,11 @@ namespace bt {
                 : ballot.rejectedBy (packet.sender);
         LOG_IF (WARNING, !success) << PRINT_PORT << "Conflicting votes received! - " << packet;
 
-        auto majority = (num_of_peers + 1) / 2;
+        static auto majority = (num_of_peers + 1) / 2;
         LOG_ASSERT (ballot.approvers.size() <= majority || ballot.rejecters.size() <= majority);
         if (ballot.approvers.size() > majority) {
-            auto timestamp = consistent_state.apply (action);
+            auto timestamp = state->apply (action);
+
             if (timestamp) {
                 LOG_IF (INFO, kLogConsistent) << PRINT_PORT << "Consistently applying action @" << timestamp << ": " << action;
                 pending_actions.erase (action.when);
