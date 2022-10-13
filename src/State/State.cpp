@@ -26,6 +26,25 @@ namespace bt {
         return copy;
     }
 
+    timestamp_t State::getAverageLatency () const {
+        if (actions.empty()) return 0;
+        auto total_latency = std::accumulate (actions.begin(), actions.end(), 0,
+                [] (timestamp_t latency, std::pair <Action, timestamp_t> const & action) {
+                    LOG_IF (WARNING, action.second < action.first.when) << "Action registered before it supposedly happened! - " << action.first;
+                    return latency + action.second - action.first.when;
+        });
+        return total_latency / actions.size();
+    }
+
+    timestamp_t State::getMaximumLatency() const {
+        if (actions.empty()) return 0;
+        return std::accumulate (actions.begin(), actions.end(), 0,
+                [] (timestamp_t latency, std::pair <Action, timestamp_t> const & action) {
+                    LOG_IF (WARNING, action.second < action.first.when) << "Action registered before it supposedly happened! - " << action.first;
+                    return std::max (latency, action.second - action.first.when);
+        });
+    }
+
     bool State::operator == (State const & other) const {
         auto const & other_actions = other.getActions();
         return std::all_of (

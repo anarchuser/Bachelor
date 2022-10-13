@@ -34,6 +34,9 @@ namespace bt {
         virtual timestamp_t act (state_t value) = 0;
         virtual timestamp_t move (Position move) = 0;
 
+        [[nodiscard]] timestamp_t getAverageLatency() const;
+        [[nodiscard]] timestamp_t getMaximumLatency() const;
+
         [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
         [[nodiscard]] inline IntState getState() const { return consistent_state; }
         [[nodiscard]] inline PosState getState(port_t peer) const { return positions.at (peer); }

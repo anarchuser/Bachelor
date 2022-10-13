@@ -78,6 +78,32 @@ namespace bt {
         }
     }
 
+    timestamp_t Peer::getAverageLatency () const {
+        timestamp_t accu = 0;
+        int counter = 0;
+        for (auto const & state : positions) {
+            auto latency = state.second.getAverageLatency();
+            if (latency) {
+                counter++;
+                accu += latency;
+            }
+        }
+        return accu / counter;
+    }
+
+    timestamp_t Peer::getMaximumLatency () const {
+        timestamp_t max = 0;
+        int counter = 0;
+        for (auto const & state : positions) {
+            auto latency = state.second.getMaximumLatency();
+            if (latency) {
+                counter++;
+                max = std::max (max, latency);
+            }
+        }
+        return max;
+    }
+
     std::ostream & operator << (std::ostream & os, Peer const & peer) {
         os << peer.port << ": [PEER|";
         os << "Σ" << peer.num_of_peers;

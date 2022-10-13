@@ -2,11 +2,14 @@
 #define BACHELOR_STATE_H
 
 #include <algorithm>
+#include <numeric>
+#include <cmath>
 #include <chrono>
 #include <mutex>
 #include <map>
 #include <set>
 #include <unordered_set>
+#include <iostream>
 
 #include <glog/logging.h>
 
