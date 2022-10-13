@@ -42,7 +42,7 @@
 #define PEERS 10
 
 #define ARGS_INIT_STATE 100
-#define ARGS_MSG_NUM 1000
+#define ARGS_MSG_NUM 0
 #define MSG_DELAY_MS 10
 
 /* Program arguments:
@@ -130,18 +130,13 @@ int main (int argc, char * argv[]) {
 
         std::thread physim (updatePositions, std::ref (peers), std::ref (rng), kScenarioDuration, kScenarioFrequency);
 
-//        peers[0]->act (bt::NOOP);
-//        peers[0]->act (bt::FORBIDDEN);
-//        peers[1]->act (-30);
-//
-//        for (int i = 0; i < kMessageCount; i++) {
-//            int index = std::floor (rng.random (Bounds (0, kPeers)));
-//            auto & peer = * peers[index];
-//            bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
-//            auto pos = peer.getState(peer.port).getState();
-//            peer.move ({change, pos + change});
-//            std::this_thread::sleep_for (std::chrono::milliseconds (5));
-//        }
+        for (int i = 0; i < kMessageCount; i++) {
+            int index = std::floor (rng.random (Bounds (0, kPeers)));
+            auto & peer = * peers[index];
+            int change = std::floor (rng.random (Bounds (-5, 5)));
+            peer.act (change);
+            std::this_thread::sleep_for (std::chrono::milliseconds (5));
+        }
 
         physim.join();
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
@@ -156,8 +151,9 @@ int main (int argc, char * argv[]) {
         for (auto const & peer : peers) std::cout << peer->port << "|  ";
         std::cout << "\nState: |";
         for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
+        for (auto const & owner : peers)
         {
-            auto & owner = peers.front();
+//            auto & owner = peers.front();
             std::cout << "\n" << "Coord: |";
             for (auto const & peer: peers) {
                 std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
@@ -195,7 +191,8 @@ void updatePositions (std::vector<std::unique_ptr<bt::Peer>> & peers, RNG & rng,
     for (int i = 0; i < duration * frequency; i++) {
         for (auto const & peer : peers) {
             bt::Position move (rng.random ({-5, 5}), rng.random ({-5, 5}));
-            peer->move (move);
+            auto timestamp = peer->move (move);
+            LOG_IF (INFO, kLogSendAction) << "\t" << peer->port << ": Suggesting action @" << timestamp << "; " << move;
         }
         std::this_thread::sleep_for (idle);
     }
