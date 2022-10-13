@@ -32,7 +32,7 @@ namespace bt {
         void connect (port_t peer);
         virtual timestamp_t act (ActionType what) = 0;
         virtual timestamp_t act (state_t value) = 0;
-        virtual timestamp_t move (PosChange move) = 0;
+        virtual timestamp_t move (Position move) = 0;
 
         [[nodiscard]] inline std::set <port_t> const & getPeers() const { return peers; }
         [[nodiscard]] inline IntState getState() const { return consistent_state; }

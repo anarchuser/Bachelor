@@ -199,7 +199,7 @@ void updatePositions (std::vector<std::unique_ptr<bt::Peer>> & peers, RNG & rng,
     for (int i = 0; i < duration * frequency; i++) {
         for (auto const & peer : peers) {
             bt::Position move (rng.random ({-5, 5}), rng.random ({-5, 5}));
-            peer->move ({move, move});
+            peer->move (move);
         }
         std::this_thread::sleep_for (idle);
     }

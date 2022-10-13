@@ -15,12 +15,10 @@ namespace bt {
 
         auto [action_pos, _] = actions.insert (action);
         for (auto trav = actions.begin(); trav != action_pos; trav++) {
-            state += trav->value.move.delta;
-            LOG_IF (WARNING, state != trav->value.move.reference) << "Given actions cannot be applied iteratively onto the given initialState!";
+            state += trav->value.move;
         }
         for (auto trav = action_pos; trav != actions.end(); trav++) {
-            state += trav->value.move.delta;
-            if (state != trav->value.move.reference) return false;
+            state += trav->value.move;
         }
         return true;
     }

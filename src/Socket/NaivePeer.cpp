@@ -15,7 +15,7 @@ namespace bt {
         return action.when;
     }
 
-    timestamp_t NaivePeer::move (PosChange move) {
+    timestamp_t NaivePeer::move (Position move) {
         Action action (port, move);
         vote (action, APPROVE);
         positions.at (port).apply (action);

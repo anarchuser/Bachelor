@@ -14,7 +14,7 @@ namespace bt {
             , value {change}
             {}
 
-    Action::Action (port_t who, PosChange move)
+    Action::Action (port_t who, Position move)
             : when {get_timestamp()}
             , who {who}
             , what {MOVE}
@@ -37,10 +37,6 @@ namespace bt {
         std::stringstream ss;
         ss << pos.x << ";" << pos.y;
         return os << ss.str();
-    }
-    std::ostream & operator << (std::ostream & os, PosChange move) {
-        Position init (move.reference.x - move.delta.x, move.reference.y - move.delta.y);
-        return os << "(" << init.x << "->" << move.reference.x << "|" << init.y << "->" << move.reference.y << ")";
     }
 
     std::ostream & operator << (std::ostream & os, ActionType type) {
@@ -88,7 +84,7 @@ namespace bt {
             case ADD:
                 return state;
             case MOVE:
-                return state + action.value.move.delta;
+                return state + action.value.move;
             default:
                 LOG (WARNING) << "\tTrying to apply an unrecognisable action!";
                 return state;
