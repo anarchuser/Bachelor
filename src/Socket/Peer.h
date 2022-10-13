@@ -43,7 +43,7 @@ namespace bt {
     protected:
         IntState consistent_state;
         // TODO: replace timestamps as identifiers with port + packet number combination
-        std::unordered_set <timestamp_t> rejected_actions;
+        std::unordered_set <Action> rejected_actions;
         std::unordered_map <port_t, PosState> positions;
 
         virtual void process (VotePacket const & packet) = 0;

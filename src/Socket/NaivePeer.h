@@ -1,6 +1,8 @@
 #ifndef BACHELOR_NAIVEPEER_H
 #define BACHELOR_NAIVEPEER_H
 
+#include <glog/logging.h>
+
 #include "Peer.h"
 
 namespace bt {

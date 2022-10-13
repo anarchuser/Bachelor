@@ -4,6 +4,8 @@
 #include <glog/logging.h>
 #include <sstream>
 #include <iomanip>
+#include <unordered_set>
+#include <utility>
 
 #include "Packet/port.h"
 #include "Chrono/util.h"
@@ -35,7 +37,7 @@ namespace bt {
 
     union __attribute((__packed__)) Data {
         explicit inline Data (std::int32_t change = ACTION_DEFAULT): change {change} {}
-        explicit inline Data (PosChange move): move{move} {}
+        explicit inline Data (PosChange move): move{std::move(move)} {}
 
         std::int32_t const change;
         PosChange const move;
@@ -67,6 +69,13 @@ namespace bt {
     std::int32_t operator + (std::int32_t state, Action const & action);
     Position operator + (Position state, Action const & action);
 } // bt
+
+template<>
+struct std::hash <bt::Action> {
+    std::size_t  operator () (bt::Action const & action) const noexcept {
+        return action.when;
+    }
+};
 
 #endif //BACHELOR_ACTION_H
 

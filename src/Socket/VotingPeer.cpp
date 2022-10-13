@@ -29,7 +29,7 @@ namespace bt {
         LOG_IF (INFO, kLogRecvVote) << PRINT_PORT << "[RECV]\t[" << packet << "]";
 
         auto const & action = packet.action;
-        if (rejected_actions.contains (action.when)) return;
+        if (rejected_actions.contains (action)) return;
 
         State * state = action.what == MOVE
                 ? dynamic_cast <State *> (& positions.at (action.who))
@@ -70,8 +70,7 @@ namespace bt {
             }
         } else if (ballot.rejecters.size() > majority) {
             pending_actions.erase (action.when);
-            rejected_actions.insert (action.when);
-            // TODO: make this printing better
+            rejected_actions.insert (action);
             LOG_IF (INFO, kLogConsistent) << PRINT_PORT << "Rejecting action " << action;
         }
     }
