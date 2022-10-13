@@ -61,6 +61,10 @@ namespace bt {
         return os << "]";
     }
 
+    std::int32_t operator + (std::int32_t state, std::pair <Action, timestamp_t> const & action) {
+        return state + action.first;
+    }
+
     std::int32_t operator + (std::int32_t state, Action const & action) {
         switch (action.what) {
             case FORBIDDEN:
@@ -74,6 +78,10 @@ namespace bt {
                 LOG (WARNING) << "\tTrying to apply an unrecognisable action!";
                 return state;
         }
+    }
+
+    Position operator + (Position state, std::pair <Action, timestamp_t> const & action) {
+        return state + action.first;
     }
 
     Position operator + (Position state, Action const & action) {

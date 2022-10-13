@@ -61,6 +61,8 @@ namespace bt {
     std::ostream & operator << (std::ostream & os, ActionType type);
     std::ostream & operator << (std::ostream & os, Action const & action);
 
+    std::int32_t operator + (std::int32_t state, std::pair <Action, timestamp_t> const & action);
+    Position operator + (Position state, std::pair <Action, timestamp_t> const & action);
     std::int32_t operator + (std::int32_t state, Action const & action);
     Position operator + (Position state, Action const & action);
 } // bt

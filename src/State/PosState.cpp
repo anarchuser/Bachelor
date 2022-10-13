@@ -1,7 +1,7 @@
 #include "PosState.h"
 
 namespace bt {
-    bool PosState::try_apply (Action action, Position state, std::set<Action> actions) {
+    bool PosState::try_apply (Action action, Position init, std::map <Action, timestamp_t> actions) {
         switch (action.what) {
             case NOOP:
                 return true;
@@ -11,14 +11,14 @@ namespace bt {
             case MOVE:
             default:;
         }
-        if (actions.contains (action)) return * actions.find (action) == action;
+        if (actions.contains (action)) return actions.find (action)->first == action;
 
-        auto [action_pos, _] = actions.insert (action);
-        for (auto trav = actions.begin(); trav != action_pos; trav++) {
-            state += trav->value.move;
-        }
+        auto [action_pos, _] = actions.emplace (action, 0);
+        // Calculate init until the time of the proposed action
+        auto state = std::accumulate (actions.begin(), action_pos, init);
+        // Calculate init from the proposed action onwards
         for (auto trav = action_pos; trav != actions.end(); trav++) {
-            state += trav->value.move;
+            state += trav->first.value.move;
         }
         return true;
     }
@@ -32,7 +32,7 @@ namespace bt {
         }
 
         auto now = get_timestamp();
-        actions.insert (action);
+        actions.emplace (action, now);
         return now;
     }
 
@@ -50,7 +50,7 @@ namespace bt {
         if (kLogState) {
             os << "\n";
             for (auto action: state.getActions ()) {
-                os << "\t" << action << "\n";
+                os << "\t" << action.first << "\n";
             }
         }
         return os;
