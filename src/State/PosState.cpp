@@ -50,7 +50,7 @@ namespace bt {
         if (kLogState) {
             os << "\n";
             for (auto action: state.getActions ()) {
-                os << "\t" << action.first << "\n";
+                os << "\t" << action.first << "  \t(d " << (action.second - action.first.when) << ")\n";
             }
         }
         return os;

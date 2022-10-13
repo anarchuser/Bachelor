@@ -28,8 +28,8 @@ namespace bt {
 
     timestamp_t State::getAverageLatency () const {
         if (actions.empty()) return 0;
-        auto total_latency = std::accumulate (actions.begin(), actions.end(), 0,
-                [] (timestamp_t latency, std::pair <Action, timestamp_t> const & action) {
+        auto total_latency = std::accumulate (actions.begin(), actions.end(), 0ll,
+                [] (auto latency, std::pair <Action, timestamp_t> const & action) {
                     LOG_IF (WARNING, action.second < action.first.when) << "Action registered before it supposedly happened! - " << action.first;
                     return latency + action.second - action.first.when;
         });

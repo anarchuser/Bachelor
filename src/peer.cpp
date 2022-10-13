@@ -148,14 +148,23 @@ int main (int argc, char * argv[]) {
 
         /* Print all states */
         std::vector <bt::timestamp_t> l_avgs;
-        for (auto const & a : peers) for (auto const & b : peers) l_avgs.push_back (a->getState (b->port).getAverageLatency());
+        for (auto const & peer : peers) l_avgs.push_back (peer->getState (peer->port).getAverageLatency());
         auto l_avg = std::accumulate (l_avgs.begin(), l_avgs.end(), bt::timestamp_t (0)) / l_avgs.size();
-        std::cout << "Average latency: " << l_avg << std::endl;
+//        std::cout << "Average latency: " << l_avg << std::endl;
 
         std::vector <bt::timestamp_t> l_maxs;
-        for (auto const & a : peers) for (auto const & b : peers) l_maxs.push_back (a->getState (b->port).getMaximumLatency());
+        for (auto const & peer : peers) l_maxs.push_back (peer->getState (peer->port).getMaximumLatency());
         auto l_max = * std::max_element (l_maxs.begin(), l_maxs.end());
-        std::cout << "Maximum latency: " << l_max << std::endl;
+//        std::cout << "Maximum latency: " << l_max << std::endl;
+        std::cout << l_avg << '\t' << l_max << std::endl;
+
+//        for (auto const & outer : peers) {
+//            std::cout << "Printing Position state from peer " << * outer << std::endl;
+//            for (auto const & inner : peers) {
+//                std::cout << "Printing Position state of peer " << * inner << std::endl;
+//                std::cout << outer->getState (inner->port);
+//            }
+//        }
 
 //        std::cout << "Peers: |  ";
 //        for (auto const & peer : peers) std::cout << peer->port << "|  ";

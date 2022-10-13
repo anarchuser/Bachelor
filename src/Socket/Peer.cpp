@@ -79,7 +79,7 @@ namespace bt {
     }
 
     timestamp_t Peer::getAverageLatency () const {
-        timestamp_t accu = 0;
+        long accu = 0;
         int counter = 0;
         for (auto const & state : positions) {
             auto latency = state.second.getAverageLatency();
