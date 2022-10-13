@@ -16,7 +16,6 @@
  */
 
 #include <algorithm>
-#include <unordered_set>
 #include <memory>
 #include <vector>
 
@@ -56,6 +55,8 @@
  * -t --trust [naive|voting]    Select the behaviour of peers
  */
 
+void updatePositions (std::vector<std::unique_ptr<bt::Peer>> & peers, RNG & rng, int duration, int frequency);
+
 int main (int argc, char * argv[]) {
     /* Init section */
     Args const args {argc, (char const * *) argv};
@@ -72,6 +73,12 @@ int main (int argc, char * argv[]) {
     auto const kInitState = args.getState() ?: ARGS_INIT_STATE;
     auto const kMessageCount = args.getMessageCount() ?: ARGS_MSG_NUM;
     auto const kTrustProtocol = args.getTrust();
+
+    auto const kScenarioDuration = args.getDuration();
+    auto const kScenarioFrequency = args.getFrequency();
+
+    std::cout << "Scenario duration (in s):  " << kScenarioDuration  << std::endl;
+    std::cout << "Scenario frequency (in s): " << kScenarioFrequency << std::endl;
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
 
@@ -124,24 +131,28 @@ int main (int argc, char * argv[]) {
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
+        std::thread physim (updatePositions, std::ref (peers), std::ref (rng), kScenarioDuration, kScenarioFrequency);
+
 //        peers[0]->act (bt::NOOP);
 //        peers[0]->act (bt::FORBIDDEN);
-        peers[1]->act (-30);
+//        peers[1]->act (-30);
+//
+//        for (int i = 0; i < kMessageCount; i++) {
+//            int index = std::floor (rng.random (Bounds (0, kPeers)));
+//            auto & peer = * peers[index];
+//            bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
+//            auto pos = peer.getState(peer.port).getState();
+//            peer.move ({change, pos + change});
+//            std::this_thread::sleep_for (std::chrono::milliseconds (5));
+//        }
 
-        for (int i = 0; i < kMessageCount; i++) {
-            int index = std::floor (rng.random (Bounds (0, kPeers)));
-            auto & peer = * peers[index];
-            bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
-            auto pos = peer.getState(peer.port).getState();
-            peer.move ({change, pos + change});
-            std::this_thread::sleep_for (std::chrono::milliseconds (5));
-        }
-
+        physim.join();
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: destruct";
 
         /* Wait for sync to finish */
         if (r) r.reset ();
         else std::this_thread::sleep_for (std::chrono::seconds (2));
+        std::this_thread::sleep_for (std::chrono::seconds (1));
 
         /* Print all states */
         std::cout << "Peers: |  ";
@@ -180,4 +191,16 @@ int main (int argc, char * argv[]) {
         }
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
+}
+
+void updatePositions (std::vector<std::unique_ptr<bt::Peer>> & peers, RNG & rng, int duration, int frequency) {
+    auto const kPeers = peers.size();
+    std::chrono::microseconds const idle (long (std::floor (1000000.0 / frequency)));
+    for (int i = 0; i < duration * frequency; i++) {
+        for (auto const & peer : peers) {
+            bt::Position move (rng.random ({-5, 5}), rng.random ({-5, 5}));
+            peer->move ({move, move});
+        }
+        std::this_thread::sleep_for (idle);
+    }
 }

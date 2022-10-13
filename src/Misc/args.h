@@ -15,6 +15,10 @@
 #define ARGS_MESSAGES   'm', "--msgs"
 #define ARGS_TRUST      't', "--trust"
 
+// Scenario commands
+#define ARGS_DURATION   'd', "--duration"  // in seconds
+#define ARGS_FREQUENCY  'f', "--frequency" // in actions / second
+
 struct Args {
     enum Trust {
         NAIVE = 0,
@@ -27,15 +31,20 @@ struct Args {
     int getIndex (char flag, char const * name) const;
 
     void isHelp() const;
-    [[nodiscard]] int          getPeers() const;
-    [[nodiscard]] bool         getRouter() const;
-    [[nodiscard]] char const * getAddress() const;
-    [[nodiscard]] bool         getExternal() const;
-    [[nodiscard]] int          getState() const;
-    [[nodiscard]] int          getMessageCount() const;
-    [[nodiscard]] Trust        getTrust() const;
+    [[nodiscard]] inline int    getPeers() const { return getTypeInt (ARGS_PEERS); }
+    [[nodiscard]] bool          getRouter() const;
+    [[nodiscard]] char const *  getAddress() const;
+    [[nodiscard]] bool          getExternal() const;
+    [[nodiscard]] inline int    getState() const { return getTypeInt (ARGS_STATE); }
+    [[nodiscard]] inline int    getMessageCount() const { return getTypeInt (ARGS_MESSAGES); }
+    [[nodiscard]] Trust         getTrust() const;
+
+    [[nodiscard]] inline int    getDuration() const { return getTypeInt (ARGS_DURATION); }
+    [[nodiscard]] inline int    getFrequency() const { return getTypeInt (ARGS_FREQUENCY); }
 
 private:
+    [[nodiscard]] int  getTypeInt  (char flag, char const * name) const;
+
     int const argc;
     char const * * argv;
 };
