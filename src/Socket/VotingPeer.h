@@ -2,6 +2,7 @@
 #define BACHELOR_VOTINGPEER_H
 
 #include <unordered_map>
+#include <memory>
 
 #include "State/Action.h"
 #include "State/Ballot.h"
@@ -20,6 +21,8 @@ namespace bt {
         void process (VotePacket const & packet) override;
 
     private:
+        mutable std::mutex mx;
+
         std::unordered_map <timestamp_t, Ballot> pending_actions;
     };
 

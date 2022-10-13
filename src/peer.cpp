@@ -77,9 +77,6 @@ int main (int argc, char * argv[]) {
     auto const kScenarioDuration = args.getDuration();
     auto const kScenarioFrequency = args.getFrequency();
 
-    std::cout << "Scenario duration (in s):  " << kScenarioDuration  << std::endl;
-    std::cout << "Scenario frequency (in s): " << kScenarioFrequency << std::endl;
-
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
 
     /* Configure router if needed */
@@ -194,7 +191,6 @@ int main (int argc, char * argv[]) {
 }
 
 void updatePositions (std::vector<std::unique_ptr<bt::Peer>> & peers, RNG & rng, int duration, int frequency) {
-    auto const kPeers = peers.size();
     std::chrono::microseconds const idle (long (std::floor (1000000.0 / frequency)));
     for (int i = 0; i < duration * frequency; i++) {
         for (auto const & peer : peers) {
