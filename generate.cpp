@@ -12,7 +12,7 @@ using namespace std;
 vector <string> const headers     {"protocol", "peers", "duration", "frequency", "average", "maximum"};
 vector <string> const protocols   {"naive", "voting"};
 vector <int>         const peers       { 5, 10 };
-vector <int>         const durations   { 60 };
+vector <int>         const durations   { 10, 60 };
 vector <int>         const frequencies { 1, 30, 60 };
 
 string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency);

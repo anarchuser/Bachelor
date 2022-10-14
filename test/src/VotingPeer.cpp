@@ -55,8 +55,8 @@ SCENARIO ("Random packets between voting peers get synchronised perfectly") {
                     auto const & finalState = peer->getState();
                     auto state = finalState.initialState;
                     for (auto action : finalState.getActions()) {
-                        REQUIRE (action.what != bt::FORBIDDEN);
-                        state += action.value.change;
+                        REQUIRE (action.first.what != bt::FORBIDDEN);
+                        state += action.first.value.change;
                         REQUIRE (state >= 0);
                     }
                 }
@@ -67,8 +67,7 @@ SCENARIO ("Random packets between voting peers get synchronised perfectly") {
                 int index = std::floor (rng.random (Bounds (0, PEERS)));
                 auto & peer = * peers[index];
                 bt::Position change (rng.random (Bounds (-5, 5)), rng.random (Bounds (-5, 5)));
-                auto pos = peer.getState(peer.port).getState();
-                peer.move ({change, pos + change});
+                peer.move (change);
                 std::this_thread::sleep_for (std::chrono::milliseconds (MSG_DELAY_MS));
             }
             std::this_thread::sleep_for (std::chrono::milliseconds (500));
@@ -92,8 +91,8 @@ SCENARIO ("Random packets between voting peers get synchronised perfectly") {
                     auto const & finalState = peer->getState();
                     auto state = finalState.initialState;
                     for (auto action : finalState.getActions()) {
-                        REQUIRE (action.what != bt::FORBIDDEN);
-                        state += action.value.change;
+                        REQUIRE (action.first.what != bt::FORBIDDEN);
+                        state += action.first.value.change;
                         REQUIRE (state >= 0);
                     }
                 }

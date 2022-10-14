@@ -149,7 +149,7 @@ int main (int argc, char * argv[]) {
         /* Print all states */
         std::vector <bt::timestamp_t> l_avgs;
         for (auto const & peer : peers) l_avgs.push_back (peer->getState (peer->port).getAverageLatency());
-        auto l_avg = std::accumulate (l_avgs.begin(), l_avgs.end(), bt::timestamp_t (0)) / l_avgs.size();
+        auto l_avg = std::accumulate (l_avgs.begin(), l_avgs.end(), 0ll) / l_avgs.size();
 //        std::cout << "Average latency: " << l_avg << std::endl;
 
         std::vector <bt::timestamp_t> l_maxs;
