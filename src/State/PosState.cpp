@@ -1,7 +1,7 @@
 #include "PosState.h"
 
 namespace bt {
-    bool PosState::try_apply (Action action, Position state, std::set<Action> actions) {
+    bool PosState::try_apply (Action action, Position init, std::map <Action, timestamp_t> actions) {
         switch (action.what) {
             case NOOP:
                 return true;
@@ -11,16 +11,14 @@ namespace bt {
             case MOVE:
             default:;
         }
-        if (actions.contains (action)) return * actions.find (action) == action;
+        if (actions.contains (action)) return actions.find (action)->first == action;
 
-        auto [action_pos, _] = actions.insert (action);
-        for (auto trav = actions.begin(); trav != action_pos; trav++) {
-            state += trav->value.move.delta;
-            LOG_IF (WARNING, state != trav->value.move.reference) << "Given actions cannot be applied iteratively onto the given initialState!";
-        }
+        auto [action_pos, _] = actions.emplace (action, 0);
+        // Calculate init until the time of the proposed action
+        auto state = std::accumulate (actions.begin(), action_pos, init);
+        // Calculate init from the proposed action onwards
         for (auto trav = action_pos; trav != actions.end(); trav++) {
-            state += trav->value.move.delta;
-            if (state != trav->value.move.reference) return false;
+            state += trav->first.value.move;
         }
         return true;
     }
@@ -34,7 +32,7 @@ namespace bt {
         }
 
         auto now = get_timestamp();
-        actions.insert (action);
+        actions.emplace (action, now);
         return now;
     }
 
@@ -52,7 +50,7 @@ namespace bt {
         if (kLogState) {
             os << "\n";
             for (auto action: state.getActions ()) {
-                os << "\t" << action << "\n";
+                os << "\t" << action.first << "  \t(d " << (action.second - action.first.when) << ")\n";
             }
         }
         return os;

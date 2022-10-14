@@ -22,7 +22,7 @@ namespace bt {
         [[nodiscard]] Position getState() const;
         [[nodiscard]] bool contains (Action action) const override;
 
-        [[nodiscard]] static bool try_apply (Action action, Position state, std::set <Action> actions);
+        [[nodiscard]] static bool try_apply (Action action, Position init, std::map <Action, timestamp_t> actions);
 
         Position const initialState = {0, 0};
     };

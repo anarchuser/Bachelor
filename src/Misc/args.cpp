@@ -25,16 +25,6 @@ void Args::isHelp() const {
     std::cout << "  -t --trust [naive|voting] Select the behaviour of peers\n" << std::endl;
 }
 
-int Args::getPeers() const {
-    auto flag_index = getIndex (ARGS_PEERS);
-    auto val_index = flag_index + 1;
-    if (!flag_index || val_index >= argc) return 0;
-    try {
-        return std::stoi (argv [val_index]);
-    } catch (...) {}
-    return 0;
-}
-
 bool Args::getRouter() const {
     return getIndex (ARGS_ROUTER);
 }
@@ -50,26 +40,6 @@ bool Args::getExternal() const {
     return getIndex (ARGS_EXTERNAL);
 }
 
-int Args::getState() const {
-    auto flag_index = getIndex (ARGS_STATE);
-    auto val_index = flag_index + 1;
-    if (!flag_index || val_index >= argc) return 0;
-    try {
-        return std::stoi (argv [val_index]);
-    } catch (...) {}
-    return 0;
-}
-
-int Args::getMessageCount() const {
-    auto flag_index = getIndex (ARGS_MESSAGES);
-    auto val_index = flag_index + 1;
-    if (!flag_index || val_index >= argc) return 0;
-    try {
-        return std::stoi (argv [val_index]);
-    } catch (...) {}
-    return 0;
-}
-
 Args::Trust Args::getTrust() const {
     auto flag_index = getIndex (ARGS_TRUST);
     auto val_index = flag_index + 1;
@@ -78,6 +48,16 @@ Args::Trust Args::getTrust() const {
     if (!strcmp (argv[val_index], "voting")) return VOTING;
     if (!strcmp (argv[val_index], "lockstep")) return LOCKSTEP;
     return NAIVE;
+}
+
+int Args::getTypeInt (char flag, const char * name) const {
+    auto flag_index = getIndex (flag, name);
+    auto val_index = flag_index + 1;
+    if (!flag_index || val_index >= argc) return 0;
+    try {
+        return std::stoi (argv [val_index]);
+    } catch (...) {}
+    return 0;
 }
 
 /* Copyright © 2022 Aaron Alef */

@@ -1,6 +1,8 @@
 #ifndef BACHELOR_NAIVEPEER_H
 #define BACHELOR_NAIVEPEER_H
 
+#include <glog/logging.h>
+
 #include "Peer.h"
 
 namespace bt {
@@ -11,7 +13,7 @@ namespace bt {
 
         timestamp_t act (ActionType what) override;
         timestamp_t act (state_t value) override;
-        timestamp_t move (PosChange move) override;
+        timestamp_t move (Position move) override;
         void process (VotePacket const & packet) override;
     };
 

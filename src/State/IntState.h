@@ -22,7 +22,7 @@ namespace bt {
         [[nodiscard]] state_t getState() const;
         [[nodiscard]] bool contains (Action action) const override;
 
-        [[nodiscard]] static bool try_apply (Action action, state_t state, std::set <Action> actions);
+        [[nodiscard]] static bool try_apply (Action action, state_t state, std::map <Action, timestamp_t> actions);
 
         state_t const initialState = 0;
     };

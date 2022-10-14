@@ -15,7 +15,7 @@ namespace bt {
         return action.when;
     }
 
-    timestamp_t NaivePeer::move (PosChange move) {
+    timestamp_t NaivePeer::move (Position move) {
         Action action (port, move);
         vote (action, APPROVE);
         positions.at (port).apply (action);
@@ -27,18 +27,21 @@ namespace bt {
 
         auto const & action = packet.action;
 
-        if (rejected_actions.contains (action.when)) return;
+        if (rejected_actions.contains (action)) return;
 
         if (action.what == MOVE) {
             if (positions.at (action.who).contains (action)) return;
 
             bool shouldReject = !positions.at (action.who).apply (action);
-            if (shouldReject) rejected_actions.insert (action.when);
+            if (shouldReject) {
+                if (rejected_actions.contains (action))
+                rejected_actions.emplace (action);
+            }
         } else {
             if (consistent_state.contains (action)) return;
 
             bool shouldReject = !consistent_state.apply (action);
-            if (shouldReject) rejected_actions.insert (action.when);
+            if (shouldReject) rejected_actions.emplace (action);
         }
     }
 }

@@ -4,6 +4,8 @@
 #include <glog/logging.h>
 #include <sstream>
 #include <iomanip>
+#include <unordered_set>
+#include <utility>
 
 #include "Packet/port.h"
 #include "Chrono/util.h"
@@ -28,23 +30,19 @@ namespace bt {
         Position & operator += (Position other);
         bool operator == (Position other) const;
     };
-    struct __attribute((__packed__)) PosChange {
-        Position const delta;
-        Position const reference;
-    };
 
     union __attribute((__packed__)) Data {
         explicit inline Data (std::int32_t change = ACTION_DEFAULT): change {change} {}
-        explicit inline Data (PosChange move): move{move} {}
+        explicit inline Data (Position move): move{move} {}
 
         std::int32_t const change;
-        PosChange const move;
+        Position const move;
     };
 
     struct __attribute__((__packed__)) Action {
         Action (port_t who, ActionType what);
         Action (port_t who, std::int32_t change);
-        Action (port_t who, PosChange move);
+        Action (port_t who, Position move);
 
         timestamp_t const when;
         port_t const who;
@@ -59,14 +57,22 @@ namespace bt {
         }
     };
 
-    std::ostream & operator << (std::ostream & os, PosChange move);
     std::ostream & operator << (std::ostream & os, Position pos);
     std::ostream & operator << (std::ostream & os, ActionType type);
     std::ostream & operator << (std::ostream & os, Action const & action);
 
+    std::int32_t operator + (std::int32_t state, std::pair <Action, timestamp_t> const & action);
+    Position operator + (Position state, std::pair <Action, timestamp_t> const & action);
     std::int32_t operator + (std::int32_t state, Action const & action);
     Position operator + (Position state, Action const & action);
 } // bt
+
+template<>
+struct std::hash <bt::Action> {
+    std::size_t  operator () (bt::Action const & action) const noexcept {
+        return action.when;
+    }
+};
 
 #endif //BACHELOR_ACTION_H
 

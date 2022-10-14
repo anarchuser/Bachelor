@@ -1,10 +1,15 @@
 #ifndef BACHELOR_STATE_H
 #define BACHELOR_STATE_H
 
+#include <algorithm>
+#include <numeric>
+#include <cmath>
 #include <chrono>
 #include <mutex>
+#include <map>
 #include <set>
 #include <unordered_set>
+#include <iostream>
 
 #include <glog/logging.h>
 
@@ -19,17 +24,19 @@ namespace bt {
         State (State const & other);
 
         virtual timestamp_t apply (Action action);
-        [[nodiscard]] virtual std::set <Action> getActions() const final;
+        [[nodiscard]] virtual std::map <Action, timestamp_t> getActions() const final;
         virtual bool contains (Action action) const = 0;
+        [[nodiscard]] timestamp_t getAverageLatency() const;
+        [[nodiscard]] timestamp_t getMaximumLatency() const;
 
-        inline bool operator == (State const & other) const { return actions == other.actions; }
+        [[nodiscard]] bool operator == (State const & other) const;
 
     protected:
         mutable std::mutex mx;
 
-        std::set <Action> actions;
+        std::map <Action, timestamp_t> actions;
 
-        [[nodiscard]] virtual std::set <Action> getActions() final;
+        [[nodiscard]] virtual std::map <Action, timestamp_t> getActions() final;
     };
 
     std::ostream & operator << (std::ostream & os, State const & state);

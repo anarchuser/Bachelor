@@ -1,17 +1,17 @@
 #include "IntState.h"
 
 namespace bt {
-    bool IntState::try_apply (Action action, state_t state, std::set<Action> actions) {
+    bool IntState::try_apply (Action action, state_t state, std::map <Action, timestamp_t> actions) {
         if (action.what != ADD) return action.what != FORBIDDEN;
-        if (actions.contains (action)) return * actions.find (action) == action;
+        if (actions.contains (action)) return actions.find (action)->first == action;
 
-        auto [action_pos, _] = actions.insert (action);
+        auto [action_pos, _] = actions.emplace (action, 0);
         for (auto trav = actions.begin(); trav != action_pos; trav++) {
-            state += trav->value.change;
+            state += trav->first.value.change;
             LOG_IF (WARNING, state < 0) << "Given actions cannot be applied iteratively onto the given initialState!";
         }
         for (auto trav = action_pos; trav != actions.end(); trav++) {
-            state += trav->value.change;
+            state += trav->first.value.change;
             if (state < 0) return false;
         }
         return true;
@@ -26,7 +26,7 @@ namespace bt {
         }
 
         auto now = get_timestamp();
-        actions.insert (action);
+        actions.emplace (action, now);
         return now;
     }
 
@@ -44,7 +44,7 @@ namespace bt {
         if (kLogState) {
             os << "\n";
             for (auto action: state.getActions ()) {
-                os << "\t" << action << "\n";
+                os << "\t" << action.first << "\n";
             }
         }
         return os;
