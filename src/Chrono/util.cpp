@@ -12,7 +12,7 @@ namespace bt {
 
     timestamp_t get_timestamp() {
         return std::chrono::duration_cast <std::chrono::nanoseconds> (
-                std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+                clock::now().time_since_epoch()).count();
     }
 
     std::string get_time_string() {
