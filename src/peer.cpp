@@ -211,6 +211,7 @@ int main (int argc, char * argv[]) {
         }
         if (pos_err_counter) {
             std::cerr << "\nFaults: " << pos_err_counter << std::endl;
+            (std::cout << "\t" << pos_err_counter).flush();
         }
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";

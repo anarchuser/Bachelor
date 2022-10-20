@@ -4,6 +4,7 @@
 #include <queue>
 #include <ctime>
 #include <chrono>
+#include <mutex>
 #include <glog/logging.h>
 #include <limits>
 #include <netdb.h>
