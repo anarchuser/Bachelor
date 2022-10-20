@@ -168,21 +168,18 @@ int main (int argc, char * argv[]) {
 //            }
 //        }
 
-        std::cout << "\nPeers: |  ";
-        for (auto const & peer : peers) std::cout << peer->port << "|  ";
-
-        std::cout << "\nState: |";
-        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
-
-        for (auto const & owner : peers)
-        {
-//            auto & owner = peers.front();
-            std::cout << "\n" << owner->port << ": |";
-            for (auto const & peer: peers) {
-                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
-            }
-        }
-        std::cout << std::endl;
+//        std::cout << "\nPeers: |  ";
+//        for (auto const & peer : peers) std::cout << peer->port << "|  ";
+//        std::cout << "\nState: |";
+//        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
+//        for (auto const & owner : peers) {
+////            auto & owner = peers.front();
+//            std::cout << "\n" << owner->port << ": |";
+//            for (auto const & peer: peers) {
+//                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
+//            }
+//        }
+//        std::cout << std::endl;
 
         /* Check that all states are actually the same in the end */
         std::vector <bt::IntState> result;
@@ -200,6 +197,7 @@ int main (int argc, char * argv[]) {
             auto first_pos = peers.front()->getState(other->port);
             positions.emplace (other->port, std::move (first_pos));
         }
+        auto pos_err_counter = 0;
         for (auto const & peer : peers) {
             for (auto const & other : peers) {
                 auto state = peer->getState(other->port);
@@ -208,11 +206,10 @@ int main (int argc, char * argv[]) {
 //                        << "Inconsistent PosState detected:\n"
 //                        << peer->port  << "| A:\t" << state << "\n"
 //                        << other->port << "| B:\t" << positions.at (other->port);
-                if (state != positions.at (other->port)) {
-                    (std::cerr << "\tX").flush();
-                }
+                if (state != positions.at (other->port)) pos_err_counter++;
             }
         }
+        std::cerr << "Faults: " << pos_err_counter << std::endl;
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
 }

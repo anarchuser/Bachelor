@@ -50,9 +50,9 @@ int main (int argc, char * argv[]) {
                             data << buffer.data();
                             std::cout << buffer.data();
                         }
-                        std::cout.flush();
-                        tsv.flush();
-                        data.flush();
+                        cout << endl;
+                        tsv << endl;
+                        data << endl;
                     }
                 }
             }
