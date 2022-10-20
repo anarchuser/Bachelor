@@ -113,13 +113,13 @@ namespace bt {
                 queue_empty = queue.empty();
                 return item;
             }();
-//            std::this_thread::sleep_until (time + latency);
+            std::this_thread::sleep_until (time + latency);
             send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
         while (!queue.empty()) {
             auto [time, packet, recv_addr] = queue.front ();
             queue.pop ();
-//            std::this_thread::sleep_until (time + latency);
+            std::this_thread::sleep_until (time + latency);
             send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
     }
