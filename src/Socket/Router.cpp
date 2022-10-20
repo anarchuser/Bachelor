@@ -3,22 +3,36 @@
 namespace bt {
     Router::Router (port_t port, timestamp_t timeout_ms)
             : port {port}
-            , address { .sin_family = AF_INET
-                      , .sin_port = htons (port)
-                      , .sin_addr = {.s_addr = INADDR_ANY}
-                      }
-            , socket_fd {[&] () {
+            , address_in { .sin_family = AF_INET
+                         , .sin_port = htons (port)
+                         , .sin_addr = {.s_addr = INADDR_ANY}
+            }
+            , address_out { .sin_family = AF_INET
+                          , .sin_port = htons (ROUTER_PORT_OUT)
+                          }
+            , recv_fd {[&] () {
                 auto fd = socket (AF_INET, SOCK_DGRAM, 0);
                 if (fd < 0) {
                     LOG (ERROR) << PRINT_PORT << "Could not create socket";
                 }
-                if (bind (fd, (struct sockaddr const *) & address, sizeof (address))) {
+                if (bind (fd, (struct sockaddr const *) & address_in, sizeof (address_in))) {
+                    LOG (ERROR) << PRINT_PORT << "Could not bind to address";
+                }
+                return fd;
+            }()}
+            , send_fd {[&] () {
+                auto fd = socket (AF_INET, SOCK_DGRAM, 0);
+                if (fd < 0) {
+                    LOG (ERROR) << PRINT_PORT << "Could not create socket";
+                }
+                if (bind (fd, (struct sockaddr const *) & address_out, sizeof (address_out))) {
                     LOG (ERROR) << PRINT_PORT << "Could not bind to address";
                 }
                 return fd;
             }()}
             , timeout (std::chrono::milliseconds (timeout_ms))
-            , thread {& Router::service, this}
+            , receiver {& Router::service, this}
+            , sender {& Router::process, this}
             {
                 char hostname[HOST_NAME_MAX];
                 gethostname (hostname, sizeof (hostname));
@@ -30,8 +44,10 @@ namespace bt {
     Router::~Router() {
         if (!should_stop.exchange (true)) {
             LOG_IF (INFO, kLogCDtor) << PRINT_PORT << "[DTOR]";
-            thread.join ();
-            close (socket_fd);
+            receiver.join ();
+            sender.join();
+            close (recv_fd);
+            close (send_fd);
         }
     }
 
@@ -48,7 +64,7 @@ namespace bt {
         socklen_t length = sizeof (struct sockaddr_in);
 
         do {
-            ssize_t read = recvfrom ( socket_fd
+            ssize_t read = recvfrom ( recv_fd
                     , buffer
                     , MAX_PAYLOAD_BYTES - 1
                     , MSG_DONTWAIT
@@ -74,9 +90,35 @@ namespace bt {
                 LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
                 LOG (WARNING) << PRINT_PORT << "Packet: " << to_string (packet);
             }
-            send (packet, sender.sin_addr.s_addr);
+            {
+                std::lock_guard guard (mx);
+                queue.push ({std::chrono::steady_clock::now(), packet, sender.sin_addr.s_addr});
+                queue_empty = false;
+            }
             checkpoint.refresh();
         } while (! (should_stop && checkpoint.has_elapsed (timeout)));
+        receive_stop = true;
+    }
+
+    void Router::process () {
+        std::chrono::milliseconds latency (ROUTER_LATENCY);
+        while (!receive_stop) {
+            if (queue_empty) continue;
+            auto [time, packet, recv_addr] = [&]() {
+                auto item = queue.front();
+                queue.pop();
+                queue_empty = queue.empty();
+                return item;
+            }();
+            std::this_thread::sleep_until (time + latency);
+            send (packet, recv_addr);
+        }
+        while (!queue.empty()) {
+            auto [time, packet, recv_addr] = queue.front ();
+            queue.pop ();
+            std::this_thread::sleep_until (time + latency);
+            send (packet, recv_addr);
+        }
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
@@ -85,7 +127,7 @@ namespace bt {
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};
 
-        sendto (socket_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+        sendto (send_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
 }
 
