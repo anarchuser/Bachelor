@@ -108,6 +108,7 @@ namespace bt {
         while (!receive_stop) {
             if (queue_empty) continue;
             auto [time, packet, recv_addr] = [&]() {
+                std::lock_guard guard (mx);
                 auto item = queue.front();
                 queue.pop();
                 queue_empty = queue.empty();

@@ -209,7 +209,9 @@ int main (int argc, char * argv[]) {
                 if (state != positions.at (other->port)) pos_err_counter++;
             }
         }
-        std::cerr << "Faults: " << pos_err_counter << std::endl;
+        if (pos_err_counter) {
+            std::cerr << "\nFaults: " << pos_err_counter << std::endl;
+        }
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
 }
