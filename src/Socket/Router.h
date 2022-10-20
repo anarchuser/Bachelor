@@ -17,12 +17,13 @@
 #include "Packet/port.h"
 #include "Packet/helper.h"
 #include "Chrono/Checkpoint.h"
+#include <queue>
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 64
 #endif
 
-#define ROUTER_TIMEOUT_MS 8000
+#define ROUTER_TIMEOUT_MS 60000
 
 namespace bt {
     class Router final {

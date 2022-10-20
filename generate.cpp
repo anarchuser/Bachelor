@@ -11,10 +11,12 @@ using namespace std;
 #define DEFAULT_ITERATIONS 20
 
 vector <string> const headers     {"protocol", "peers", "duration", "frequency", "average", "maximum"};
-vector <string> const protocols   {"naive", "voting"};
+//vector <string> const protocols   {"naive", "voting"};
+vector <string> const protocols   {"voting"};
 vector <int>    const peers       { 10 };
-vector <int>    const durations   { 60 };
-vector <int>    const frequencies { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70 };
+vector <int>    const durations   { 5 };
+//vector <int>    const frequencies { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70 };
+vector <int>    const frequencies { 5, 40, 70 };
 
 string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency);
 
@@ -66,5 +68,6 @@ string build_cmd (string const & prgm, string const & protocol, int peer, int du
     ss << " -d " << duration;
     ss << " -f " << frequency;
     ss << " -m " << 0;
+    ss << " -r ";
     return ss.str();
 }
