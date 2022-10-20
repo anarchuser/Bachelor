@@ -4,6 +4,7 @@
 #include <chrono>
 #include <atomic>
 #include <glog/logging.h>
+#include "util.h"
 
 namespace bt {
     using namespace std::chrono;
@@ -17,7 +18,7 @@ namespace bt {
         [[nodiscard]] bool has_elapsed (milliseconds duration) const;
 
     private:
-        std::atomic <time_point <high_resolution_clock>> checkpoint;
+        std::atomic <time_point <clock>> checkpoint;
     };
 }
 

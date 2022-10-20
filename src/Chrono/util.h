@@ -11,6 +11,7 @@
 
 namespace bt {
     typedef std::uint64_t timestamp_t;
+    typedef std::chrono::steady_clock clock;
 
     std::string separate_thousands (timestamp_t timestamp);
     timestamp_t get_timestamp();

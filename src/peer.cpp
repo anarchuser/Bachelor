@@ -182,27 +182,29 @@ int main (int argc, char * argv[]) {
 //        }
 //        std::cout << std::endl;
 //
-//        /* Check that all states are actually the same in the end */
-//        std::vector <bt::IntState> result;
-//        for (auto const & peer : peers) {
-//            auto state = peer->getState();
-//            for (auto const & other : result) {
+        /* Check that all states are actually the same in the end */
+        std::vector <bt::IntState> result;
+        for (auto const & peer : peers) {
+            auto state = peer->getState();
+            for (auto const & other : result) {
 //                CHECK_EQ (state, other);
-//            }
-//            result.emplace_back (std::move (state));
-//        }
-//
-//        std::unordered_map <bt::port_t, bt::PosState> positions;
-//        for (auto const & other : peers) {
-//            auto first_pos = peers.front()->getState(other->port);
-//            positions.emplace (other->port, std::move (first_pos));
-//        }
-//        for (auto const & peer : peers) {
-//            for (auto const & other : peers) {
-//                auto state = peer->getState(other->port);
+                LOG_IF (WARNING, state != other) << "Inconsistent IntState detected:\n" << "A:\t" << state << "\nB:\t" << other;
+            }
+            result.emplace_back (std::move (state));
+        }
+
+        std::unordered_map <bt::port_t, bt::PosState> positions;
+        for (auto const & other : peers) {
+            auto first_pos = peers.front()->getState(other->port);
+            positions.emplace (other->port, std::move (first_pos));
+        }
+        for (auto const & peer : peers) {
+            for (auto const & other : peers) {
+                auto state = peer->getState(other->port);
 //                CHECK_EQ (state, positions.at (other->port));
-//            }
-//        }
+                LOG_IF (WARNING, state != positions.at (other->port)) << "Inconsistent PosState detected:\n" << "A:\t" << state << "\nB:\t" << positions.at (other->port);
+            }
+        }
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
 }
