@@ -25,11 +25,9 @@
 #define HOST_NAME_MAX 64
 #endif
 
-#define ROUTER_TIMEOUT_MS 2000
+#define ROUTER_TIMEOUT_MS 20000
 
 #define ROUTER_LATENCY 100
-
-#define ROUTER_PORT_OUT 49999
 
 namespace bt {
     class Router final {
@@ -60,7 +58,7 @@ namespace bt {
 
         std::mutex mutable mx;
         std::atomic <bool> queue_empty = true;
-        std::queue <std::tuple <std::chrono::steady_clock::time_point, Packet const &, in_addr_t>> queue;
+        std::queue <std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t>> queue;
     };
 }
 

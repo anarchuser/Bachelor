@@ -13,7 +13,7 @@ static bool const kLogRoute = false;
 static bool const kLogSend = false;
 static bool const kLogSendPing    = !kLogSend && false;
 static bool const kLogSendConnect = !kLogSend && false;
-static bool const kLogSendAction  = !kLogSend && true;
+static bool const kLogSendAction  = !kLogSend && false;
 static bool const kLogSendVote    = !kLogSend && false;
 // Receive
 static bool const kLogRecv = false;

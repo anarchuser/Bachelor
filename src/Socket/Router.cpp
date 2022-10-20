@@ -8,8 +8,9 @@ namespace bt {
                          , .sin_addr = {.s_addr = INADDR_ANY}
             }
             , address_out { .sin_family = AF_INET
-                          , .sin_port = htons (ROUTER_PORT_OUT)
-                          }
+                          , .sin_port = htons (PORT_ROUTER_OUT)
+                          , .sin_addr = {.s_addr = INADDR_ANY}
+            }
             , recv_fd {[&] () {
                 auto fd = socket (AF_INET, SOCK_DGRAM, 0);
                 if (fd < 0) {
@@ -62,6 +63,7 @@ namespace bt {
         char buffer [MAX_PAYLOAD_BYTES] = {0};
         struct sockaddr_in sender = {0};
         socklen_t length = sizeof (struct sockaddr_in);
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
 
         do {
             ssize_t read = recvfrom ( recv_fd
@@ -86,17 +88,18 @@ namespace bt {
 
             buffer [read] = 0;
             auto const & packet = bt::Packet::from_buffer (buffer);
+            std::string packet_copy (buffer, read);
             if (ntohs (sender.sin_port) != packet.sender) {
                 LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
                 LOG (WARNING) << PRINT_PORT << "Packet: " << to_string (packet);
             }
             {
                 std::lock_guard guard (mx);
-                queue.push ({std::chrono::steady_clock::now(), packet, sender.sin_addr.s_addr});
+                queue.push ({std::chrono::steady_clock::now(), std::move (packet_copy), sender.sin_addr.s_addr});
                 queue_empty = false;
             }
             checkpoint.refresh();
-        } while (! (should_stop && checkpoint.has_elapsed (timeout)));
+        } while (!should_stop || !checkpoint.has_elapsed (timeout));
         receive_stop = true;
     }
 
@@ -110,14 +113,14 @@ namespace bt {
                 queue_empty = queue.empty();
                 return item;
             }();
-            std::this_thread::sleep_until (time + latency);
-            send (packet, recv_addr);
+//            std::this_thread::sleep_until (time + latency);
+            send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
         while (!queue.empty()) {
             auto [time, packet, recv_addr] = queue.front ();
             queue.pop ();
-            std::this_thread::sleep_until (time + latency);
-            send (packet, recv_addr);
+//            std::this_thread::sleep_until (time + latency);
+            send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
     }
 

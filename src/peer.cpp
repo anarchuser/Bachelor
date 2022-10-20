@@ -119,9 +119,11 @@ int main (int argc, char * argv[]) {
 
         for (int i = 1; i < peers.size(); i++) {
             peers[i]->connect (PORT(i - 1));
+            std::this_thread::sleep_for (std::chrono::seconds (1));
         }
 
         /* Wait for network */
+        LOG (INFO) << "\tWaiting for network to form...";
         while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
             return peer->num_of_peers < kPeers - 1;
         })) std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
@@ -144,7 +146,6 @@ int main (int argc, char * argv[]) {
         /* Wait for sync to finish */
         if (r) r.reset ();
         else std::this_thread::sleep_for (std::chrono::seconds (2));
-        std::this_thread::sleep_for (std::chrono::seconds (1));
 
         /* Print all states */
         std::vector <bt::timestamp_t> l_avgs;
@@ -202,7 +203,10 @@ int main (int argc, char * argv[]) {
             for (auto const & other : peers) {
                 auto state = peer->getState(other->port);
 //                CHECK_EQ (state, positions.at (other->port));
-                LOG_IF (WARNING, state != positions.at (other->port)) << "Inconsistent PosState detected:\n" << "A:\t" << state << "\nB:\t" << positions.at (other->port);
+                LOG_IF (WARNING, state != positions.at (other->port))
+                        << "Inconsistent PosState detected:\n"
+                        << peer->port  << "| A:\t" << state << "\n"
+                        << other->port << "| B:\t" << positions.at (other->port);
             }
         }
     }

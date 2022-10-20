@@ -22,6 +22,7 @@ namespace bt {
         }
         if (packet.receiver != port) {
             LOG (WARNING) << PRINT_PORT << "Received packet with foreign recipient - " << packet;
+            LOG (WARNING) << "Port: " << port << " - " << packet.receiver;
             return;
         }
         LOG_IF (INFO, kLogRecv) << PRINT_PORT << "[RECV|" << sender << "]\t[" << to_string (packet) << "]";
