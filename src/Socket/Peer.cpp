@@ -48,7 +48,7 @@ namespace bt {
     }
 
     void Peer::vote (Action action, Vote vote) {
-        LOG_IF (INFO, kLogSendVote) << PRINT_PORT << "[SEND]\t" << action;
+        LOG_IF (INFO, kLogSendVote) << PRINT_PORT << "[VOTE|" << vote << "]\t" << action;
         for (auto peer : peers) {
             send (VotePacket (peer, port, vote, action, count_msg()));
         }
@@ -110,7 +110,7 @@ namespace bt {
         os << "Σ" << peer.num_of_peers;
         for (auto neighbour : peer.getPeers()) os << "|" << neighbour;
         os << "]\n";
-        os << peer.getState();
+        os << "State: " << peer.getState() << "\n";
         return os;
     }
 }
