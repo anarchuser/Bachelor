@@ -1,7 +1,10 @@
 #ifndef BACHELOR_ROUTER_H
 #define BACHELOR_ROUTER_H
 
+#include <queue>
+#include <ctime>
 #include <chrono>
+#include <mutex>
 #include <glog/logging.h>
 #include <limits>
 #include <netdb.h>
@@ -9,6 +12,7 @@
 #include <sys/socket.h>
 #include <thread>
 #include <unistd.h>
+#include <iostream>
 
 #include "log.h"
 #include "config.h"
@@ -22,7 +26,9 @@
 #define HOST_NAME_MAX 64
 #endif
 
-#define ROUTER_TIMEOUT_MS 8000
+#define ROUTER_TIMEOUT_MS 120000000
+
+#define ROUTER_LATENCY 50
 
 namespace bt {
     class Router final {
@@ -38,15 +44,22 @@ namespace bt {
 
     private:
         void service ();
+        void process ();
         void send (Packet const & packet, in_addr_t receiver_address) const;
 
-        struct sockaddr_in const address;
-        int const socket_fd;
+        struct sockaddr_in const address_in, address_out;
+        int const recv_fd;
+        int const send_fd;
 
-        std::thread thread;
+        std::thread receiver, sender;
         std::atomic <bool> should_stop = false;
+        std::atomic <bool> receive_stop = false;
         Checkpoint checkpoint;
         std::chrono::milliseconds const timeout;
+
+        std::mutex mutable mx;
+        std::atomic <bool> queue_empty = true;
+        std::queue <std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t>> queue;
     };
 }
 

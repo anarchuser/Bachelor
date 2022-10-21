@@ -57,6 +57,8 @@
 
 void updatePositions (std::vector<std::unique_ptr<bt::Peer>> & peers, RNG & rng, int duration, int frequency);
 
+using namespace std::literals;
+
 int main (int argc, char * argv[]) {
     /* Init section */
     Args const args {argc, (char const * *) argv};
@@ -122,6 +124,7 @@ int main (int argc, char * argv[]) {
         }
 
         /* Wait for network */
+        LOG (INFO) << "\tWaiting for network to form...";
         while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
             return peer->num_of_peers < kPeers - 1;
         })) std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
@@ -135,7 +138,7 @@ int main (int argc, char * argv[]) {
             auto & peer = * peers[index];
             int change = std::floor (rng.random (Bounds (-5, 5)));
             peer.act (change);
-            std::this_thread::sleep_for (std::chrono::milliseconds (5));
+            std::this_thread::sleep_for (5ms);
         }
 
         physim.join();
@@ -143,8 +146,7 @@ int main (int argc, char * argv[]) {
 
         /* Wait for sync to finish */
         if (r) r.reset ();
-        else std::this_thread::sleep_for (std::chrono::seconds (2));
-        std::this_thread::sleep_for (std::chrono::seconds (1));
+        else std::this_thread::sleep_for (2s);
 
         /* Print all states */
         std::vector <bt::timestamp_t> l_avgs;
@@ -156,7 +158,7 @@ int main (int argc, char * argv[]) {
         for (auto const & peer : peers) for (auto const & other : peers) l_maxs.push_back (peer->getState (other->port).getMaximumLatency());
         auto l_max = * std::max_element (l_maxs.begin(), l_maxs.end());
 //        std::cout << "Maximum latency: " << l_max << std::endl;
-        std::cout << l_avg << '\t' << l_max << std::endl;
+        (std::cout << l_avg << '\t' << l_max).flush();
 
 //        for (auto const & outer : peers) {
 //            std::cout << "Printing Position state from peer " << * outer << std::endl;
@@ -166,22 +168,19 @@ int main (int argc, char * argv[]) {
 //            }
 //        }
 
-//        std::cout << "Peers: |  ";
+//        std::cout << "\nPeers: |  ";
 //        for (auto const & peer : peers) std::cout << peer->port << "|  ";
-//
 //        std::cout << "\nState: |";
 //        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
-
-//        for (auto const & owner : peers)
-//        {
+//        for (auto const & owner : peers) {
 ////            auto & owner = peers.front();
-//            std::cout << "\n" << "Coord: |";
+//            std::cout << "\n" << owner->port << ": |";
 //            for (auto const & peer: peers) {
 //                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
 //            }
 //        }
 //        std::cout << std::endl;
-//
+
         /* Check that all states are actually the same in the end */
         std::vector <bt::IntState> result;
         for (auto const & peer : peers) {
@@ -198,13 +197,22 @@ int main (int argc, char * argv[]) {
             auto first_pos = peers.front()->getState(other->port);
             positions.emplace (other->port, std::move (first_pos));
         }
+        auto pos_err_counter = 0;
         for (auto const & peer : peers) {
             for (auto const & other : peers) {
                 auto state = peer->getState(other->port);
 //                CHECK_EQ (state, positions.at (other->port));
-                LOG_IF (WARNING, state != positions.at (other->port)) << "Inconsistent PosState detected:\n" << "A:\t" << state << "\nB:\t" << positions.at (other->port);
+//                LOG_IF (WARNING, state != positions.at (other->port))
+//                        << "Inconsistent PosState detected:\n"
+//                        << peer->port  << "| A:\t" << state << "\n"
+//                        << other->port << "| B:\t" << positions.at (other->port);
+                if (state != positions.at (other->port)) pos_err_counter++;
             }
         }
+        if (pos_err_counter) {
+            std::cerr << "\nFaults: " << pos_err_counter << std::endl;
+        }
+        (std::cout << "\t" << pos_err_counter).flush();
     }
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: end";
 }

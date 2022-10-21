@@ -48,9 +48,9 @@ int main (int argc, char * argv[]) {
                             data << buffer.data();
                             std::cout << buffer.data();
                         }
-                        std::cout.flush();
-                        tsv.flush();
-                        data.flush();
+                        cout << endl;
+                        tsv << endl;
+                        data << endl;
                     }
                 }
             }
@@ -66,5 +66,6 @@ string build_cmd (string const & prgm, string const & protocol, int peer, int du
     ss << " -d " << duration;
     ss << " -f " << frequency;
     ss << " -m " << 0;
+    ss << " -r ";
     return ss.str();
 }

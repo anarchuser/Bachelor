@@ -12,8 +12,9 @@ setup:	CMakeLists.txt
 	cmake -H. -B$(BUILD_DIR) > /dev/zero
 
 # Build the project (lib and src)
-build:	setup
+build:	setup	generate.cpp
 	cmake --build $(BUILD_DIR) --target Peer > /dev/zero
+	g++ -o $(BUILD_DIR)/generate generate.cpp
 
 # Build the benchmarking tool
 run:	build
