@@ -29,9 +29,13 @@
 
 #define ROUTER_TIMEOUT_MS 120000000
 
-#define ROUTER_LATENCY 100
-#define ROUTER_PEERS 10
+#define ROUTER_LATENCY 100.0
+#define ROUTER_PEERS 10.0
 #define ROUTER_DEV 0.5
+
+//#define TRIVIAL
+//#define LINEAR
+#define QUINTIC
 
 namespace bt {
     typedef std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t> carriage_t;
