@@ -31,6 +31,8 @@
 #define ROUTER_LATENCY 100
 
 namespace bt {
+    typedef std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t> carriage_t;
+
     class Router final {
     public:
         port_t const port;
@@ -59,7 +61,7 @@ namespace bt {
 
         std::mutex mutable mx;
         std::atomic <bool> queue_empty = true;
-        std::queue <std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t>> queue;
+        std::priority_queue <carriage_t,  std::vector <carriage_t>, std::greater<>> queue;
     };
 }
 

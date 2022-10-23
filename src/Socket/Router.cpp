@@ -109,7 +109,7 @@ namespace bt {
             if (queue_empty) continue;
             auto [time, packet, recv_addr] = [&]() {
                 std::lock_guard guard (mx);
-                auto item = queue.front();
+                auto item = queue.top();
                 queue.pop();
                 queue_empty = queue.empty();
                 return item;
@@ -118,7 +118,7 @@ namespace bt {
             send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
         while (!queue.empty()) {
-            auto [time, packet, recv_addr] = queue.front ();
+            auto [time, packet, recv_addr] = queue.top();
             queue.pop ();
             std::this_thread::sleep_until (time + latency);
             send (Packet::from_buffer (packet.c_str()), recv_addr);
