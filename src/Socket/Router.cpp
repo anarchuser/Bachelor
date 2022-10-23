@@ -138,7 +138,7 @@ namespace bt {
     }
 
     constexpr std::chrono::milliseconds get_latency (int a, int b) {
-        int latency = ROUTER_LATENCY;
+        int latency = ROUTER_DEV * ROUTER_LATENCY * (a + b) / ROUTER_PEERS + (1 - ROUTER_DEV) * ROUTER_LATENCY;
         return std::chrono::milliseconds {latency};
     }
 }
