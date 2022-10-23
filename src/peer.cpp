@@ -168,18 +168,18 @@ int main (int argc, char * argv[]) {
 //            }
 //        }
 
-        std::cout << "\nPeers: |  ";
-        for (auto const & peer : peers) std::cout << peer->port << "|  ";
-//        std::cout << "\nState: |";
-//        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
-        for (auto const & owner : peers) {
-//            auto & owner = peers.front();
-            std::cout << "\n" << owner->port << ": |";
-            for (auto const & peer: peers) {
-                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
-            }
-        }
-        std::cout << std::endl;
+//        std::cout << "\nPeers: |  ";
+//        for (auto const & peer : peers) std::cout << peer->port << "|  ";
+////        std::cout << "\nState: |";
+////        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
+//        for (auto const & owner : peers) {
+////            auto & owner = peers.front();
+//            std::cout << "\n" << owner->port << ": |";
+//            for (auto const & peer: peers) {
+//                std::cout << std::setfill(' ') << std::setw (7) << owner->getState (peer->port) << "|";
+//            }
+//        }
+//        std::cout << std::endl;
 
         /* Check that all states are actually the same in the end */
         std::vector <bt::IntState> result;

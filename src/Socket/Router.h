@@ -28,7 +28,7 @@
 
 #define ROUTER_TIMEOUT_MS 120000000
 
-#define ROUTER_LATENCY 50
+#define ROUTER_LATENCY 100
 
 namespace bt {
     class Router final {

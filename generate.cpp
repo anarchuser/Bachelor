@@ -66,6 +66,6 @@ string build_cmd (string const & prgm, string const & protocol, int peer, int du
     ss << " -f " << frequency;
     ss << " -m " << 0;
     ss << " -r ";
-    ss << " -a beelzebub ";
+//    ss << " -a beelzebub ";
     return ss.str();
 }
