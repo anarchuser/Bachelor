@@ -95,7 +95,12 @@ namespace bt {
             }
             {
                 std::lock_guard guard (mx);
-                queue.push ({std::chrono::steady_clock::now(), std::move (packet_copy), sender.sin_addr.s_addr});
+                auto latency = get_latency (packet.receiver, packet.sender);
+                queue.push (
+                        { std::chrono::steady_clock::now() + latency
+                        , std::move (packet_copy)
+                        , sender.sin_addr.s_addr
+                        });
                 queue_empty = false;
             }
             checkpoint.refresh();
@@ -106,24 +111,20 @@ namespace bt {
     void Router::process () {
         while (!receive_stop) {
             if (queue_empty) continue;
-            auto [time, buffer, recv_addr] = [&]() {
+            auto [time, packet, recv_addr] = [&]() {
                 std::lock_guard guard (mx);
                 auto item = queue.top();
                 queue.pop();
                 queue_empty = queue.empty();
                 return item;
             }();
-            auto const & packet = Packet::from_buffer (buffer.c_str());
-            auto const latency = get_latency (packet.sender, packet.receiver);
-            std::this_thread::sleep_until (time + latency);
-            send (packet, recv_addr);
+            std::this_thread::sleep_until (time);
+            send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
         while (!queue.empty()) {
-            auto [time, buffer, recv_addr] = queue.top();
+            auto [time, packet, recv_addr] = queue.top();
             queue.pop ();
-            auto const & packet = Packet::from_buffer (buffer.c_str());
-            auto latency = get_latency (packet.sender, packet.receiver);
-            std::this_thread::sleep_until (time + latency);
+            std::this_thread::sleep_until (time);
             send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
     }
