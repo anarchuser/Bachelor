@@ -104,22 +104,25 @@ namespace bt {
     }
 
     void Router::process () {
-        std::chrono::milliseconds latency (ROUTER_LATENCY);
         while (!receive_stop) {
             if (queue_empty) continue;
-            auto [time, packet, recv_addr] = [&]() {
+            auto [time, buffer, recv_addr] = [&]() {
                 std::lock_guard guard (mx);
                 auto item = queue.top();
                 queue.pop();
                 queue_empty = queue.empty();
                 return item;
             }();
+            auto const & packet = Packet::from_buffer (buffer.c_str());
+            auto latency = get_latency (packet.sender, packet.receiver);
             std::this_thread::sleep_until (time + latency);
-            send (Packet::from_buffer (packet.c_str()), recv_addr);
+            send (packet, recv_addr);
         }
         while (!queue.empty()) {
-            auto [time, packet, recv_addr] = queue.top();
+            auto [time, buffer, recv_addr] = queue.top();
             queue.pop ();
+            auto const & packet = Packet::from_buffer (buffer.c_str());
+            auto latency = get_latency (packet.sender, packet.receiver);
             std::this_thread::sleep_until (time + latency);
             send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
@@ -132,6 +135,11 @@ namespace bt {
                 , .sin_addr = {.s_addr = receiver_address}};
 
         sendto (send_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+    }
+
+    constexpr std::chrono::milliseconds get_latency (int a, int b) {
+        int latency = ROUTER_LATENCY;
+        return std::chrono::milliseconds {latency};
     }
 }
 
