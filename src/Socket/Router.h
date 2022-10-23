@@ -5,6 +5,7 @@
 #include <ctime>
 #include <chrono>
 #include <mutex>
+#include <cmath>
 #include <glog/logging.h>
 #include <limits>
 #include <netdb.h>
