@@ -10,7 +10,7 @@ using namespace std;
 
 #define DEFAULT_ITERATIONS 20
 
-vector <string> const headers     {"protocol", "peers", "duration", "frequency", "average", "maximum"};
+vector <string> const headers     {"protocol", "peers", "duration", "frequency", "average", "maximum", "faults"};
 vector <string> const protocols   {"naive", "voting"};
 vector <int>    const peers       { 10 };
 vector <int>    const durations   { 60 };
@@ -27,8 +27,7 @@ int main (int argc, char * argv[]) {
     ofstream tsv, data;
     tsv.open (tsv_name, ios_base::app);
     data.open (data_name, ios_base::app);
-    for (auto const & header : headers) tsv << header << '\t';
-    tsv << '\n';
+    for (auto i = headers.begin(); i != headers.end();) tsv << * i << ((++i != headers.end()) ? '\t' : '\n');
 
     auto const iterations = argc == 4 ? std::stoi (argv[3]) : DEFAULT_ITERATIONS;
     array <char, 128> buffer;
@@ -67,5 +66,6 @@ string build_cmd (string const & prgm, string const & protocol, int peer, int du
     ss << " -f " << frequency;
     ss << " -m " << 0;
     ss << " -r ";
+//    ss << " -a beelzebub ";
     return ss.str();
 }

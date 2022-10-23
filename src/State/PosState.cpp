@@ -47,11 +47,19 @@ namespace bt {
 
     std::ostream & operator << (std::ostream & os, PosState const & state) {
         os << state.getState();
-        if (kLogState) {
-            os << "\n";
-            for (auto action: state.getActions ()) {
-                os << "\t" << action.first << "  \t(d " << (action.second - action.first.when) << ")\n";
-            }
+//        if (kLogState) {
+//            os << "\n";
+//            for (auto action: state.getActions ()) {
+//                os << "\t" << action.first << "  \t(d " << (action.second - action.first.when) << ")\n";
+//            }
+//        }
+        return os;
+    }
+    std::ostream & operator <<= (std::ostream & os, PosState const & state) {
+        os << "\n" << state.getState();
+        os << "\n";
+        for (auto action: state.getActions ()) {
+            os << "\t" << action.first << "\n";
         }
         return os;
     }

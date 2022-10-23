@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <ostream>
 
 #include "State/Action.h"
 #include "State/Ballot.h"
@@ -20,11 +21,15 @@ namespace bt {
         timestamp_t move (Position move) override;
         void process (VotePacket const & packet) override;
 
+        std::ostream & print (std::ostream & os) const;
+
     private:
         mutable std::mutex mx;
 
         std::unordered_map <timestamp_t, Ballot> pending_actions;
     };
+
+    inline std::ostream & operator << (std::ostream & os, VotingPeer const & peer) { return peer.print (os); }
 
 } // bt
 

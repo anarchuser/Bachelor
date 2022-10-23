@@ -170,8 +170,8 @@ int main (int argc, char * argv[]) {
 
 //        std::cout << "\nPeers: |  ";
 //        for (auto const & peer : peers) std::cout << peer->port << "|  ";
-//        std::cout << "\nState: |";
-//        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
+////        std::cout << "\nState: |";
+////        for (auto const & peer : peers) std::cout << std::setfill(' ') << std::setw (7) << peer->getState().getState() << "|";
 //        for (auto const & owner : peers) {
 ////            auto & owner = peers.front();
 //            std::cout << "\n" << owner->port << ": |";
@@ -206,7 +206,11 @@ int main (int argc, char * argv[]) {
 //                        << "Inconsistent PosState detected:\n"
 //                        << peer->port  << "| A:\t" << state << "\n"
 //                        << other->port << "| B:\t" << positions.at (other->port);
-                if (state != positions.at (other->port)) pos_err_counter++;
+                if (state != positions.at (other->port)) {
+//                    (std::cerr <<= state) << std::endl;
+//                    (std::cerr << * dynamic_cast<bt::VotingPeer *> (peer.get())).flush();
+                    pos_err_counter++;
+                }
             }
         }
         if (pos_err_counter) {

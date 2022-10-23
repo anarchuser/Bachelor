@@ -5,6 +5,7 @@
 #include <ctime>
 #include <chrono>
 #include <mutex>
+#include <cmath>
 #include <glog/logging.h>
 #include <limits>
 #include <netdb.h>
@@ -28,9 +29,17 @@
 
 #define ROUTER_TIMEOUT_MS 120000000
 
-#define ROUTER_LATENCY 50
+#define ROUTER_LATENCY 100.0
+#define ROUTER_PEERS 10.0
+#define ROUTER_DEV 0.5
+
+//#define TRIVIAL
+//#define LINEAR
+#define QUINTIC
 
 namespace bt {
+    typedef std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t> carriage_t;
+
     class Router final {
     public:
         port_t const port;
@@ -59,8 +68,10 @@ namespace bt {
 
         std::mutex mutable mx;
         std::atomic <bool> queue_empty = true;
-        std::queue <std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t>> queue;
+        std::priority_queue <carriage_t,  std::vector <carriage_t>, std::greater<>> queue;
     };
+
+    static constexpr std::chrono::milliseconds get_latency (int a, int b);
 }
 
 

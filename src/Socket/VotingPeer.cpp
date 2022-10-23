@@ -42,12 +42,16 @@ namespace bt {
         {
             std::lock_guard guard (mx);
             if (!pending_actions.contains (action.when)) {
-                pending_actions.emplace (action.when, action);
+                auto [iter, status] = pending_actions.emplace (action.when, action);
 
                 // TODO: determine whether to approve or reject
                 // TODO: let states apply wrong actions
                 auto ownVote = (Vote) (action.what != FORBIDDEN);
 
+                if (status) {
+                    if (ownVote == APPROVE) iter->second.approvedBy (port);
+                    else iter->second.rejectedBy (port);
+                }
                 vote (action, ownVote);
             } else {
                 LOG_IF (WARNING, pending_actions.at (action.when).action != action)
@@ -64,22 +68,30 @@ namespace bt {
                            : ballot.rejectedBy (packet.sender);
             LOG_IF (WARNING, !success) << PRINT_PORT << "Conflicting votes received! - " << packet;
 
-            static auto majority = (num_of_peers + 1) / 2;
+            static auto majority = (num_of_peers + 1) / 2 + 1;
             LOG_ASSERT (ballot.approvers.size () <= majority || ballot.rejecters.size () <= majority);
-            if (ballot.approvers.size () > majority) {
+            if (ballot.approvers.size () >= majority) {
                 auto timestamp = state->apply (action);
-
                 if (timestamp) {
-                    LOG_IF (INFO, kLogConsistent)
-                                    << PRINT_PORT << "Consistently applying action @" << timestamp << ": " << action;
+                    LOG_IF (INFO, kLogConsistent) << PRINT_PORT << "[CONS]\t" << action << " @" << timestamp;
                     pending_actions.erase (action.when);
                 }
-            } else if (ballot.rejecters.size () > majority) {
+            } else if (ballot.rejecters.size () >= majority) {
                 pending_actions.erase (action.when);
                 rejected_actions.insert (action);
                 LOG_IF (INFO, kLogConsistent) << PRINT_PORT << "Rejecting action " << action;
             }
         }
+    }
+
+    std::ostream & VotingPeer::print (std::ostream & os) const {
+        os << "\nVotingPeer @" << port << "\n";
+        for (auto const & element : pending_actions) {
+            os << element.second.action << " @" << element.first << "\n";
+            os << "Approvers: " << element.second.approvers.size();
+            os << "\t- Rejecters: " << element.second.rejecters.size() << "\n";
+        }
+        return os;
     }
 }
 

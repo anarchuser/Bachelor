@@ -104,22 +104,25 @@ namespace bt {
     }
 
     void Router::process () {
-        std::chrono::milliseconds latency (ROUTER_LATENCY);
         while (!receive_stop) {
             if (queue_empty) continue;
-            auto [time, packet, recv_addr] = [&]() {
+            auto [time, buffer, recv_addr] = [&]() {
                 std::lock_guard guard (mx);
-                auto item = queue.front();
+                auto item = queue.top();
                 queue.pop();
                 queue_empty = queue.empty();
                 return item;
             }();
+            auto const & packet = Packet::from_buffer (buffer.c_str());
+            auto const latency = get_latency (packet.sender, packet.receiver);
             std::this_thread::sleep_until (time + latency);
-            send (Packet::from_buffer (packet.c_str()), recv_addr);
+            send (packet, recv_addr);
         }
         while (!queue.empty()) {
-            auto [time, packet, recv_addr] = queue.front ();
+            auto [time, buffer, recv_addr] = queue.top();
             queue.pop ();
+            auto const & packet = Packet::from_buffer (buffer.c_str());
+            auto latency = get_latency (packet.sender, packet.receiver);
             std::this_thread::sleep_until (time + latency);
             send (Packet::from_buffer (packet.c_str()), recv_addr);
         }
@@ -132,6 +135,18 @@ namespace bt {
                 , .sin_addr = {.s_addr = receiver_address}};
 
         sendto (send_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+    }
+
+     constexpr std::chrono::milliseconds get_latency (int a, int b) {
+        double x = 0.5 * (a + b) - PORT_PEER_START;
+        double latency = ROUTER_LATENCY;
+#ifdef LINEAR
+        latency = ROUTER_DEV * ROUTER_LATENCY * x / ROUTER_PEERS + (1.0 - ROUTER_DEV) * ROUTER_LATENCY;
+#endif
+#ifdef QUINTIC
+        latency = ROUTER_DEV * ROUTER_LATENCY * std::pow (0.5 * ROUTER_PEERS, -5) * std::pow (x - 0.5 * ROUTER_PEERS, 5) + ROUTER_LATENCY;
+#endif
+        return std::chrono::milliseconds {int (std::round (latency))};
     }
 }
 

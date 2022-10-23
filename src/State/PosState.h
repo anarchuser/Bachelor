@@ -28,6 +28,7 @@ namespace bt {
     };
 
     std::ostream & operator << (std::ostream & os, PosState const & state);
+    std::ostream & operator <<= (std::ostream & os, PosState const & state);
 
 } // bt
 
