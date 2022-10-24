@@ -97,6 +97,9 @@ namespace bt {
                 std::lock_guard guard (mx);
                 auto latency = get_latency (packet.receiver, packet.sender);
                 std::cout << packet.receiver << ", " << packet.sender << " -> " << latency << std::endl;
+                std::cout << get_latency(50001, 50001) << std::endl;
+                std::cout << get_latency(50010, 50010) << std::endl;
+                std::this_thread::sleep_for (std::chrono::seconds (10));
                 queue.push (
                         { std::chrono::steady_clock::now() + latency
                         , std::move (packet_copy)
@@ -140,13 +143,13 @@ namespace bt {
     }
 
      constexpr std::chrono::milliseconds get_latency (int a, int b) {
-        double x = 0.5 * (a + b) - PORT_PEER_START;
+        double x = a - PORT_PEER_START + b - PORT_PEER_START;
         double latency = ROUTER_LATENCY;
 #ifdef LINEAR
-        latency = 2 * ROUTER_DEV * ROUTER_LATENCY * x / ROUTER_PEERS + (1.0 - ROUTER_DEV) * ROUTER_LATENCY;
+        latency = ROUTER_DEV * ROUTER_LATENCY * x / ROUTER_PEERS + (1.0 - ROUTER_DEV) * ROUTER_LATENCY;
 #endif
 #ifdef QUINTIC
-        latency = ROUTER_DEV * ROUTER_LATENCY * std::pow (0.5 * ROUTER_PEERS, -5) * std::pow (x - 0.5 * ROUTER_PEERS, 5) + ROUTER_LATENCY;
+        latency = ROUTER_DEV * ROUTER_LATENCY * std::pow (0.5 * ROUTER_PEERS, -5) * std::pow (0.5 * (x - ROUTER_PEERS), 5) + ROUTER_LATENCY;
 #endif
         return std::chrono::milliseconds {int (std::round (latency))};
     }
