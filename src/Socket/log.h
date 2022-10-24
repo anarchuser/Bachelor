@@ -10,7 +10,7 @@ static bool const kLogCDtor = false;
 // Router
 static bool const kLogRoute = false;
 // Send
-static bool const kLogSend = true;
+static bool const kLogSend = false;
 static bool const kLogSendPing    = !kLogSend && false;
 static bool const kLogSendConnect = !kLogSend && false;
 static bool const kLogSendAction  = !kLogSend && false;
@@ -24,8 +24,8 @@ static bool const kLogRecvVote    = !kLogRecv && true;
 static bool const kLogJoin = false;
 static bool const kLogTell = false;
 // State
-static bool const kLogState = true;
-static bool const kLogConsistent = true;
+static bool const kLogState = false;
+static bool const kLogConsistent = false;
 static std::atomic <bool> kLogPeerDtorState = false;
 static bool const kLogInvalidAction = false;
 //TODO: log actions being applied persistently
