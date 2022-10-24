@@ -34,8 +34,8 @@
 #define ROUTER_DEV 0.5
 
 //#define TRIVIAL
-//#define LINEAR
-#define QUINTIC
+#define LINEAR
+//#define QUINTIC
 
 namespace bt {
     typedef std::tuple <std::chrono::steady_clock::time_point, std::string, in_addr_t> carriage_t;

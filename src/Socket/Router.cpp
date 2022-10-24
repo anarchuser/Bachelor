@@ -96,7 +96,6 @@ namespace bt {
             {
                 std::lock_guard guard (mx);
                 auto latency = get_latency (packet.receiver, packet.sender);
-                std::this_thread::sleep_for (std::chrono::seconds (10));
                 queue.push (
                         { std::chrono::steady_clock::now() + latency
                         , std::move (packet_copy)
