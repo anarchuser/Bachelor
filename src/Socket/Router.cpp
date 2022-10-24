@@ -96,6 +96,7 @@ namespace bt {
             {
                 std::lock_guard guard (mx);
                 auto latency = get_latency (packet.receiver, packet.sender);
+                std::cout << packet.receiver << ", " << packet.sender << " -> " << latency << std::endl;
                 queue.push (
                         { std::chrono::steady_clock::now() + latency
                         , std::move (packet_copy)
@@ -142,7 +143,7 @@ namespace bt {
         double x = 0.5 * (a + b) - PORT_PEER_START;
         double latency = ROUTER_LATENCY;
 #ifdef LINEAR
-        latency = ROUTER_DEV * ROUTER_LATENCY * x / ROUTER_PEERS + (1.0 - ROUTER_DEV) * ROUTER_LATENCY;
+        latency = 2 * ROUTER_DEV * ROUTER_LATENCY * x / ROUTER_PEERS + (1.0 - ROUTER_DEV) * ROUTER_LATENCY;
 #endif
 #ifdef QUINTIC
         latency = ROUTER_DEV * ROUTER_LATENCY * std::pow (0.5 * ROUTER_PEERS, -5) * std::pow (x - 0.5 * ROUTER_PEERS, 5) + ROUTER_LATENCY;
