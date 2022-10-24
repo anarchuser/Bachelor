@@ -96,9 +96,6 @@ namespace bt {
             {
                 std::lock_guard guard (mx);
                 auto latency = get_latency (packet.receiver, packet.sender);
-                std::cout << packet.receiver << ", " << packet.sender << " -> " << latency << std::endl;
-                std::cout << get_latency(50001, 50001) << std::endl;
-                std::cout << get_latency(50010, 50010) << std::endl;
                 std::this_thread::sleep_for (std::chrono::seconds (10));
                 queue.push (
                         { std::chrono::steady_clock::now() + latency
