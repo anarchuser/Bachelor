@@ -98,7 +98,7 @@ int main (int argc, char * argv[]) {
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: connect";
     {
-        /* Build network */
+        /* Set up all peers */
         std::vector<std::unique_ptr<bt::Peer>> peers;
         for (int i = 0; i < kPeers; i++) {
             switch (kTrustProtocol) {
@@ -113,15 +113,19 @@ int main (int argc, char * argv[]) {
                 default:;
             }
         }
-        /* Do any scenario action */
         if (peers.empty()) {
             LOG (WARNING) << "No peer created! Note that Lockstep is not available (yet)";
             return EXIT_FAILURE;
         }
 
+        (std::cout << "Starting to form a network:").flush();
+        /* Build network */
         for (int i = 1; i < peers.size(); i++) {
             peers[i]->connect (PORT(i - 1));
+            (std::cout << ".").flush();
+            std::this_thread::sleep_for (std::chrono::seconds (1));
         }
+        std::cout << " Done" << std::endl;
 
         /* Wait for network */
         LOG (INFO) << "\tWaiting for network to form...";

@@ -130,7 +130,7 @@ namespace bt {
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
-        LOG_IF (INFO, kLogRoute) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << to_string (packet) << "]";
+        LOG_IF (INFO, kLogRoute) << "\t" << PORT_ROUTER_OUT << ": [ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << to_string (packet) << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};
