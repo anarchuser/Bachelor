@@ -6,9 +6,9 @@
 #define PRINT_PORT "\t" << port << ": "
 
 // Ctor / Dtor
-static bool const kLogCDtor = false;
+static bool const kLogCDtor = true;
 // Router
-static bool const kLogRoute = false;
+static bool const kLogRoute = true;
 // Send
 static bool const kLogSend = false;
 static bool const kLogSendPing    = !kLogSend && false;

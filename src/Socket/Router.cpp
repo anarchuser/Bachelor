@@ -11,22 +11,22 @@ namespace bt {
                           , .sin_port = htons (PORT_ROUTER_OUT)
                           , .sin_addr = {.s_addr = INADDR_ANY}
             }
+            , send_fd {[&] () {
+                auto fd = socket (AF_INET, SOCK_DGRAM, 0);
+                if (fd < 0) {
+                    LOG (ERROR) << "\t" << PORT_ROUTER_OUT << ": Could not create socket";
+                }
+                if (bind (fd, (struct sockaddr const *) & address_out, sizeof (address_out))) {
+                    LOG (ERROR) << "\t" << PORT_ROUTER_OUT << ": Could not bind to address";
+                }
+                return fd;
+            }()}
             , recv_fd {[&] () {
                 auto fd = socket (AF_INET, SOCK_DGRAM, 0);
                 if (fd < 0) {
                     LOG (ERROR) << PRINT_PORT << "Could not create socket";
                 }
                 if (bind (fd, (struct sockaddr const *) & address_in, sizeof (address_in))) {
-                    LOG (ERROR) << PRINT_PORT << "Could not bind to address";
-                }
-                return fd;
-            }()}
-            , send_fd {[&] () {
-                auto fd = socket (AF_INET, SOCK_DGRAM, 0);
-                if (fd < 0) {
-                    LOG (ERROR) << PRINT_PORT << "Could not create socket";
-                }
-                if (bind (fd, (struct sockaddr const *) & address_out, sizeof (address_out))) {
                     LOG (ERROR) << PRINT_PORT << "Could not bind to address";
                 }
                 return fd;
@@ -130,7 +130,7 @@ namespace bt {
     }
 
     void Router::send (Packet const & packet, in_addr_t receiver_address) const {
-        LOG_IF (INFO, kLogRoute) << PRINT_PORT << "[ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << to_string (packet) << "]";
+        LOG_IF (INFO, kLogRoute) << "\t" << PORT_ROUTER_OUT << ": [ROUT|" << packet.sender << "->" << packet.receiver << "]\t[" << to_string (packet) << "]";
         struct sockaddr_in recv_addr = { .sin_family = AF_INET
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};

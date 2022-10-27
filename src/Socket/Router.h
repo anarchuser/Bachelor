@@ -33,8 +33,8 @@
 #define ROUTER_PEERS 9.0
 #define ROUTER_DEV 0.5
 
-//#define TRIVIAL
-#define LINEAR
+#define TRIVIAL
+//#define LINEAR
 //#define QUINTIC
 
 namespace bt {
