@@ -85,9 +85,13 @@ namespace bt {
                         LOG (WARNING) << PRINT_PORT << "Unknown error: " << errno;
                 }
             }
-
             buffer [read] = 0;
             auto const & packet = bt::Packet::from_buffer (buffer);
+            {
+                static bool first_packet = true;
+                LOG_IF (INFO, first_packet) << PRINT_PORT << "Connection established to " << addr2str (sender.sin_addr.s_addr);
+                first_packet = false;
+            }
             std::string packet_copy (buffer, read);
             if (ntohs (sender.sin_port) != packet.sender) {
                 LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;

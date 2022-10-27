@@ -3,7 +3,7 @@
 namespace bt {
     std::string addr2str (in_addr_t address) {
         std::stringstream ss;
-        auto bytes = (char const *) & address;
+        auto bytes = (unsigned char const *) & address;
         ss << (int) bytes[0] << ".";
         ss << (int) bytes[1] << ".";
         ss << (int) bytes[2] << ".";
