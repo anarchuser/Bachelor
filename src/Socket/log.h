@@ -8,7 +8,7 @@
 // Ctor / Dtor
 static bool const kLogCDtor = false;
 // Router
-static bool const kLogRoute = false;
+static bool const kLogRoute = true;
 // Send
 static bool const kLogSend = false;
 static bool const kLogSendPing    = !kLogSend && false;

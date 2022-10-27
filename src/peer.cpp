@@ -87,7 +87,7 @@ int main (int argc, char * argv[]) {
         bt::Socket::router_address = router_host ? * (in_addr_t *) (router_host->h_addr_list[0]) : INADDR_ANY;
         bt::Socket::router_port = PORT_ROUTER;
 
-        if (!kExternalRouter || strcmp (kRouterAddress, "localhost")) {
+        if (!kExternalRouter && strcmp (kRouterAddress, "localhost")) {
             r = std::make_unique <bt::Router> (PORT_ROUTER, TIMEOUT_MS);
         } else {
             LOG (INFO) << "\tRouter: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
