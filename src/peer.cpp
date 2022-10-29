@@ -70,7 +70,7 @@ int main (int argc, char * argv[]) {
     args.isHelp ();
     auto const kPeers = args.getPeers() ?: PEERS;
     auto const kRouter = args.getRouter();
-    auto const kRouterAddress = args.getAddress() ?: "localhost";
+    std::string const kRouterAddress = args.getAddress() ?: "localhost";
     auto const kExternalRouter = args.getExternal();
     auto const kInitState = args.getState() ?: ARGS_INIT_STATE;
     auto const kMessageCount = args.getMessageCount() ?: ARGS_MSG_NUM;
@@ -83,11 +83,11 @@ int main (int argc, char * argv[]) {
 
     /* Configure router if needed */
     if (kRouter) {
-        auto router_host = gethostbyname (kRouterAddress);
+        auto router_host = gethostbyname (kRouterAddress.c_str());
         bt::Socket::router_address = router_host ? * (in_addr_t *) (router_host->h_addr_list[0]) : INADDR_ANY;
         bt::Socket::router_port = PORT_ROUTER;
 
-        if (!kExternalRouter && strcmp (kRouterAddress, "localhost")) {
+        if (!kExternalRouter && kRouterAddress == "localhost") {
             r = std::make_unique <bt::Router> (PORT_ROUTER, TIMEOUT_MS);
         } else {
             LOG (INFO) << "\tRouter: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
@@ -118,16 +118,24 @@ int main (int argc, char * argv[]) {
             return EXIT_FAILURE;
         }
 
-        /* Build network */
-        for (int i = 1; i < peers.size(); i++) {
-            peers[i]->connect (PORT(i - 1));
-        }
+        int networkRetries = 500;
+        do {
+            /* Build network */
+            for (int i = 1; i < peers.size (); i++) {
+                peers[i]->connect (PORT(i - 1));
+            }
 
-        /* Wait for network */
-        LOG (INFO) << "\tWaiting for network to form...";
-        while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
+            /* Wait for network */
+            LOG (INFO) << "\tWaiting for network to form...";
+            std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
+
+            if (--networkRetries <= 0) {
+                LOG (ERROR) << "Could not form network! Check connection to router";
+                return EXIT_FAILURE;
+            }
+        } while (std::any_of (peers.begin (), peers.end (), [kPeers] (auto const & peer) {
             return peer->num_of_peers < kPeers - 1;
-        })) std::this_thread::sleep_for (std::chrono::milliseconds (kPeers * kPeers));
+        }));
 
         LOG (INFO) << "\t" << bt::get_time_string() << " ns: act";
 
