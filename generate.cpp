@@ -15,6 +15,7 @@ vector <string> const protocols   {"naive", "voting"};
 vector <int>    const peers       { 10 };
 vector <int>    const durations   { 60 };
 vector <int>    const frequencies { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70 };
+//vector <int>    const frequencies { 5, 20, 35, 50, 60, 70 };
 
 string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency);
 
@@ -66,6 +67,6 @@ string build_cmd (string const & prgm, string const & protocol, int peer, int du
     ss << " -f " << frequency;
     ss << " -m " << 0;
     ss << " -r ";
-    ss << " -a azazel ";
+//    ss << " -a azazel ";
     return ss.str();
 }
