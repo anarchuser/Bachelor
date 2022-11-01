@@ -8,16 +8,17 @@
 
 using namespace std;
 
-#define DEFAULT_ITERATIONS 10
+#define DEFAULT_ITERATIONS 5
 
-vector <string> const headers     {"protocol", "peers", "duration", "frequency", "average", "maximum", "faults"};
+vector <string> const headers     {"protocol", "peers", "duration", "frequency", "packetloss", "average", "maximum", "faults"};
 vector <string> const protocols   {"naive", "voting"};
 vector <int>    const peers       { 10 };
-vector <int>    const durations   { 20 };
+vector <int>    const durations   { 5 };
 //vector <int>    const frequencies { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70 };
 vector <int>    const frequencies { 5, 20, 35, 50, 60, 70 };
+vector <int>    const losses      { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency);
+string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency, int packetloss);
 
 int main (int argc, char * argv[]) {
     if (argc < 3) return EXIT_FAILURE;
@@ -36,21 +37,23 @@ int main (int argc, char * argv[]) {
         for (auto peer : peers) {
             for (auto duration : durations) {
                 for (auto frequency : frequencies) {
-                    data << "#" << protocol << '\t' << peer << '\t' << duration << '\t' << frequency << '\n';
-                    for (int i = 1; i <= iterations; i++) {
-                        tsv << protocol << '\t' << peer << '\t' << duration << '\t' << frequency << '\t';
-                        auto cmd = build_cmd (prgm, protocol, peer, duration, frequency);
-                        (std::cout << i << "/" << iterations << ":\t" << cmd << "\t").flush();
-                        unique_ptr<FILE, decltype (& pclose)> pipe (popen (cmd.c_str(), "r"), pclose);
-                        if (!pipe) throw runtime_error ("popen() failed!");
-                        while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-                            tsv << buffer.data();
-                            data << buffer.data();
-                            std::cout << buffer.data();
+                    for (auto packetloss : losses) {
+                        data << "#" << protocol << '\t' << peer << '\t' << duration << '\t' << frequency << '\t' << packetloss << '\n';
+                        for (int i = 1; i <= iterations; i++) {
+                            tsv << protocol << '\t' << peer << '\t' << duration << '\t' << frequency << '\t';
+                            auto cmd = build_cmd (prgm, protocol, peer, duration, frequency, packetloss);
+                            (std::cout << i << "/" << iterations << ":\t" << cmd << "\t").flush ();
+                            unique_ptr<FILE, decltype (& pclose)> pipe (popen (cmd.c_str (), "r"), pclose);
+                            if (!pipe) throw runtime_error ("popen() failed!");
+                            while (fgets (buffer.data (), buffer.size (), pipe.get ()) != nullptr) {
+                                tsv << buffer.data ();
+                                data << buffer.data ();
+                                std::cout << buffer.data ();
+                            }
+                            cout << endl;
+                            tsv << endl;
+                            data << endl;
                         }
-                        cout << endl;
-                        tsv << endl;
-                        data << endl;
                     }
                 }
             }
@@ -58,7 +61,7 @@ int main (int argc, char * argv[]) {
     }
 }
 
-string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency) {
+string build_cmd (string const & prgm, string const & protocol, int peer, int duration, int frequency, int packetloss) {
     std::stringstream ss;
     ss << prgm;
     ss << " -t " << protocol;
@@ -67,6 +70,7 @@ string build_cmd (string const & prgm, string const & protocol, int peer, int du
     ss << " -f " << frequency;
     ss << " -m " << 0;
     ss << " -r ";
+    ss << " -l " << packetloss;
 //    ss << " -a azazel ";
     return ss.str();
 }

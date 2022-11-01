@@ -45,7 +45,7 @@ namespace bt {
     public:
         port_t const port;
 
-        explicit Router (port_t port, timestamp_t timeout_ms = ROUTER_TIMEOUT_MS, float packetLoss = 0);
+        explicit Router (port_t port, timestamp_t timeout_ms = ROUTER_TIMEOUT_MS, int packetLoss = 0);
         Router (Router const &) = delete;
         Router (Router &&) = delete;
         ~Router();
@@ -61,7 +61,7 @@ namespace bt {
         int const recv_fd;
         int const send_fd;
 
-        float const packet_loss;
+        int const packet_loss;
         RNG rng;
 
         std::thread receiver, sender;

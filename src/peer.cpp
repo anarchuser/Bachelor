@@ -78,6 +78,7 @@ int main (int argc, char * argv[]) {
 
     auto const kScenarioDuration = args.getDuration();
     auto const kScenarioFrequency = args.getFrequency();
+    auto const kScenarioPacketLoss = args.getPacketLoss();
 
     LOG (INFO) << "\t" << bt::get_time_string() << " ns: start";
 
@@ -88,7 +89,7 @@ int main (int argc, char * argv[]) {
         bt::Socket::router_port = PORT_ROUTER;
 
         if (!kExternalRouter && kRouterAddress == "localhost") {
-            r = std::make_unique <bt::Router> (PORT_ROUTER, TIMEOUT_MS);
+            r = std::make_unique <bt::Router> (PORT_ROUTER, TIMEOUT_MS, kScenarioPacketLoss);
         } else {
             LOG (INFO) << "\tRouter: " << bt::addr2str (bt::Socket::router_address, bt::Socket::router_port);
         }

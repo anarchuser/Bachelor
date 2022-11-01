@@ -18,6 +18,7 @@
 // Scenario commands
 #define ARGS_DURATION   'd', "--duration"  // in seconds
 #define ARGS_FREQUENCY  'f', "--frequency" // in actions / second
+#define ARGS_LOSS       'l', "--loss"
 
 struct Args {
     enum Trust {
@@ -41,6 +42,7 @@ struct Args {
 
     [[nodiscard]] inline int    getDuration() const { return getTypeInt (ARGS_DURATION); }
     [[nodiscard]] inline int    getFrequency() const { return getTypeInt (ARGS_FREQUENCY); }
+    [[nodiscard]] inline int    getPacketLoss() const { return getTypeInt (ARGS_LOSS); }
 
 private:
     [[nodiscard]] int  getTypeInt  (char flag, char const * name) const;
