@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#include "Random/random.h"
 #include "log.h"
 #include "config.h"
 #include "Packet/port.h"
@@ -44,7 +45,7 @@ namespace bt {
     public:
         port_t const port;
 
-        explicit Router (port_t port, timestamp_t timeout_ms = ROUTER_TIMEOUT_MS);
+        explicit Router (port_t port, timestamp_t timeout_ms = ROUTER_TIMEOUT_MS, float packetLoss = 0);
         Router (Router const &) = delete;
         Router (Router &&) = delete;
         ~Router();
@@ -59,6 +60,9 @@ namespace bt {
         struct sockaddr_in const address_in, address_out;
         int const recv_fd;
         int const send_fd;
+
+        float const packet_loss;
+        RNG rng;
 
         std::thread receiver, sender;
         std::atomic <bool> should_stop = false;

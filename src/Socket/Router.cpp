@@ -1,7 +1,7 @@
 #include "Router.h"
 
 namespace bt {
-    Router::Router (port_t port, timestamp_t timeout_ms)
+    Router::Router (port_t port, timestamp_t timeout_ms, float packetLoss)
             : port {port}
             , address_in { .sin_family = AF_INET
                          , .sin_port = htons (port)
@@ -34,6 +34,7 @@ namespace bt {
             , timeout (std::chrono::milliseconds (timeout_ms))
             , receiver {& Router::service, this}
             , sender {& Router::process, this}
+            , packet_loss {packetLoss}
             {
                 char hostname[HOST_NAME_MAX];
                 gethostname (hostname, sizeof (hostname));
@@ -97,7 +98,8 @@ namespace bt {
                 LOG (WARNING) << PRINT_PORT << "Received packet from port " << sender.sin_port << " with alleged sender " << packet.sender;
                 LOG (WARNING) << PRINT_PORT << "Packet: " << to_string (packet);
             }
-            {
+            // Roll for packet loss
+            if (packet.type == CONNECT || rng.random ({0, 1}) >= packet_loss) {
                 std::lock_guard guard (mx);
                 auto latency = get_latency (packet.receiver, packet.sender);
                 queue.push (
