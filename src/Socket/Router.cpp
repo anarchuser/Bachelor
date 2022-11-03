@@ -40,7 +40,8 @@ namespace bt {
                 gethostname (hostname, sizeof (hostname));
                 auto router_host = gethostbyname (hostname);
                 auto const * addr_cp = (in_addr_t const *) router_host->h_addr_list[0];
-                LOG (INFO) << "\tRouter: " << addr2str (* addr_cp, port);
+                LOG (INFO) << "\tRouter: " << addr2str (* addr_cp, port)
+                           << " (latency: " << ROUTER_LATENCY << "ms; packet loss: " << packetLoss << "%)" ;
             }
 
     Router::~Router() {

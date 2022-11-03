@@ -24,5 +24,6 @@ int main (int argc, char * argv[]) {
     google::InitGoogleLogging (argv[0]);
 
     auto const kTimeout = argc > 1 ? std::stoi (argv[1]) : ROUTER_TIMEOUT_MS;
-    bt::Router (PORT_ROUTER, kTimeout);
+    auto const kPacketLoss = argc > 2 ? std::stoi (argv[2]) : 0;
+    bt::Router (PORT_ROUTER, kTimeout, kPacketLoss);
 }
