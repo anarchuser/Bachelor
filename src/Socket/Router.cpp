@@ -11,16 +11,16 @@ namespace bt {
                           , .sin_port = htons (PORT_ROUTER_OUT)
                           , .sin_addr = {.s_addr = INADDR_ANY}
             }
-            , send_fd {[&] () {
-                auto fd = socket (AF_INET, SOCK_DGRAM, 0);
-                if (fd < 0) {
-                    LOG (ERROR) << "\t" << PORT_ROUTER_OUT << ": Could not create socket";
-                }
-                if (bind (fd, (struct sockaddr const *) & address_out, sizeof (address_out))) {
-                    LOG (ERROR) << "\t" << PORT_ROUTER_OUT << ": Could not bind to address";
-                }
-                return fd;
-            }()}
+//            , send_fd {[&] () {
+//                auto fd = socket (AF_INET, SOCK_DGRAM, 0);
+//                if (fd < 0) {
+//                    LOG (ERROR) << "\t" << PORT_ROUTER_OUT << ": Could not create socket";
+//                }
+//                if (bind (fd, (struct sockaddr const *) & address_out, sizeof (address_out))) {
+//                    LOG (ERROR) << "\t" << PORT_ROUTER_OUT << ": Could not bind to address";
+//                }
+//                return fd;
+//            }()}
             , recv_fd {[&] () {
                 auto fd = socket (AF_INET, SOCK_DGRAM, 0);
                 if (fd < 0) {
@@ -50,7 +50,7 @@ namespace bt {
             receiver.join ();
             sender.join();
             close (recv_fd);
-            close (send_fd);
+//            close (send_fd);
         }
     }
 
@@ -142,7 +142,8 @@ namespace bt {
                 , .sin_port = htons (packet.receiver)
                 , .sin_addr = {.s_addr = receiver_address}};
 
-        sendto (send_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+//        sendto (send_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
+        sendto (recv_fd, packet.c_str(), packet.size, 0, (struct sockaddr *) & recv_addr, sizeof (recv_addr));
     }
 
      constexpr std::chrono::milliseconds get_latency (int a, int b) {

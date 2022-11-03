@@ -30,7 +30,7 @@
 
 #define ROUTER_TIMEOUT_MS 120000000
 
-#define ROUTER_LATENCY 0.0
+#define ROUTER_LATENCY 50.0
 #define ROUTER_PEERS 9.0
 #define ROUTER_DEV 0.5
 
@@ -59,7 +59,7 @@ namespace bt {
 
         struct sockaddr_in const address_in, address_out;
         int const recv_fd;
-        int const send_fd;
+//        int const send_fd;
 
         int const packet_loss;
         RNG rng;
